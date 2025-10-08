@@ -10,7 +10,7 @@ ThemeData lightTheme = ThemeData(
   colorScheme: ColorScheme.light(
     primary: AppColors.tael,
     onPrimary: AppColors.richBlack,
-    surface: AppColors.lightGreyLighMode,
+    surface: AppColors.lightGreyLightMode,
     onSurface: AppColors.richBlack
   ),
   appBarTheme: const AppBarTheme(

@@ -19,6 +19,14 @@ ThemeData darkTheme = ThemeData(
     centerTitle: false,
   ),
 
+  iconButtonTheme: IconButtonThemeData(
+    style: ButtonStyle(
+    splashFactory: NoSplash.splashFactory,          // disable ripple
+    overlayColor: WidgetStateProperty.all(Colors.transparent), // no overlay tint
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap, // optional: reduces hit area
+  ),
+  ),
+
   elevatedButtonTheme: ElevatedButtonThemeData(
     
     style: ElevatedButton.styleFrom(
