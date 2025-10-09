@@ -1,4 +1,17 @@
 {
     "local":"ar",
-    "welcome":"مرحبا"
+    "welcome":"مرحبا",
+    "home": "الرئيسية",
+    "search": "بحث",
+    "profile": "الملف الشخصي",
+    "store": "المتجر",
+    "settings": "الإعدادات",
+    "mail": "الرسائل",
+    "forYou": "لك",
+    "following": "المتابَعون",
+    "notification": "الإشعارات",
+    "featuredMember": "عضو مميز",
+    "follow": "متابعة",
+    "feed": "الموجز"
+
 }

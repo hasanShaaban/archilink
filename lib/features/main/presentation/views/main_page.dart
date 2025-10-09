@@ -2,6 +2,7 @@ import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Home/presentation/views/home_page_body.dart';
 import 'package:archilink/features/main/presentation/views/widgets/nav_bar_icon_and_label.dart';
+import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
@@ -30,23 +31,23 @@ class _MainViewState extends State<MainView> {
   ];
 
   // Section: Navigation bar items
-  List<PersistentBottomNavBarItem> _navBarsItems() {
+  List<PersistentBottomNavBarItem> _navBarsItems(S lang) {
     return [
-      navigationBarItem(context, image: Assets.assetsIconsHome, title: 'Home'),
+      navigationBarItem(context, image: Assets.assetsIconsHome, title: lang.home),
       navigationBarItem(
         context,
         image: Assets.assetsIconsShoppingBasket,
-        title: 'Store',
+        title: lang.store,
       ),
       navigationBarItem(
         context,
         image: Assets.assetsIconsUser,
-        title: 'profile',
+        title: lang.profile,
       ),
       navigationBarItem(
         context,
         image: Assets.assetsIconsSettings,
-        title: 'Settings',
+        title: lang.settings,
       ),
     ];
   }
@@ -54,6 +55,7 @@ class _MainViewState extends State<MainView> {
   // Section: Build method for the main view
   @override
   Widget build(BuildContext context) {
+    var lang = S.of(context);
     return PersistentTabView(
       decoration: NavBarDecoration(
         border: Border(
@@ -66,7 +68,7 @@ class _MainViewState extends State<MainView> {
       context,
       screens: _pages,
       controller: _controller,
-      items: _navBarsItems(),
+      items: _navBarsItems(lang),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       handleAndroidBackButtonPress: true,
       resizeToAvoidBottomInset: true,
@@ -96,7 +98,7 @@ PersistentBottomNavBarItem navigationBarItem(
       image: image,
       title: title,
     ),
-    title: ("Home"),
+    title: (title),
     activeColorPrimary: Theme.of(context).colorScheme.primary,
     inactiveColorPrimary: Theme.of(context).colorScheme.onSurface,
   );

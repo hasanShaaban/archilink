@@ -63,6 +63,76 @@ class S {
   String get welcome {
     return Intl.message('Welcome', name: 'welcome', desc: '', args: []);
   }
+
+  /// `Home`
+  String get home {
+    return Intl.message('Home', name: 'home', desc: '', args: []);
+  }
+
+  /// `Search`
+  String get search {
+    return Intl.message('Search', name: 'search', desc: '', args: []);
+  }
+
+  /// `Profile`
+  String get profile {
+    return Intl.message('Profile', name: 'profile', desc: '', args: []);
+  }
+
+  /// `Store`
+  String get store {
+    return Intl.message('Store', name: 'store', desc: '', args: []);
+  }
+
+  /// `Settings`
+  String get settings {
+    return Intl.message('Settings', name: 'settings', desc: '', args: []);
+  }
+
+  /// `Mail`
+  String get mail {
+    return Intl.message('Mail', name: 'mail', desc: '', args: []);
+  }
+
+  /// `For you`
+  String get forYou {
+    return Intl.message('For you', name: 'forYou', desc: '', args: []);
+  }
+
+  /// `Following`
+  String get following {
+    return Intl.message('Following', name: 'following', desc: '', args: []);
+  }
+
+  /// `Notifications`
+  String get notification {
+    return Intl.message(
+      'Notifications',
+      name: 'notification',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Featured Member`
+  String get featuredMember {
+    return Intl.message(
+      'Featured Member',
+      name: 'featuredMember',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Follow`
+  String get follow {
+    return Intl.message('Follow', name: 'follow', desc: '', args: []);
+  }
+
+  /// `Feed`
+  String get feed {
+    return Intl.message('Feed', name: 'feed', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

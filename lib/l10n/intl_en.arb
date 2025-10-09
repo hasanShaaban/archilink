@@ -1,4 +1,17 @@
 {
     "local":"en",
-    "welcome":"Welcome"
+    "welcome":"Welcome",
+    "home":"Home",
+    "search":"Search",
+    "profile":"Profile",
+    "store":"Store",
+    "settings":"Settings",
+    "mail":"Mail",
+    "forYou":"For you",
+    "following":"Following",
+    "notification":"Notifications",
+    "featuredMember":"Featured Member",
+    "follow":"Follow",
+    "feed":"Feed"
+
 }
