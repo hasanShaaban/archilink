@@ -14,6 +14,7 @@ class AppBarActionButton extends StatelessWidget {
       onPressed: onPress,
       icon: SvgPicture.asset(
         icon,
+        width: 24,
         color: Theme.of(context).colorScheme.onSurface,
       ),
     );

@@ -9,6 +9,8 @@ ThemeData lightTheme = ThemeData(
   scaffoldBackgroundColor:  AppColors.white,
   colorScheme: ColorScheme.light(
     primary: AppColors.tael,
+    secondary: AppColors.darkGray,
+    tertiary: AppColors.lightGreyLightMode,
     onPrimary: AppColors.richBlack,
     surface: AppColors.lightGreyLightMode,
     onSurface: AppColors.richBlack
