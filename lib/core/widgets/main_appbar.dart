@@ -1,85 +1,47 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/app_bar_action_button.dart';
-import 'package:archilink/generated/l10n.dart';
+import 'package:archilink/features/Home/presentation/views/widgets/home_page_tap_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
-AppBar mainAppBar(
-  BuildContext context, {
-  required bool withTabBar,
-  required S lang,
-}) {
-  double height = MediaQuery.of(context).size.height;
-  return AppBar(
-    actionsPadding: EdgeInsets.only(right: 27),
-    titleSpacing: 27,
-    title: Text(
-      'Acrhi Link',
-      style: AppTextStyle.appTilte.copyWith(height: 1),
-      textHeightBehavior: TextHeightBehavior(applyHeightToFirstAscent: false),
-    ),
-    actions: [
-      AppBarActionButton(icon: Assets.assetsIconsMail, onPress: () {}),
-      AppBarActionButton(icon: Assets.assetsIconsSearch, onPress: () {}),
-    ],
-    bottom: withTabBar
-        ? PreferredSize(
-          preferredSize: Size.fromHeight(height * 43.5/874),
-          child: HomePageTapbar())
-        : null,
-  );
-}
-
-class HomePageTapbar extends StatefulWidget {
-  const HomePageTapbar({
+class MainAppBar extends StatelessWidget {
+  const MainAppBar({
     super.key,
   });
 
   @override
-  State<HomePageTapbar> createState() => _HomePageTapbarState();
-}
-
-class _HomePageTapbarState extends State<HomePageTapbar> {
-  int seleted = 0;
-  @override
   Widget build(BuildContext context) {
-    
-    var lang = S.of(context);
-    return TabBar(
-      onTap: (value) => {
-        setState(() {
-          seleted = value;
-        })
-      },
-      isScrollable: true,
-        physics: BouncingScrollPhysics(),
-        indicatorWeight: 1,
-        labelColor: Theme.of(context).colorScheme.primary,
-        unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
-        labelStyle: AppTextStyle.mallannaRegular20,
-        indicatorSize: TabBarIndicatorSize.label,
-        indicatorColor: Theme.of(context).colorScheme.primary,
-    
-        tabs: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: Tab(text: lang.forYou),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: Tab(text: lang.following),
-          ),
-          Tab(
-            child: SvgPicture.asset(
-              Assets.assetsIconsNotification,
-              width: 24,
-              color:seleted == 2 ?
-               Theme.of(context).colorScheme.primary:
-               Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-        ],
-      );
+    return SliverAppBar(
+      pinned: true,
+      floating: true,
+      snap: true,
+      elevation: 0,
+      actionsPadding: EdgeInsets.only(right: 27),
+      titleSpacing: 27,
+      title: Text(
+        'Acrhi Link',
+        style: AppTextStyle.appTilte.copyWith(height: 1),
+        textHeightBehavior: TextHeightBehavior(
+          applyHeightToFirstAscent: false,
+        ),
+      ),
+      actions: [
+        AppBarActionButton(
+          icon: Assets.assetsIconsMail,
+          onPress: () {},
+        ),
+        AppBarActionButton(
+          icon: Assets.assetsIconsSearch,
+          onPress: () {},
+        ),
+      ],
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(
+          MediaQuery.of(context).size.height * 50 / 874,
+        ),
+        child: HomePageTapbar(),
+      ),
+    );
   }
 }
+
