@@ -93,7 +93,7 @@ PersistentBottomNavBarItem navigationBarItem(
       title: title,
     ),
     icon: NavBarIconAndLabel(
-      alignment: MainAxisAlignment.end,
+      alignment: MainAxisAlignment.center,
       color: Theme.of(context).colorScheme.primary,
       image: image,
       title: title,

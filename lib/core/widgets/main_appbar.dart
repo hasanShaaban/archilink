@@ -16,8 +16,8 @@ class MainAppBar extends StatelessWidget {
       floating: true,
       snap: true,
       elevation: 0,
-      actionsPadding: EdgeInsets.only(right: 27),
-      titleSpacing: 27,
+      actionsPadding: EdgeInsets.only(right: 20),
+      titleSpacing: 20,
       title: Text(
         'Acrhi Link',
         style: AppTextStyle.appTilte.copyWith(height: 1),
