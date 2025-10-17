@@ -12,6 +12,7 @@ class MainView extends StatefulWidget {
   @override
   State<MainView> createState() => _MainViewState();
 }
+
 // Section: State class for the main view
 class _MainViewState extends State<MainView> {
   late PersistentTabController _controller;
@@ -25,15 +26,19 @@ class _MainViewState extends State<MainView> {
   // Section: List of pages
   final List<Widget> _pages = [
     HomePageBody(),
-    Center(child: Text('store')),//TODO: store page
-    Center(child: Text('profile')),//TODO: profile page
-    Center(child: Text('settings')),//TODO: Setting page
+    Center(child: Text('store')), //TODO: store page
+    Center(child: Text('profile')), //TODO: profile page
+    Center(child: Text('settings')), //TODO: Setting page
   ];
 
   // Section: Navigation bar items
   List<PersistentBottomNavBarItem> _navBarsItems(S lang) {
     return [
-      navigationBarItem(context, image: Assets.assetsIconsHome, title: lang.home),
+      navigationBarItem(
+        context,
+        image: Assets.assetsIconsHome,
+        title: lang.home,
+      ),
       navigationBarItem(
         context,
         image: Assets.assetsIconsShoppingBasket,
@@ -103,5 +108,3 @@ PersistentBottomNavBarItem navigationBarItem(
     inactiveColorPrimary: Theme.of(context).colorScheme.onSurface,
   );
 }
-
-

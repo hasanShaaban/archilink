@@ -6,21 +6,20 @@ ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   useMaterial3: false,
 
-  scaffoldBackgroundColor:  AppColors.white,
+  scaffoldBackgroundColor: AppColors.white,
   colorScheme: ColorScheme.light(
     primary: AppColors.tael,
-    secondary: AppColors.darkGray,
+    secondary: AppColors.gray,
     tertiary: AppColors.lightGreyLightMode,
     onPrimary: AppColors.richBlack,
     surface: AppColors.lightGreyLightMode,
-    onSurface: AppColors.richBlack
+    onSurface: AppColors.richBlack,
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.white,
     foregroundColor: AppColors.richBlack,
     elevation: 0,
     centerTitle: false,
-    
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -29,10 +28,7 @@ ThemeData lightTheme = ThemeData(
       backgroundColor: AppColors.tael,
       foregroundColor: AppColors.richBlack,
       textStyle: AppTextStyle.interMedium16,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8)
-      )
-
-    )
-  )
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    ),
+  ),
 );
