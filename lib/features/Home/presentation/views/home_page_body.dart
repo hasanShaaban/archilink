@@ -12,6 +12,7 @@ class HomePageBody extends StatelessWidget {
       length: 3,
       child: Scaffold(
         body: NestedScrollView(
+          physics: BouncingScrollPhysics(),
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             MainAppBar(),
           ],
