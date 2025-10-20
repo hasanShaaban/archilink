@@ -36,23 +36,31 @@ class FeedSection extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(lang.feed, style: AppTextStyle.manjariRegular20),
-          const SizedBox(height: 8),
-          ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: 5,
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index){
-            return Post(lang: lang, width: width, height: height);
-          })
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(lang.feed, style: AppTextStyle.manjariRegular20),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          padding: EdgeInsets.zero,
+          itemCount: 5,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index){
+          return Column(
+            children: [
+              Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Post(lang: lang, width: width, height: height),
+              ),
+              Divider(height: 1,color: Theme.of(context).colorScheme.secondary,)
+            ],
+          );
+        })
+      ],
     );
   }
 }

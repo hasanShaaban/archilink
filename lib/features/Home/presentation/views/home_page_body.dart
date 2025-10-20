@@ -17,6 +17,7 @@ class HomePageBody extends StatelessWidget {
             MainAppBar(),
           ],
           body: TabBarView(
+            physics: BouncingScrollPhysics(),
             children: [
               ForYouPage(),
               Center(child: Text('following')),
