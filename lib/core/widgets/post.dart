@@ -1,7 +1,7 @@
-import 'package:archilink/core/utils/app_text_style.dart';
+
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/core/widgets/post_actions.dart';
 import 'package:archilink/core/widgets/post_body.dart';
-import 'package:archilink/core/widgets/post_like_button.dart';
 import 'package:archilink/core/widgets/post_user_image.dart';
 import 'package:archilink/core/widgets/post_username_and_date.dart';
 import 'package:archilink/generated/l10n.dart';
@@ -27,6 +27,7 @@ class Post extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // User image section
             PostUserImage(width: width),
             SizedBox(width: 12),
             Expanded(
@@ -35,6 +36,7 @@ class Post extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // User name and date section
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -50,24 +52,10 @@ class Post extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 2),
+                    // Post body section
                     PostBody(width: width, height: height),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              LikeButton(),
-                              SizedBox(width: width * 25 / 402),
-                              CommentButton(),
-                            ],
-                          ),
-                          PostActionButton(icon: Assets.assetsIconsShare),
-                          PostActionButton(icon: Assets.assetsIconsSave),
-                        ],
-                      ),
-                    ),
+                    // Post actions section
+                    PostActions(width: width),
                   ],
                 ),
               ),
@@ -79,38 +67,3 @@ class Post extends StatelessWidget {
   }
 }
 
-class CommentButton extends StatelessWidget {
-  const CommentButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SvgPicture.asset(
-          Assets.assetsIconsComment,
-          color: Theme.of(context).colorScheme.onSurface,
-          width: 24,
-        ),
-        SizedBox(width: 4),
-        Text('500', style: AppTextStyle.interBold12),
-      ],
-    );
-  }
-}
-
-class PostActionButton extends StatelessWidget {
-  const PostActionButton({super.key, required this.icon});
-
-  final String icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: SvgPicture.asset(
-        icon,
-        color: Theme.of(context).colorScheme.onSurface,
-        width: 24,
-      ),
-    );
-  }
-}
