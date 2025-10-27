@@ -1,3 +1,4 @@
+import 'package:archilink/core/functions/on_generate_route.dart';
 import 'package:archilink/core/theme/app_theme.dart';
 import 'package:archilink/features/main/presentation/views/main_page.dart';
 import 'package:archilink/generated/l10n.dart';
@@ -33,8 +34,8 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightMode,
       darkTheme: AppTheme.darkMode,
       themeMode: ThemeMode.system,
-
-      home:MainView(),
+      onGenerateRoute: onGenerateRoute,
+      initialRoute: MainView.name,
     );
   }
 }
