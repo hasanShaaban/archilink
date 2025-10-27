@@ -133,6 +133,11 @@ class S {
   String get feed {
     return Intl.message('Feed', name: 'feed', desc: '', args: []);
   }
+
+  /// `Post`
+  String get post {
+    return Intl.message('Post', name: 'post', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -12,6 +12,7 @@
     "notification":"Notifications",
     "featuredMember":"Featured Member",
     "follow":"Follow",
-    "feed":"Feed"
+    "feed":"Feed",
+    "post":"Post"
 
 }

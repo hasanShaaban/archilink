@@ -31,6 +31,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "local": MessageLookupByLibrary.simpleMessage("en"),
     "mail": MessageLookupByLibrary.simpleMessage("Mail"),
     "notification": MessageLookupByLibrary.simpleMessage("Notifications"),
+    "post": MessageLookupByLibrary.simpleMessage("Post"),
     "profile": MessageLookupByLibrary.simpleMessage("Profile"),
     "search": MessageLookupByLibrary.simpleMessage("Search"),
     "settings": MessageLookupByLibrary.simpleMessage("Settings"),

@@ -31,6 +31,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "local": MessageLookupByLibrary.simpleMessage("ar"),
     "mail": MessageLookupByLibrary.simpleMessage("الرسائل"),
     "notification": MessageLookupByLibrary.simpleMessage("الإشعارات"),
+    "post": MessageLookupByLibrary.simpleMessage("منشور"),
     "profile": MessageLookupByLibrary.simpleMessage("الملف الشخصي"),
     "search": MessageLookupByLibrary.simpleMessage("بحث"),
     "settings": MessageLookupByLibrary.simpleMessage("الإعدادات"),

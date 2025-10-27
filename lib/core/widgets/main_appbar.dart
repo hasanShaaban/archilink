@@ -3,6 +3,7 @@ import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/app_bar_action_button.dart';
 import 'package:archilink/features/Home/presentation/views/widgets/home_page_tap_bar.dart';
 import 'package:archilink/features/chat/presentation/view/chat_view.dart';
+import 'package:archilink/features/post/presentation/view/post_details_view.dart';
 import 'package:flutter/material.dart';
 
 class MainAppBar extends StatelessWidget {
@@ -30,7 +31,7 @@ class MainAppBar extends StatelessWidget {
         AppBarActionButton(
           icon: Assets.assetsIconsMail,
           onPress: () {
-            Navigator.pushNamed(context, ChatView.name);
+            Navigator.of(context, rootNavigator: true).pushNamed(PostDetailsView.name);
           },
         ),
         AppBarActionButton(

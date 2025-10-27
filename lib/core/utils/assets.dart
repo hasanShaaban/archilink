@@ -6,6 +6,10 @@ class Assets {
   /// assets/icons/add.svg
   static const String assetsIconsAdd = "assets/icons/add.svg";
 
+  /// Assets for assetsIconsBack
+  /// assets/icons/back.svg
+  static const String assetsIconsBack = "assets/icons/back.svg";
+
   /// Assets for assetsIconsCall
   /// assets/icons/call.svg
   static const String assetsIconsCall = "assets/icons/call.svg";
@@ -13,6 +17,10 @@ class Assets {
   /// Assets for assetsIconsComment
   /// assets/icons/Comment.svg
   static const String assetsIconsComment = "assets/icons/Comment.svg";
+
+  /// Assets for assetsIconsDownArrow
+  /// assets/icons/down_arrow.svg
+  static const String assetsIconsDownArrow = "assets/icons/down_arrow.svg";
 
   /// Assets for assetsIconsEdit
   /// assets/icons/edit.svg
@@ -89,6 +97,10 @@ class Assets {
   /// Assets for assetsIconsShare
   /// assets/icons/share.svg
   static const String assetsIconsShare = "assets/icons/share.svg";
+
+  /// Assets for assetsIconsShareComment
+  /// assets/icons/share_comment.svg
+  static const String assetsIconsShareComment = "assets/icons/share_comment.svg";
 
   /// Assets for assetsIconsSharePost
   /// assets/icons/share_post.svg
