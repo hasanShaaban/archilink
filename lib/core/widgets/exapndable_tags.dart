@@ -38,8 +38,8 @@ class _ExpandableTagsState extends State<ExpandableTags>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Wrap(
-          spacing: 8,
-          runSpacing: 6,
+          spacing: 4,
+          runSpacing: 4,
           children: [
             // Always visible tags
             ...alwaysVisibleTags.map((tag) => _buildTag(context, tag)),
