@@ -1,11 +1,18 @@
+import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/expandable_text.dart';
 import 'package:archilink/core/widgets/post_image_listview.dart';
 import 'package:flutter/material.dart';
 
 class PostBody extends StatelessWidget {
-  const PostBody({super.key, required this.width, required this.height});
+  const PostBody({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.withDetails,
+  });
 
   final double width, height;
+  final bool withDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -13,11 +20,20 @@ class PostBody extends StatelessWidget {
       children: [
         SizedBox(
           width: width * 305 / 402,
-          child: ExpandableText(
-            //-----------------body
-            'Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own. Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own.',
-          ),
+          child: withDetails
+              ? Text(
+                  'Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own. Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own.',
+                  style: AppTextStyle.mallannaRegular14.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    height: 1.2,
+                  ),
+                )
+              : ExpandableText(
+                  //-----------------body
+                  'Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own. Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own.',
+                ),
         ),
+        SizedBox(height: 9),
         SizedBox(
           height: height * 158 / 847,
           child: PostImagesListView(width: width),

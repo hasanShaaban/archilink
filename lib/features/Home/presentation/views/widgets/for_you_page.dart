@@ -1,7 +1,7 @@
-import 'package:archilink/core/utils/app_text_style.dart';
-import 'package:archilink/core/widgets/post.dart';
+
 import 'package:archilink/features/Home/presentation/views/widgets/ads_section.dart';
 import 'package:archilink/features/Home/presentation/views/widgets/featured_member_section.dart';
+import 'package:archilink/features/Home/presentation/views/widgets/post_section.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 
@@ -28,39 +28,5 @@ class ForYouPage extends StatelessWidget {
   }
 }
 
-class FeedSection extends StatelessWidget {
-  const FeedSection({super.key, required this.lang});
-  final S lang;
 
-  @override
-  Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(lang.feed, style: AppTextStyle.manjariRegular20),
-        ),
-        const SizedBox(height: 8),
-        ListView.builder(
-          padding: EdgeInsets.zero,
-          itemCount: 5,
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index){
-          return Column(
-            children: [
-              Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Post(lang: lang, width: width, height: height),
-              ),
-              Divider(height: 1,color: Theme.of(context).colorScheme.secondary,)
-            ],
-          );
-        })
-      ],
-    );
-  }
-}
+

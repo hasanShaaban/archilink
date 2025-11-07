@@ -1,6 +1,8 @@
 
 import 'package:archilink/core/widgets/main_appbar.dart';
+import 'package:archilink/features/Home/presentation/views/widgets/following_posts_page.dart';
 import 'package:archilink/features/Home/presentation/views/widgets/for_you_page.dart';
+
 import 'package:flutter/material.dart';
 
 class HomePageBody extends StatelessWidget {
@@ -8,6 +10,7 @@ class HomePageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -20,7 +23,7 @@ class HomePageBody extends StatelessWidget {
             physics: BouncingScrollPhysics(),
             children: [
               ForYouPage(),
-              Center(child: Text('following')),
+              FollowingPostsPage(),
               Center(child: Text('saved')),
             ],
           ),
