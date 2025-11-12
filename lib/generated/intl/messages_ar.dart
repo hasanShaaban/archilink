@@ -35,6 +35,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile": MessageLookupByLibrary.simpleMessage("الملف الشخصي"),
     "search": MessageLookupByLibrary.simpleMessage("بحث"),
     "settings": MessageLookupByLibrary.simpleMessage("الإعدادات"),
+    "sortComments": MessageLookupByLibrary.simpleMessage("ترتيب التعليقات"),
     "store": MessageLookupByLibrary.simpleMessage("المتجر"),
     "welcome": MessageLookupByLibrary.simpleMessage("مرحبا"),
   };

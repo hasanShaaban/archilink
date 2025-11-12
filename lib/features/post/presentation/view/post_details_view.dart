@@ -1,9 +1,9 @@
-import 'package:archilink/core/utils/app_text_style.dart';
-import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/post.dart';
+import 'package:archilink/features/post/presentation/view/widget/comment.dart';
+import 'package:archilink/features/post/presentation/view/widget/post_details_app_bar.dart';
+import 'package:archilink/features/post/presentation/view/widget/sort_comments_buttons.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class PostDetailsView extends StatelessWidget {
   const PostDetailsView({super.key});
@@ -24,30 +24,78 @@ class PostDetailsViewBody extends StatelessWidget {
     var lang = S.of(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 16, left: 20, right: 20, bottom: 16),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: (){
-                  Navigator.pop(context);
-                },
-                radius: 24,
-                borderRadius: BorderRadius.circular(12),
-                child: SvgPicture.asset(Assets.assetsIconsBack, color: Theme.of(context).colorScheme.onSurface, width: 24,),
-              ),
-              SizedBox(width: 26),
-              Text('Hasan shaaban\'s ${lang.post}', style: AppTextStyle.interSemiBold16,)
-            ],
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: PostDetailsAppBar(lang: lang)),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          sliver: SliverToBoxAdapter(
+            child: Post(
+              lang: lang,
+              width: width,
+              height: height,
+              withDetails: true,
+            ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Post(lang: lang, width: width, height: height, withDetails: true,),
-        )
+        SliverToBoxAdapter(
+          child: Divider(
+            height: 0,
+            thickness: 1,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+        ),
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _StickyHeaderDelegate(
+            height: 56,
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: SortCommentsButton(lang: lang),
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Divider(
+            height: 0,
+            thickness: 1,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
+            return Comment(width: width);
+          }, childCount: 5),
+        ),
       ],
     );
   }
+}
+
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final double height;
+
+  _StickyHeaderDelegate({
+    required this.child,
+    this.height = 56, // <— choose a value slightly larger than your button
+  });
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox(
+      height: height,
+      child: child,
+    );
+  }
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  bool shouldRebuild(_StickyHeaderDelegate oldDelegate) =>
+      oldDelegate.child != child || oldDelegate.height != height;
 }

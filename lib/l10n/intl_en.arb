@@ -13,6 +13,7 @@
     "featuredMember":"Featured Member",
     "follow":"Follow",
     "feed":"Feed",
-    "post":"Post"
+    "post":"Post",
+    "sortComments":"Sort comments"
 
 }

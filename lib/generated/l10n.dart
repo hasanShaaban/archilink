@@ -138,6 +138,16 @@ class S {
   String get post {
     return Intl.message('Post', name: 'post', desc: '', args: []);
   }
+
+  /// `Sort comments`
+  String get sortComments {
+    return Intl.message(
+      'Sort comments',
+      name: 'sortComments',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
