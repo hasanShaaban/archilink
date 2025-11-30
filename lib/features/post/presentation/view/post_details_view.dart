@@ -1,3 +1,4 @@
+import 'package:archilink/core/utils/temp.dart';
 import 'package:archilink/core/widgets/post.dart';
 import 'package:archilink/features/post/presentation/view/widget/comment.dart';
 import 'package:archilink/features/post/presentation/view/widget/post_details_app_bar.dart';
@@ -64,8 +65,10 @@ class PostDetailsViewBody extends StatelessWidget {
         ),
         SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
-            return Comment(width: width);
-          }, childCount: 5),
+            return Padding(padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Comment(width: width, comment: commentsTree[index],),
+            );
+          }, childCount: commentsTree.length),
         ),
       ],
     );

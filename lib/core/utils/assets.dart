@@ -114,6 +114,10 @@ class Assets {
   /// assets/icons/shopping-basket.svg
   static const String assetsIconsShoppingBasket = "assets/icons/shopping-basket.svg";
 
+  /// Assets for assetsIconsUpArrow
+  /// assets/icons/up_arrow.svg
+  static const String assetsIconsUpArrow = "assets/icons/up_arrow.svg";
+
   /// Assets for assetsIconsUser
   /// assets/icons/user.svg
   static const String assetsIconsUser = "assets/icons/user.svg";

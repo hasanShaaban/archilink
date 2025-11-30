@@ -16,7 +16,31 @@ List commentsTree = [
             "user": "Hasan Shaaban",
             "time": "1h",
             "comment": "reply to Malek Rustom",
-            "replies": [],
+            "replies": [
+              {
+                "id": 5,
+                "user": "Ali khalil",
+                "time": "35m",
+                "comment": "This is a comment",
+                "replies": [
+                  {
+                    "id": 5,
+                    "user": "Ali khalil",
+                    "time": "35m",
+                    "comment": "This is a comment",
+                    "replies": [
+                      {
+                        "id": 5,
+                        "user": "Ali khalil",
+                        "time": "35m",
+                        "comment": "This is a comment",
+                        "replies": [],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
