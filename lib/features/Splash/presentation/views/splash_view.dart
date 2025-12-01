@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:archilink/core/utils/assets.dart';
-import 'package:archilink/features/main/presentation/views/main_page.dart';
+import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -48,17 +48,16 @@ class _SplashViewBodyState extends State<SplashViewBody> {
     super.initState();
   }
 
-  void _navigation(){
-    Navigator.pushReplacementNamed(context, MainView.name);
+  void _navigation() {
+    Navigator.pushReplacementNamed(context, AuthView.name);
   }
+
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.of(context).size.width;
     final double viewportHeight = MediaQuery.of(context).size.height;
     return Stack(
-      
       children: [
-
         Positioned(
           top: -30,
           child: SizedBox(
@@ -66,14 +65,20 @@ class _SplashViewBodyState extends State<SplashViewBody> {
             height: viewportHeight,
             child: ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-              child: Image.asset(Assets.assetsImagesBackgroundLight, fit: BoxFit.cover,)),
+              child: Image.asset(
+                Assets.assetsImagesBackgroundLight,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
-                AnimatedOpacity(
-                  duration: const Duration(seconds: 1),
-                  curve: Curves.easeInCubic,
-                  opacity: opacity,
-                  child: Center(child: SvgPicture.asset(Assets.assetsIconsAppLogo),)),
-    ],);
+        AnimatedOpacity(
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeInCubic,
+          opacity: opacity,
+          child: Center(child: SvgPicture.asset(Assets.assetsIconsAppLogo)),
+        ),
+      ],
+    );
   }
 }

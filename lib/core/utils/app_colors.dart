@@ -26,5 +26,10 @@ abstract class AppColorsFromTheme {
       Theme.of(context).brightness == Brightness.light
       ? AppColors.richBlack
       : AppColors.whiteForElements;
+
+  static secondaryColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+      ? AppColors.whiteForElements
+      : AppColors.darkGray;
   
 }

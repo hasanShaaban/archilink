@@ -12,6 +12,11 @@ abstract class AppTextStyle {
     fontFamily: 'Manjari',
     fontWeight: FontWeight.normal
   );
+  static const TextStyle manjariBold25 = TextStyle(
+    fontSize: 25,
+    fontFamily: 'Manjari',
+    fontWeight: FontWeight.w700
+  );
   static const TextStyle manjariRegular12 = TextStyle(
     fontSize: 12,
     fontFamily: 'Manjari',
@@ -22,6 +27,18 @@ abstract class AppTextStyle {
     fontSize: 14,
     fontFamily: 'Mallanna',
     fontWeight: FontWeight.normal
+  );
+
+  static const TextStyle mallannaSemiBold14 = TextStyle(
+    fontSize: 14,
+    fontFamily: 'Mallanna',
+    fontWeight: FontWeight.w600
+  );
+
+  static const TextStyle mallannaSemiBold17 = TextStyle(
+    fontSize: 17,
+    fontFamily: 'Mallanna',
+    fontWeight: FontWeight.w600
   );
 
   static const TextStyle mallannaRegular12 = TextStyle(
