@@ -11,6 +11,7 @@ abstract class AppColors {
   static const lightGrayDarkMode = Color(0xFF989898);
   static const gray = Color(0xFF636363);
   static const darkGray = Color(0xFF242527);
+  static const red = Color(0xFFFB344F);
 }
 
 abstract class AppColorsFromTheme {

@@ -22,7 +22,7 @@ class AuthBackGround extends StatelessWidget {
             width: viewportWidth,
             height: viewportHeight,
             child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+              imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
               child: Image.asset(
                 Theme.of(context).brightness == Brightness.dark ? Assets.assetsImagesBackgroundDark :
                 Assets.assetsImagesBackgroundLight,

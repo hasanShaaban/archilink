@@ -35,7 +35,9 @@ class AuthViewBody extends StatelessWidget {
         const AuthBackGround(),
 
         Center(
-          child: AnimatedSwitcher(duration: const Duration(milliseconds: 800),
+          child: AnimatedSwitcher(duration: const Duration(milliseconds: 1000),
+          switchInCurve: Curves.easeIn,
+          switchOutCurve: Curves.easeOutCubic,
           transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child,),
           child: _buildStep(step, controller),
           ),
@@ -54,9 +56,9 @@ Widget _buildStep(AuthStep step, AuthFlowController c){
         onSignupPressed: c.toSignup,
       );
     case AuthStep.login:
-      return LoginPage();
+      return LoginPage(onSignupPressed: c.toSignup,);
     case AuthStep.signup:
-      return SignupPage();
+      return SignupPage(onLoginTap: c.toLogin,);
     case AuthStep.setupAccount:
       return SetupAccountPage();
     
