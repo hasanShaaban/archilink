@@ -3,13 +3,15 @@ import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/auth_button.dart';
 import 'package:archilink/core/widgets/auth_text_field.dart';
+import 'package:archilink/features/Auth/presentation/manager/controller/auth_flow_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class SignupPage extends StatelessWidget {
-  const SignupPage({super.key, required this.onLoginTap});
+  const SignupPage({super.key, required this.onLoginTap, required this.controller});
 
   final VoidCallback onLoginTap;
+  final AuthFlowController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +48,7 @@ class SignupPage extends StatelessWidget {
               color: AppColors.whiteForElements,
             ),
           ),
-          onPressed: () {},
+          onPressed: controller.toSetupAccount,
         ),
         SizedBox(height: 16),
         Row(
@@ -96,7 +98,6 @@ class SignupPage extends StatelessWidget {
           onPressed: () {},
           secondary: true,
         ),
-        Spacer()
         
       ],
     );

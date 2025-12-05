@@ -34,6 +34,7 @@ class AuthViewBody extends StatelessWidget {
     final step = controller.currentStep;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(child: Stack(children: [
         const AuthBackGround(),
 
@@ -61,16 +62,13 @@ Widget _pageContainer({required AuthStep step, required AuthFlowController c}){
   return LayoutBuilder(
     key: ValueKey(step),
     builder: (context, constraints){
-      return SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: ConstrainedBox(constraints: BoxConstraints(
-          maxHeight: constraints.maxHeight,
-          minHeight: constraints.minHeight
-        ),
-        child: IntrinsicHeight(
-          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 27.5), child: _buildStepContent(step, c),),
-        ),
-        ),
+      return ConstrainedBox(constraints: BoxConstraints(
+        maxHeight: constraints.maxHeight,
+        minHeight: constraints.minHeight
+      ),
+      child: IntrinsicHeight(
+        child: Padding(padding: const EdgeInsets.symmetric(horizontal: 27.5), child: _buildStepContent(step, c),),
+      ),
       );
   });
 }
@@ -85,7 +83,7 @@ Widget _buildStepContent(AuthStep step, AuthFlowController c){
       return LoginPage(onSignupPressed: c.toSignup,);
 
     case AuthStep.signup:
-      return SignupPage(onLoginTap: c.toLogin,);
+      return SignupPage(onLoginTap: c.toLogin, controller: c,);
 
     case AuthStep.setupAccount:
       return SetupAccountPage();

@@ -40,7 +40,7 @@ class _SplashViewBodyState extends State<SplashViewBody> {
       });
     });
 
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(milliseconds: 2300), () {
       _navigation();
     });
 
