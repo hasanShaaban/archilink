@@ -13,84 +13,48 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 27.5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: height * 51 / 896),
+        AuthTextFiled(
+          height: height,
+          label: 'Email​ Address',
+          hint: 'email@gmail.com',
+        ),
+        SizedBox(height: 16),
+        AuthTextFiled(
+          height: height,
+          label: 'Password',
+          hint: 'Your Password',
+          isPassword: true,
+        ),
+        SizedBox(height: 16),
+        Row(
           children: [
-            SizedBox(height: height * 75 / 896),
-            Align(
-              alignment: Alignment.topCenter,
-              child: Text(
-                'Hey, Welcome Back!',
-                style: AppTextStyle.manjariBold25.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+            RememberMeSection(),
+            Spacer(),
+            Text(
+              'Forgot Password?',
+              style: AppTextStyle.mallannaSemiBold14.copyWith(
+                color: AppColors.red,
               ),
             ),
-            SizedBox(height: height * 51 / 896),
-            AuthTextFiled(
-              height: height,
-              label: 'Email​ Address',
-              hint: 'email@gmail.com',
-            ),
-            SizedBox(height: 16),
-            AuthTextFiled(
-              height: height,
-              label: 'Password',
-              hint: 'Your Password',
-              isPassword: true,
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                RememberMeSection(),
-                Spacer(),
-                Text(
-                  'Forgot Password?',
-                  style: AppTextStyle.mallannaSemiBold14.copyWith(
-                    color: AppColors.red,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: height * 42 / 896,),
-            AuthButton(
-            onPressed: (){},
-            height: height,
-            content: Text(
-              'Login',
-              style: AppTextStyle.mallannaSemiBold17.copyWith(
-                color: AppColors.whiteForElements,
-              ),
-            ),
-            
-          ),
-          SizedBox(height: height * 244 / 896),
-          Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Don’t have an account ?',
-                    style: AppTextStyle.mallannaSemiBold14.copyWith(
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: onSignupPressed,
-                    child: Text(
-                      'Sign up',
-                      style: AppTextStyle.mallannaSemiBold14.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
           ],
         ),
-      ),
+        SizedBox(height: height * 42 / 896,),
+        AuthButton(
+        onPressed: (){},
+        height: height,
+        content: Text(
+          'Login',
+          style: AppTextStyle.mallannaSemiBold17.copyWith(
+            color: AppColors.whiteForElements,
+          ),
+        ),
+        
+      ),Spacer()
+      ],
     );
   }
 }
