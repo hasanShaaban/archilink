@@ -29,6 +29,10 @@ ThemeData darkTheme = ThemeData(
   ),
   ),
 
+  popupMenuTheme: PopupMenuThemeData(
+    color: Colors.transparent
+  ),
+
   elevatedButtonTheme: ElevatedButtonThemeData(
     
     style: ElevatedButton.styleFrom(

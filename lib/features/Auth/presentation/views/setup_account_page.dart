@@ -2,12 +2,16 @@ import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/auth_button.dart';
 import 'package:archilink/core/widgets/auth_text_field.dart';
+import 'package:archilink/features/Auth/presentation/manager/controller/auth_flow_controller.dart';
 import 'package:archilink/features/Auth/presentation/views/widgets/phone_number_text_field.dart';
+import 'package:archilink/features/Auth/presentation/views/widgets/role_drop_down_field.dart';
 import 'package:archilink/features/main/presentation/views/main_page.dart';
 import 'package:flutter/material.dart';
 
 class SetupAccountPage extends StatelessWidget {
-  const SetupAccountPage({super.key});
+  const SetupAccountPage({super.key, required this.c});
+
+  final AuthFlowController c;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,18 @@ class SetupAccountPage extends StatelessWidget {
         const SizedBox(height: 16),
         AuthTextFiled(height: height, label: 'Username', hint: 'Your username'),
         const SizedBox(height: 16),
-        AuthTextFiled(height: height, label: 'Role', hint: 'Select your role'),
+        RoleDropDownField(
+          height: height,
+          label: 'Role',
+          hint: 'Select your role',
+          value: c.selectRole,
+          options: const [
+            'Student Account',
+            'Mentor Account',
+            'Store Account'
+          ],
+          onSelected: c.setRole,
+        ),
         const SizedBox(height: 16),
         PhoneNumberTextField(height: height),
         SizedBox(height: height * 42 / 896),

@@ -22,6 +22,10 @@ ThemeData lightTheme = ThemeData(
     centerTitle: false,
   ),
 
+  popupMenuTheme: PopupMenuThemeData(
+    color: Colors.transparent
+  ),
+
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       elevation: 0,

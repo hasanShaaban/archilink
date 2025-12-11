@@ -86,7 +86,7 @@ Widget _buildStepContent(AuthStep step, AuthFlowController c){
       return SignupPage(onLoginTap: c.toLogin, controller: c,);
 
     case AuthStep.setupAccount:
-      return SetupAccountPage();
+      return SetupAccountPage(c: c,);
   }
 }
 

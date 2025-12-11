@@ -33,7 +33,6 @@ class _AuthTextFiledState extends State<AuthTextFiled> {
           width: double.infinity,
           height: widget.height * 41 / 896,
           child: TextField(
-            
             obscureText: widget.isPassword ? obscureText : false,
             decoration: InputDecoration(
               suffixIcon: widget.isPassword
@@ -57,7 +56,9 @@ class _AuthTextFiledState extends State<AuthTextFiled> {
               enabledBorder: buildBorder(
                 AppColorsFromTheme.secondaryColor(context).withOpacity(0.5),
               ),
-              fillColor: AppColorsFromTheme.secondaryColor(context).withOpacity(0.5),
+              fillColor: AppColorsFromTheme.secondaryColor(
+                context,
+              ).withOpacity(0.5),
               filled: true,
             ),
           ),
@@ -73,3 +74,4 @@ OutlineInputBorder buildBorder(Color color) {
     borderSide: BorderSide(color: color, width: 1.5),
   );
 }
+
