@@ -17,7 +17,7 @@ class HomePageBody extends StatelessWidget {
         body: NestedScrollView(
           physics: BouncingScrollPhysics(),
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            MainAppBar(),
+            MainAppBar(withTabbar: true,),
           ],
           body: TabBarView(
             physics: BouncingScrollPhysics(),

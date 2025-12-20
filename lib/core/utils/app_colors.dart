@@ -32,5 +32,18 @@ abstract class AppColorsFromTheme {
       Theme.of(context).brightness == Brightness.light
       ? AppColors.whiteForElements
       : AppColors.darkGray;
+
+  static grayForTheme(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+      ? AppColors.lightGreyLightMode
+      : AppColors.darkGray;
+  static reverseGrayForTheme(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+      ? AppColors.darkGray
+      : AppColors.lightGreyLightMode;
+  static borderColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+      ? AppColors.lightGreyLightMode
+      : AppColors.darkGray;
   
 }

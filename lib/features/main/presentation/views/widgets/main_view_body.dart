@@ -1,6 +1,7 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Home/presentation/views/home_page_body.dart';
+import 'package:archilink/features/Profile/presentation/views/profile_page_body.dart';
 import 'package:archilink/features/main/presentation/views/widgets/nav_bar_icon_and_label.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class _MainViewBodyState extends State<MainViewBody> {
   final List<Widget> _pages = [
     HomePageBody(),
     Center(child: Text('store')), //TODO: store page
-    Center(child: Text('profile')), //TODO: profile page
+    ProfilePageBody(),
     Center(child: Text('settings')), //TODO: Setting page
   ];
 

@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 class ExpandableText extends StatefulWidget {
   final String text;
   final int trimLines;
+  final TextStyle? style;
 
-  const ExpandableText(this.text, {super.key, this.trimLines = 3});
+  const ExpandableText(this.text, {super.key, this.trimLines = 3, this.style = AppTextStyle.mallannaRegular14});
 
   @override
   _ExpandableTextState createState() => _ExpandableTextState();
@@ -35,9 +36,9 @@ class _ExpandableTextState extends State<ExpandableText> {
           widget.text,
           maxLines: _readMore ? widget.trimLines : null,
           overflow: _readMore ? TextOverflow.ellipsis : TextOverflow.visible,
-          style: AppTextStyle.mallannaRegular14.copyWith(
+          style: widget.style!.copyWith(
             color: Theme.of(context).colorScheme.onSurface,
-            height: 1.2,
+            height: 1.4,
           ),
         ),
         if (isOverflowing)

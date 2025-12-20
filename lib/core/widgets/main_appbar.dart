@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 
 class MainAppBar extends StatelessWidget {
   const MainAppBar({
-    super.key,
+    super.key, required this.withTabbar,
   });
+
+  final bool withTabbar;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ class MainAppBar extends StatelessWidget {
       actionsPadding: EdgeInsets.only(right: 20),
       titleSpacing: 20,
       title: Text(
-        'Acrhi Link',
+        'Archi Link',
         style: AppTextStyle.appTilte.copyWith(height: 1),
         textHeightBehavior: TextHeightBehavior(
           applyHeightToFirstAscent: false,
@@ -38,12 +40,12 @@ class MainAppBar extends StatelessWidget {
           onPress: () {},
         ),
       ],
-      bottom: PreferredSize(
+      bottom: withTabbar? PreferredSize(
         preferredSize: Size.fromHeight(
           MediaQuery.of(context).size.height * 50 / 874,
         ),
         child: HomePageTapbar(),
-      ),
+      ): PreferredSize(preferredSize: Size.zero, child: SizedBox()),
     );
   }
 }
