@@ -1,6 +1,7 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -31,10 +32,12 @@ class PersonalProfileButtons extends StatelessWidget {
           SizedBox(width: 8),
           Expanded(
             child: ProfileCustomButton(
-              onPress: () {},
+              onPress: () {
+                Navigator.of(context, rootNavigator: true).pushNamed(EditProfileView.name);
+              },
               icon: Assets.assetsIconsEditProfile,
               iconSize: 16,
-              title: 'Create Post',
+              title: 'Edit Profile',
               backgroundColor: AppColorsFromTheme.grayForTheme(context),
               textStyle: AppTextStyle.interMedium12.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,

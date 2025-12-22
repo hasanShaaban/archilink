@@ -1,10 +1,13 @@
 
+import 'dart:developer';
+
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/post_actions.dart';
 import 'package:archilink/core/widgets/post_body.dart';
 import 'package:archilink/core/widgets/post_locaion_date_and_tags.dart';
 import 'package:archilink/core/widgets/post_user_image.dart';
 import 'package:archilink/core/widgets/post_username_and_date.dart';
+import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -35,7 +38,11 @@ class Post extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // User image section
-              PostUserImage(width: width),
+              GestureDetector(
+                onTap: (){
+                  Navigator.of(context, rootNavigator: true).pushNamed(UserProfileView.name);
+                },
+                child: PostUserImage(width: width)),
               SizedBox(width: 12),
               Expanded(
                 child: Padding(

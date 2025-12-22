@@ -1,5 +1,7 @@
 
 import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
+import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/features/Splash/presentation/views/splash_view.dart';
 import 'package:archilink/features/chat/presentation/view/chat_view.dart';
 import 'package:archilink/features/post/presentation/view/post_details_view.dart';
@@ -19,6 +21,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => const PostDetailsView());
     case MainView.name:
       return MaterialPageRoute(builder: (context) => const MainView());
+    case UserProfileView.name:
+      return MaterialPageRoute(builder: (context)=> const UserProfileView());
+    case EditProfileView.name:
+      return MaterialPageRoute(builder: (context)=> const EditProfileView());
     
     default:
       return MaterialPageRoute(builder: (context) => Scaffold(body: Center(child: Text('Page not found'))));

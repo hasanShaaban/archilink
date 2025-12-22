@@ -1,5 +1,4 @@
 
-import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
