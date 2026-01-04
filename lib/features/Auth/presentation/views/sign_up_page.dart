@@ -20,25 +20,25 @@ class SignupPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         SizedBox(height: height * 37 / 896),
-        AuthTextFiled(
-          height: height,
-          label: 'Email​ Address',
-          hint: 'email@gmail.com',
-        ),
+        // AuthTextFiled(
+        //   height: height,
+        //   label: 'Email​ Address',
+        //   hint: 'email@gmail.com',
+        // ),
         SizedBox(height: 16),
-        AuthTextFiled(
-          height: height,
-          label: 'Password',
-          hint: 'Your Password',
-          isPassword: true,
-        ),
+        // AuthTextFiled(
+        //   height: height,
+        //   label: 'Password',
+        //   hint: 'Your Password',
+        //   isPassword: true,
+        // ),
         SizedBox(height: 16),
-        AuthTextFiled(
-          height: height,
-          label: 'Confirm Password',
-          hint: 'Your Password',
-          isPassword: true,
-        ),
+        // AuthTextFiled(
+        //   height: height,
+        //   label: 'Confirm Password',
+        //   hint: 'Your Password',
+        //   isPassword: true,
+        // ),
         SizedBox(height: height * 42 / 896),
         AuthButton(
           height: height,

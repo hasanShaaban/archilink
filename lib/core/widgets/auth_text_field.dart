@@ -11,11 +11,17 @@ class AuthTextFiled extends StatefulWidget {
     required this.label,
     required this.hint,
     this.isPassword = false,
+    required this.controller,
+    this.validator,
+    this.keyboardType,
   });
 
   final double height;
   final String label, hint;
   final bool isPassword;
+  final TextEditingController controller;
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
 
   @override
   State<AuthTextFiled> createState() => _AuthTextFiledState();
@@ -32,7 +38,10 @@ class _AuthTextFiledState extends State<AuthTextFiled> {
         SizedBox(
           width: double.infinity,
           height: widget.height * 41 / 896,
-          child: TextField(
+          child: TextFormField(
+            controller: widget.controller,
+            validator: widget.validator,
+            keyboardType: widget.keyboardType,
             obscureText: widget.isPassword ? obscureText : false,
             decoration: InputDecoration(
               suffixIcon: widget.isPassword
@@ -74,4 +83,3 @@ OutlineInputBorder buildBorder(Color color) {
     borderSide: BorderSide(color: color, width: 1.5),
   );
 }
-

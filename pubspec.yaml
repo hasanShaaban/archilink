@@ -30,11 +30,17 @@ environment:
 dependencies:
   bloc: ^9.1.0
   cupertino_icons: ^1.0.8
+  dartz: ^0.10.1
+  get_it: ^8.0.2
+  dio: ^5.9.0
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
+  flutter_bloc: ^9.1.1
   flutter_localizations:
     sdk: flutter
   flutter_svg: ^2.2.1
+  hive: ^2.2.3
   intl_utils: ^2.8.12
   persistent_bottom_nav_bar: ^6.2.1
   provider: ^6.1.5+1

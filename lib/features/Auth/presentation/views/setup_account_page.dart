@@ -19,9 +19,9 @@ class SetupAccountPage extends StatelessWidget {
     return Column(
       children: [
         SizedBox(height: height * 51 / 896),
-        AuthTextFiled(height: height, label: 'Name', hint: 'Your Fall Name'),
+        // AuthTextFiled(height: height, label: 'Name', hint: 'Your Fall Name'),
         const SizedBox(height: 16),
-        AuthTextFiled(height: height, label: 'Username', hint: 'Your username'),
+        // AuthTextFiled(height: height, label: 'Username', hint: 'Your username'),
         const SizedBox(height: 16),
         RoleDropDownField(
           height: height,
