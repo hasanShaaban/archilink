@@ -27,7 +27,7 @@ class SetupAccountPage extends StatelessWidget {
           height: height,
           label: 'Role',
           hint: 'Select your role',
-          value: c.selectRole,
+          value: c.draft.role,
           options: const [
             'Student Account',
             'Mentor Account',

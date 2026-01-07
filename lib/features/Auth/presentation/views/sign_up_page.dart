@@ -98,7 +98,6 @@ class SignupPage extends StatelessWidget {
           onPressed: () {},
           secondary: true,
         ),
-        
       ],
     );
   }

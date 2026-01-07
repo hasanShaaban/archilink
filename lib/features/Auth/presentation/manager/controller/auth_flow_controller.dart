@@ -1,21 +1,50 @@
 
 import 'package:archilink/features/Auth/domain/auth_step.dart';
+import 'package:archilink/features/Auth/domain/entity/signup_draft.dart';
 import 'package:flutter/material.dart';
 
 class AuthFlowController extends ChangeNotifier{
 
-  String? selectRole;
-  void setRole(String role){
-    selectRole = role;
-    notifyListeners();
-  }
+  final SignupDraft draft = SignupDraft();
 
   AuthStep _currentStep = AuthStep.onboarding;
   AuthStep get currentStep => _currentStep;
+
   void goTo(AuthStep step){
     _currentStep = step;
     notifyListeners();
   }
+
+  void setEmail(String email){
+    draft.email = email;
+  }
+
+  void setPassword(String password){
+    draft.password = password;
+  }
+
+  void setConfirmPassword(String password){
+    draft.confirmPassword = password;
+  }
+
+  void setName(String name){
+    draft.name = name;
+  }
+
+  void setUsername(String username){
+    draft.username = username;
+  }
+
+  void setPhone(String phoneNumber){
+    draft.phone = phoneNumber;
+  }
+
+  void setRole(String role){
+    draft.role = role;
+    notifyListeners();
+  }
+
+  
 
   void toLogin() => goTo(AuthStep.login);
   void toSignup() => goTo(AuthStep.signup);

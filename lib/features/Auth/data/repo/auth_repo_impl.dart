@@ -1,10 +1,10 @@
-
 import 'package:archilink/core/error/exception_to_faliure_mapper.dart';
 import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Auth/domain/data_source/auth_local_data_source.dart';
 import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_source.dart';
 import 'package:archilink/features/Auth/domain/entity/auth_token.dart';
+import 'package:archilink/features/Auth/domain/entity/register_etity.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:dartz/dartz.dart';
 
@@ -25,6 +25,35 @@ class AuthRepoImpl implements AuthRepo {
         password: password,
       );
       await localDataSource.saveToken(model.accessToken);
+      return right(model.toEntity());
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, RegisterEntity>> register({
+    required String email,
+    required String password,
+    required String confirmPassword,
+    required String name,
+    required String username,
+    required String role,
+    String? phone,
+  }) async {
+    try {
+      final model = await remoteDataSource.register(
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        name: name,
+        username: username,
+        role: role,
+        phone: phone,
+      );
+      await localDataSource.saveToken(model.token);
       return right(model.toEntity());
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));
