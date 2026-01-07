@@ -5,11 +5,15 @@ import 'package:archilink/features/Splash/presentation/views/splash_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  
-  await initServiceLocator();
+
+  await Hive.initFlutter();
+  final authBox = await Hive.openBox('authBox');
+
+  await initServiceLocator(authBox);
 
   runApp(const MyApp());
 }

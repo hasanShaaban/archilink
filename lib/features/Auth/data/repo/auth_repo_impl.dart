@@ -1,8 +1,8 @@
-import 'dart:developer';
 
 import 'package:archilink/core/error/exception_to_faliure_mapper.dart';
 import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/features/Auth/domain/data_source/auth_local_data_source.dart';
 import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_source.dart';
 import 'package:archilink/features/Auth/domain/entity/auth_token.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
@@ -10,8 +10,9 @@ import 'package:dartz/dartz.dart';
 
 class AuthRepoImpl implements AuthRepo {
   final AuthRemoteDataSource remoteDataSource;
+  final AuthLocalDataSource localDataSource;
 
-  AuthRepoImpl(this.remoteDataSource);
+  AuthRepoImpl({required this.remoteDataSource, required this.localDataSource});
 
   @override
   Future<Either<Failure, AuthToken>> login({
@@ -23,7 +24,7 @@ class AuthRepoImpl implements AuthRepo {
         email: email,
         password: password,
       );
-      log(model.accessToken);
+      await localDataSource.saveToken(model.accessToken);
       return right(model.toEntity());
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));

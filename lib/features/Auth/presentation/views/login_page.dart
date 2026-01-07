@@ -20,6 +20,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  AutovalidateMode autovalidateMode = AutovalidateMode.disabled;
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -47,53 +48,56 @@ class _LoginPageState extends State<LoginPage> {
         return Stack(
           children: [
             Form(
+              autovalidateMode: autovalidateMode,
               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: height * 51 / 896),
-                  AuthTextFiled(
-                    height: height,
-                    label: 'Email​ Address',
-                    hint: 'email@gmail.com',
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: _emailValidator,
-                  ),
-                  SizedBox(height: 16),
-                  AuthTextFiled(
-                    height: height,
-                    label: 'Password',
-                    hint: 'Your Password',
-                    isPassword: true,
-                    controller: passwordController,
-                    validator: _passwordValidator,
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      RememberMeSection(),
-                      Spacer(),
-                      Text(
-                        'Forgot Password?',
-                        style: AppTextStyle.mallannaSemiBold14.copyWith(
-                          color: AppColors.red,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: height * 51 / 896),
+                    AuthTextFiled(
+                      height: height,
+                      label: 'Email​ Address',
+                      hint: 'email@gmail.com',
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: _emailValidator,
+                    ),
+                    SizedBox(height: 10),
+                    AuthTextFiled(
+                      height: height,
+                      label: 'Password',
+                      hint: 'Your Password',
+                      isPassword: true,
+                      controller: passwordController,
+                      validator: _passwordValidator,
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        RememberMeSection(),
+                        Spacer(),
+                        Text(
+                          'Forgot Password?',
+                          style: AppTextStyle.mallannaSemiBold14.copyWith(
+                            color: AppColors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: height * 42 / 896),
+                    AuthButton(
+                      onPressed: _onLoginPressed,
+                      height: height,
+                      content: Text(
+                        'Login',
+                        style: AppTextStyle.mallannaSemiBold17.copyWith(
+                          color: AppColors.whiteForElements,
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: height * 42 / 896),
-                  AuthButton(
-                    onPressed: _onLoginPressed,
-                    height: height,
-                    content: Text(
-                      'Login',
-                      style: AppTextStyle.mallannaSemiBold17.copyWith(
-                        color: AppColors.whiteForElements,
-                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             state is AuthLoading ? Expanded(
@@ -112,12 +116,18 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLoginPressed() {
-    if (!_formKey.currentState!.validate()) return;
-
-    context.read<AuthCubit>().login(
-      email: emailController.text.trim(),
-      password: passwordController.text,
-    );
+    if(_formKey.currentState!.validate()){
+      _formKey.currentState!.save();
+      context.read<AuthCubit>().login(
+          email: emailController.text.trim(),
+          password: passwordController.text,
+        );
+    }else{
+      autovalidateMode = AutovalidateMode.always;
+      setState(() {
+        
+      });
+    }
   }
 
   String? _emailValidator(String? value) {
