@@ -8,49 +8,79 @@ import 'package:archilink/features/Auth/presentation/views/widgets/role_drop_dow
 import 'package:archilink/features/main/presentation/views/main_page.dart';
 import 'package:flutter/material.dart';
 
-class SetupAccountPage extends StatelessWidget {
+class SetupAccountPage extends StatefulWidget {
   const SetupAccountPage({super.key, required this.c});
 
   final AuthFlowController c;
 
   @override
+  State<SetupAccountPage> createState() => _SetupAccountPageState();
+}
+
+class _SetupAccountPageState extends State<SetupAccountPage> {
+  final _formKey = GlobalKey<FormState>();
+  AutovalidateMode autovalidateMode = AutovalidateMode.disabled;
+
+  final nameController = TextEditingController();
+  final usernameController = TextEditingController();
+  @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
-    return Column(
-      children: [
-        SizedBox(height: height * 51 / 896),
-        // AuthTextFiled(height: height, label: 'Name', hint: 'Your Fall Name'),
-        const SizedBox(height: 16),
-        // AuthTextFiled(height: height, label: 'Username', hint: 'Your username'),
-        const SizedBox(height: 16),
-        RoleDropDownField(
-          height: height,
-          label: 'Role',
-          hint: 'Select your role',
-          value: c.draft.role,
-          options: const [
-            'Student Account',
-            'Mentor Account',
-            'Store Account'
-          ],
-          onSelected: c.setRole,
-        ),
-        const SizedBox(height: 16),
-        PhoneNumberTextField(height: height),
-        SizedBox(height: height * 42 / 896),
-        AuthButton(
-          height: height,
-          content: Text(
-            'Sign Up',
-            style: AppTextStyle.mallannaSemiBold17.copyWith(
-              color: AppColors.whiteForElements,
-            ),
+    return Form(
+      key: _formKey,
+      autovalidateMode: autovalidateMode,
+      child: Column(
+        children: [
+          SizedBox(height: height * 51 / 896),
+          AuthTextFiled(
+            height: height,
+            label: 'Name',
+            hint: 'Your Fall Name',
+            controller: nameController,
+            validator: _nameValidator,
           ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, MainView.name);
-          },
-        ),
-      ],
+          const SizedBox(height: 16),
+          // AuthTextFiled(
+          //   height: height,
+          //   label: 'Username',
+          //   hint: 'Your username',
+          // ),
+          const SizedBox(height: 16),
+          RoleDropDownField(
+            height: height,
+            label: 'Role',
+            hint: 'Select your role',
+            value: widget.c.draft.role,
+            options: const [
+              'Student Account',
+              'Mentor Account',
+              'Store Account',
+            ],
+            onSelected: widget.c.setRole,
+          ),
+          const SizedBox(height: 16),
+          PhoneNumberTextField(height: height),
+          SizedBox(height: height * 42 / 896),
+          AuthButton(
+            height: height,
+            content: Text(
+              'Sign Up',
+              style: AppTextStyle.mallannaSemiBold17.copyWith(
+                color: AppColors.whiteForElements,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, MainView.name);
+            },
+          ),
+        ],
+      ),
     );
+  }
+
+  String? _nameValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'This filed is required';
+    }
   }
 }

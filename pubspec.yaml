@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   bloc: ^9.1.0
+  chatview: ^3.0.0
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   dio: ^5.9.0
