@@ -94,6 +94,10 @@ class Assets {
   /// assets/icons/mail-add.svg
   static const String assetsIconsMailAdd = "assets/icons/mail-add.svg";
 
+  /// Assets for assetsIconsMenu
+  /// assets/icons/menu.svg
+  static const String assetsIconsMenu = "assets/icons/menu.svg";
+
   /// Assets for assetsIconsMoreVertical
   /// assets/icons/more-vertical.svg
   static const String assetsIconsMoreVertical = "assets/icons/more-vertical.svg";
