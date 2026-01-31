@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   useMaterial3: false,
-
+  
   scaffoldBackgroundColor: AppColors.white,
   colorScheme: ColorScheme.light(
+    error: AppColors.red,
+    onError: AppColors.whiteForElements,
     primary: AppColors.tael,
     secondary: AppColors.gray,
     tertiary: AppColors.lightGreyLightMode,
@@ -21,7 +23,7 @@ ThemeData lightTheme = ThemeData(
     elevation: 0,
     centerTitle: false,
   ),
-
+  
   popupMenuTheme: PopupMenuThemeData(
     color: Colors.transparent
   ),

@@ -3,10 +3,12 @@ import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/auth_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class PhoneNumberTextField extends StatelessWidget {
-  const PhoneNumberTextField({super.key, required this.height});
+  const PhoneNumberTextField({super.key, required this.height, required this.controler});
   final double height;
+  final TextEditingController controler;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class PhoneNumberTextField extends StatelessWidget {
           width: double.infinity,
           height: height * 41 / 896,
           child: TextField(
+            controller: controler,
             keyboardType: TextInputType.phone,
             decoration: InputDecoration(
               prefixIcon: Row(

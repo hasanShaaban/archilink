@@ -14,5 +14,5 @@ abstract class AuthRepo {
     required String role,
     String? phone,
   });
-
+  Future<Either<Failure, bool>> checkUsername({required String username});
 }

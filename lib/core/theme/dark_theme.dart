@@ -7,6 +7,8 @@ ThemeData darkTheme = ThemeData(
   useMaterial3: false,
   scaffoldBackgroundColor: AppColors.richBlack,
   colorScheme: ColorScheme.dark(
+    error: AppColors.red,
+    onError: AppColors.whiteForElements,
     primary: AppColors.lightTeal,
     secondary: AppColors.darkGray,
     tertiary: AppColors.lightGrayDarkMode,

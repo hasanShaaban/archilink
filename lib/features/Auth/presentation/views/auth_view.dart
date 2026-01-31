@@ -2,6 +2,7 @@ import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/features/Auth/domain/auth_step.dart';
 import 'package:archilink/features/Auth/presentation/manager/controller/auth_flow_controller.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
 import 'package:archilink/features/Auth/presentation/views/login_page.dart';
 import 'package:archilink/features/Auth/presentation/views/on_boarding_page.dart';
 import 'package:archilink/features/Auth/presentation/views/setup_account_page.dart';
@@ -34,8 +35,11 @@ class AuthViewBody extends StatelessWidget {
     final controller = context.watch<AuthFlowController>();
     final step = controller.currentStep;
 
-    return BlocProvider(
-      create: (context) => sl<AuthCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => sl<AuthCubit>()),
+        BlocProvider(create: (context) => sl<CheckUsernameCubit>()),
+      ],
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         body: SafeArea(

@@ -4,28 +4,61 @@ import 'package:archilink/core/utils/assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class RoleDropDownField extends StatefulWidget {
-  const RoleDropDownField({
+class RoleDropDownField extends FormField<String> {
+  RoleDropDownField({
     super.key,
+    required double height,
+    required String label,
+    required String hint,
+    required List<String> options,
+    String? value,
+    required ValueChanged<String> onSelected,
+    FormFieldValidator<String>? validator,
+    AutovalidateMode? autovalidateMode,
+  }) : super(
+          initialValue: value,
+          validator: validator,
+          autovalidateMode: autovalidateMode,
+          builder: (state) {
+            return _RoleDropDownBody(
+              height: height,
+              label: label,
+              hint: hint,
+              options: options,
+              value: state.value,
+              errorText: state.errorText,
+              onSelected: (v) {
+                state.didChange(v);
+                onSelected(v);
+              },
+            );
+          },
+        );
+}
+
+class _RoleDropDownBody extends StatefulWidget {
+  final double height;
+  final String label;
+  final String hint;
+  final List<String> options;
+  final String? value;
+  final String? errorText;
+  final ValueChanged<String> onSelected;
+
+  const _RoleDropDownBody({
     required this.height,
     required this.label,
     required this.hint,
-    this.value,
     required this.options,
+    required this.value,
+    required this.errorText,
     required this.onSelected,
   });
 
-  final double height;
-  final String label, hint;
-  final String? value;
-  final List<String> options;
-  final void Function(String) onSelected;
-
   @override
-  State<RoleDropDownField> createState() => _RoleDropDownFieldState();
+  State<_RoleDropDownBody> createState() => _RoleDropDownBodyState();
 }
-
-class _RoleDropDownFieldState extends State<RoleDropDownField> {
+class _RoleDropDownBodyState extends State<_RoleDropDownBody> {
 
   final GlobalKey _key = GlobalKey();
 
@@ -62,6 +95,7 @@ class _RoleDropDownFieldState extends State<RoleDropDownField> {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasError = widget.errorText != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -76,7 +110,7 @@ class _RoleDropDownFieldState extends State<RoleDropDownField> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: AppColorsFromTheme.secondaryColor(
+                color: hasError ? AppColors.red :  AppColorsFromTheme.secondaryColor(
                   context,
                 ).withOpacity(0.5),
               ),
@@ -104,6 +138,14 @@ class _RoleDropDownFieldState extends State<RoleDropDownField> {
             ),
           ),
         ),
+        if (hasError)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 4),
+            child: Text(
+              widget.errorText!,
+              style: AppTextStyle.interRegular10.copyWith(color: AppColors.red),
+            ),
+          ),
       ],
     );
   }

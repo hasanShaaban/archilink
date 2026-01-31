@@ -52,7 +52,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             "password_confirmation": confirmPassword,
           },
           "role": role,
-          "login": true,
+          "login": true,//TODO add phone later
         },
       );
       final data = response.data;
@@ -61,6 +61,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
       return RegisterModel.fromJson(data);
     } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+  
+  @override
+  Future<bool> checkUsername({required String username}) async{
+    try{
+      final response = await apiService.get('account-center/check-availability/$username');
+      final data = response.data;
+      if(data == null){
+        throw ServerException(message: 'Invalid check username response');
+      }
+      return data['data']['available'] as bool;
+    }on DioException catch(e){
       throw AppException.handelDioException(e);
     }
   }

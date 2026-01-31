@@ -25,6 +25,7 @@ class AuthRepoImpl implements AuthRepo {
         password: password,
       );
       await localDataSource.saveToken(model.accessToken);
+      await localDataSource.saveUsername(model.username);
       return right(model.toEntity());
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));
@@ -56,6 +57,18 @@ class AuthRepoImpl implements AuthRepo {
       await localDataSource.saveToken(model.token);
       return right(model.toEntity());
     } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+  
+  @override
+  Future<Either<Failure, bool>> checkUsername({required String username}) async {
+    try{
+      final available = await remoteDataSource.checkUsername(username: username);
+      return right(available);
+    }on AppException catch (e) {
       return left(mapExceptionToFailure(e));
     } catch (_) {
       return left(UnknownFailure());

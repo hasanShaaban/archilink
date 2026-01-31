@@ -12,6 +12,7 @@ import 'package:archilink/features/Auth/domain/data_source/auth_local_data_sourc
 import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_source.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
@@ -77,4 +78,5 @@ Future<void> initServiceLocator(Box authBox) async {
   ///Bloc
   ///---------
   sl.registerLazySingleton(() => AuthCubit(sl()));
+  sl.registerLazySingleton(() => CheckUsernameCubit(sl()));
 }

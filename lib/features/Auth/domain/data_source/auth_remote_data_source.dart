@@ -15,4 +15,5 @@ abstract class AuthRemoteDataSource {
     required String role,
     String? phone,
   });
+  Future<bool> checkUsername({required String username});
 }
