@@ -107,5 +107,10 @@ abstract class AppTextStyle {
     fontFamily: 'Inter',
     fontWeight: FontWeight.w600
   );
+  static const TextStyle interSemiBold24 = TextStyle(
+    fontSize: 24,
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w600
+  );
 
 }
