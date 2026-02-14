@@ -1,14 +1,17 @@
 import 'package:archilink/core/functions/on_generate_route.dart';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/theme/app_theme.dart';
+import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
+import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Splash/presentation/views/splash_view.dart';
 import 'package:archilink/features/chat/presentation/view/chat_list_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
@@ -24,30 +27,35 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      // Localization
-      localizationsDelegates: [
-        S.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ProfileCubit(sl<ProfileRepo>())),
       ],
-      supportedLocales: S.delegate.supportedLocales,
+      child: MaterialApp(
+        // Localization
+        localizationsDelegates: [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: S.delegate.supportedLocales,
 
-      // Debug
-      debugShowCheckedModeBanner: false,
+        // Debug
+        debugShowCheckedModeBanner: false,
 
-      // App
-      title: 'ArchiLink Demo',
+        // App
+        title: 'ArchiLink Demo',
 
-      // Theme
-      theme: AppTheme.lightMode,
-      darkTheme: AppTheme.darkMode,
-      themeMode: ThemeMode.system,
+        // Theme
+        theme: AppTheme.lightMode,
+        darkTheme: AppTheme.darkMode,
+        themeMode: ThemeMode.system,
 
-      //Routing
-      onGenerateRoute: onGenerateRoute,
-      initialRoute: ChatListView.name,
+        //Routing
+        onGenerateRoute: onGenerateRoute,
+        initialRoute: SplashView.name,
+      ),
     );
   }
 }

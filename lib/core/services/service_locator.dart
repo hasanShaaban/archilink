@@ -13,6 +13,10 @@ import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_sour
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
+import 'package:archilink/features/Profile/data/data_source/profile_remote_data_source_impl.dart';
+import 'package:archilink/features/Profile/data/repo/profile_repo_impl.dart';
+import 'package:archilink/features/Profile/domain/data_source/profile_remote_data_source.dart';
+import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
@@ -37,6 +41,9 @@ Future<void> initServiceLocator(Box authBox) async {
   ///---------
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(sl()),
   );
 
   ///----------
@@ -73,6 +80,8 @@ Future<void> initServiceLocator(Box authBox) async {
   sl.registerLazySingleton<AuthRepo>(
     () => AuthRepoImpl(localDataSource: sl(), remoteDataSource: sl()),
   );
+
+  sl.registerLazySingleton<ProfileRepo>(() => ProfileRepoImpl(sl()));
 
   ///---------
   ///Bloc

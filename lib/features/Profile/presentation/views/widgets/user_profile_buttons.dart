@@ -29,7 +29,9 @@ class UserProfileButtons extends StatelessWidget {
               icon: Assets.assetsIconsEditProfile,
               iconSize: 24,
               backgroundColor: Theme.of(context).colorScheme.primary,
-              textStyle: AppTextStyle.interMedium16.copyWith(color: Theme.of(context).colorScheme.onSurface),
+              textStyle: AppTextStyle.interMedium16.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
           SizedBox(width: 8),
@@ -40,10 +42,12 @@ class UserProfileButtons extends StatelessWidget {
               icon: Assets.assetsIconsShareProfile,
               title: 'Send a message',
               backgroundColor: AppColorsFromTheme.grayForTheme(context),
-              textStyle: AppTextStyle.interMedium16.copyWith(color: Theme.of(context).colorScheme.onSurface),
+              textStyle: AppTextStyle.interMedium16.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
-                          ],
+        ],
       ),
     );
   }

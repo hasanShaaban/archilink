@@ -1,11 +1,16 @@
+import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Auth/domain/data_source/auth_local_data_source.dart';
 import 'package:archilink/features/Home/presentation/views/home_page_body.dart';
 import 'package:archilink/features/Profile/domain/profile_type.dart';
+import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/profile_page_body.dart';
+import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/features/main/presentation/views/widgets/nav_bar_icon_and_label.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 class MainViewBody extends StatefulWidget {
@@ -29,12 +34,12 @@ class _MainViewBodyState extends State<MainViewBody> {
   final List<Widget> _pages = [
     HomePageBody(),
     Center(child: Text('store')), //TODO: store page
-    ProfilePageBody(type: ProfileType.personalProfile,),
+    ProfilePageBody(type: ProfileType.personalProfile),
     Center(child: Text('settings')), //TODO: Setting page
   ];
 
   // Section: Navigation bar items
-  List<PersistentBottomNavBarItem> _navBarsItems(S lang) {
+  List<PersistentBottomNavBarItem> _navBarsItems(BuildContext context, S lang) {
     return [
       navigationBarItem(
         context,
@@ -75,12 +80,18 @@ class _MainViewBodyState extends State<MainViewBody> {
       context,
       screens: _pages,
       controller: _controller,
-      items: _navBarsItems(lang),
+      items: _navBarsItems(context, lang),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       handleAndroidBackButtonPress: true,
       resizeToAvoidBottomInset: true,
       stateManagement: true,
-
+      onItemSelected: (value) {
+        if(value == 2){
+          AuthLocalDataSource dataSource = sl<AuthLocalDataSource>();
+          String username = dataSource.getUsername()!;
+          BlocProvider.of<ProfileCubit>(context).getProfile(username: username);
+        }
+      },
       navBarStyle: NavBarStyle.style13,
     );
   }
@@ -91,8 +102,10 @@ PersistentBottomNavBarItem navigationBarItem(
   BuildContext context, {
   required String image,
   required String title,
+  Function(BuildContext?)? onPressed,
 }) {
   return PersistentBottomNavBarItem(
+    onPressed: onPressed,
     inactiveIcon: NavBarIconAndLabel(
       alignment: MainAxisAlignment.end,
       color: Theme.of(context).colorScheme.onSurface,

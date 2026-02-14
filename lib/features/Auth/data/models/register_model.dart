@@ -1,10 +1,10 @@
-import 'package:archilink/features/Auth/data/models/profile_model.dart';
+import 'package:archilink/features/Auth/data/models/profile_record_model.dart';
 import 'package:archilink/features/Auth/data/models/user_model.dart';
 import 'package:archilink/features/Auth/domain/entity/register_etity.dart';
 
 class RegisterModel {
   final UserModel user;
-  final ProfileModel profile;
+  final ProfileRecordModel profile;
   final String token;
 
   RegisterModel({
@@ -18,7 +18,7 @@ class RegisterModel {
 
     return RegisterModel(
       user: UserModel.fromJson(data['user']),
-      profile: ProfileModel.fromJson(data['profile']),
+      profile: ProfileRecordModel.fromJson(data['profile']),
       token: data['token'],
     );
   }

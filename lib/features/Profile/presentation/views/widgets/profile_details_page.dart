@@ -73,4 +73,3 @@ class ProfileDetailsPage extends StatelessWidget {
     );
   }
 }
-

@@ -1,10 +1,10 @@
-class ProfileEntity {
+class ProfileRecordEntity {
   final int id;
   final int userId;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  const ProfileEntity({
+  const ProfileRecordEntity({
     required this.id,
     required this.userId,
     required this.createdAt,

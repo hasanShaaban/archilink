@@ -1,21 +1,21 @@
 
-import 'package:archilink/features/Auth/domain/entity/profile_entity.dart';
+import 'package:archilink/features/Auth/domain/entity/profile_record_entity.dart';
 
-class ProfileModel {
+class ProfileRecordModel {
   final int id;
   final int userId;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  ProfileModel({
+  ProfileRecordModel({
     required this.id,
     required this.userId,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  factory ProfileModel.fromJson(Map<String, dynamic> json) {
-    return ProfileModel(
+  factory ProfileRecordModel.fromJson(Map<String, dynamic> json) {
+    return ProfileRecordModel(
       id: json['id'],
       userId: json['user_id'],
       createdAt: DateTime.parse(json['created_at']),
@@ -23,8 +23,8 @@ class ProfileModel {
     );
   }
 
-  ProfileEntity toEntity() {
-    return ProfileEntity(
+  ProfileRecordEntity toEntity() {
+    return ProfileRecordEntity(
       id: id,
       userId: userId,
       createdAt: createdAt,
