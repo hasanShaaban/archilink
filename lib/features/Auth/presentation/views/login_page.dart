@@ -3,7 +3,7 @@ import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/auth_button.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/views/widgets/remember_me_section.dart';
-import 'package:archilink/features/main/presentation/views/main_page.dart';
+import 'package:archilink/features/Main/presentation/views/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:archilink/core/widgets/auth_text_field.dart';

@@ -1,4 +1,4 @@
-import 'package:archilink/features/chat/presentation/view/widgets/chat_filter_chip.dart';
+import 'package:archilink/features/Chat/presentation/view/widgets/chat_filter_chip.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 

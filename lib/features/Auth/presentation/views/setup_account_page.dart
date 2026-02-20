@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/auth_button.dart';
@@ -11,7 +9,7 @@ import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_c
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
 import 'package:archilink/features/Auth/presentation/views/widgets/phone_number_text_field.dart';
 import 'package:archilink/features/Auth/presentation/views/widgets/role_drop_down_field.dart';
-import 'package:archilink/features/main/presentation/views/main_page.dart';
+import 'package:archilink/features/Main/presentation/views/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

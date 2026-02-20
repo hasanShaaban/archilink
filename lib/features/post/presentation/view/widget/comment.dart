@@ -1,6 +1,6 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
-import 'package:archilink/features/post/presentation/view/widget/comment_like_button.dart';
+import 'package:archilink/features/Post/presentation/view/widget/comment_like_button.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

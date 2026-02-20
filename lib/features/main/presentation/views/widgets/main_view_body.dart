@@ -1,13 +1,11 @@
-import 'package:archilink/core/services/service_locator.dart';
+
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/assets.dart';
-import 'package:archilink/features/Auth/domain/data_source/auth_local_data_source.dart';
 import 'package:archilink/features/Home/presentation/views/home_page_body.dart';
 import 'package:archilink/features/Profile/domain/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/profile_page_body.dart';
-import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
-import 'package:archilink/features/main/presentation/views/widgets/nav_bar_icon_and_label.dart';
+import 'package:archilink/features/Main/presentation/views/widgets/nav_bar_icon_and_label.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -87,9 +85,8 @@ class _MainViewBodyState extends State<MainViewBody> {
       stateManagement: true,
       onItemSelected: (value) {
         if(value == 2){
-          AuthLocalDataSource dataSource = sl<AuthLocalDataSource>();
-          String username = dataSource.getUsername()!;
-          BlocProvider.of<ProfileCubit>(context).getProfile(username: username);
+          
+          BlocProvider.of<ProfileCubit>(context).getPersonlProfile();
         }
       },
       navBarStyle: NavBarStyle.style13,

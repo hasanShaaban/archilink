@@ -1,10 +1,10 @@
 import 'package:archilink/core/functions/on_generate_route.dart';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/theme/app_theme.dart';
+import 'package:archilink/core/utils/constants.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Splash/presentation/views/splash_view.dart';
-import 'package:archilink/features/chat/presentation/view/chat_list_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,9 +15,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
-  final authBox = await Hive.openBox('authBox');
-
-  await initServiceLocator(authBox);
+  final authBox = await Hive.openBox(kAuthBox);
+  final profileBox = await Hive.openBox(kProfileBox);
+  await initServiceLocator(authBox: authBox, profileBox: profileBox);
 
   runApp(const MyApp());
 }
@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
+      //Bloc Providers 
       providers: [
         BlocProvider(create: (context) => ProfileCubit(sl<ProfileRepo>())),
       ],

@@ -12,14 +12,30 @@ class UserProfileResponseModel {
   });
 
   factory UserProfileResponseModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>;
-
     return UserProfileResponseModel(
       profile: ProfileModel.fromJson(
-        data['profile_data'] as Map<String, dynamic>,
+        json['profile_data'] as Map<String, dynamic>,
       ),
       followStats: FollowStatsModel.fromJson(
-        data['follow_data'] as Map<String, dynamic>,
+        json['follow_data'] as Map<String, dynamic>,
+      ),
+    );
+  }
+  factory UserProfileResponseModel.fromLocalDataSource(
+    Map<String, dynamic> data,
+  ) {
+    return UserProfileResponseModel(
+      profile: ProfileModel(
+        name: data['name'],
+        username: data['username'],
+        email: data['email'],
+        bio: data['bio'],
+        location: data['location'],
+        profilePictureUrl: data['profilePictureUrl'],
+      ),
+      followStats: FollowStatsModel(
+        followedCount: data['followers'],
+        followerCount: data['following'],
       ),
     );
   }

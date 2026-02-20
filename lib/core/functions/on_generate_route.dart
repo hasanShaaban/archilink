@@ -3,11 +3,11 @@ import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/features/Splash/presentation/views/splash_view.dart';
-import 'package:archilink/features/chat/presentation/view/chat_list_view.dart';
-import 'package:archilink/features/chat/presentation/view/app_chat_view.dart';
-import 'package:archilink/features/post/presentation/view/post_details_view.dart';
+import 'package:archilink/features/Chat/presentation/view/chat_list_view.dart';
+import 'package:archilink/features/Chat/presentation/view/app_chat_view.dart';
+import 'package:archilink/features/Post/presentation/view/post_details_view.dart';
 import 'package:flutter/material.dart';
-import 'package:archilink/features/main/presentation/views/main_page.dart';
+import 'package:archilink/features/Main/presentation/views/main_page.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
 

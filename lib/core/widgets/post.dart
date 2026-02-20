@@ -1,6 +1,3 @@
-
-import 'dart:developer';
-
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/post_actions.dart';
 import 'package:archilink/core/widgets/post_body.dart';
@@ -37,12 +34,16 @@ class Post extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User image section
+//------------// User image section //-------------------------------------------------------------------------
               GestureDetector(
-                onTap: (){
-                  Navigator.of(context, rootNavigator: true).pushNamed(UserProfileView.name);
+                onTap: () {
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pushNamed(UserProfileView.name);
                 },
-                child: PostUserImage(width: width)),
+                child: PostUserImage(width: width),
+              ),
               SizedBox(width: 12),
               Expanded(
                 child: Padding(
@@ -50,7 +51,7 @@ class Post extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // User name and date section
+//--------------------// User name and date section //--------------------------------------------------------
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -66,15 +67,15 @@ class Post extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 9),
-                      // Post body section
+//--------------------// Post body section //---------------------------------------------------------------
                       PostBody(
                         width: width,
                         height: height,
                         withDetails: withDetails,
                       ),
                       SizedBox(height: 16),
-                      withDetails? PostLocationDateAndTags() : SizedBox(),
-                      // Post actions section
+                      withDetails ? PostLocationDateAndTags() : SizedBox(),
+//--------------------// Post actions section //------------------------------------------------------------
                       PostActions(width: width),
                     ],
                   ),
@@ -87,4 +88,3 @@ class Post extends StatelessWidget {
     );
   }
 }
-

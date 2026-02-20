@@ -3,5 +3,6 @@ import 'package:archilink/features/Profile/domain/entity/user_profile_entity.dar
 import 'package:dartz/dartz.dart';
 
 abstract class ProfileRepo {
-  Future<Either<Failure, UserProfileEntity>> getProfile({required String username});
+  Future<Either<Failure, UserProfileEntity>> getPersonalProfile();
+  Future<Either<Failure, UserProfileEntity>> getUserProfile({required String username});
 }

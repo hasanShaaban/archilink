@@ -5,6 +5,7 @@ import 'package:archilink/core/network/interceptors/error_interceptor.dart';
 import 'package:archilink/core/network/interceptors/log_interceptor.dart';
 import 'package:archilink/core/storage/hive_storage.dart';
 import 'package:archilink/core/storage/local_storage.dart';
+import 'package:archilink/core/utils/constants.dart';
 import 'package:archilink/features/Auth/data/data_source/auth_local_data_source_impl.dart';
 import 'package:archilink/features/Auth/data/data_source/auth_remote_data_source_impl.dart';
 import 'package:archilink/features/Auth/data/repo/auth_repo_impl.dart';
@@ -13,8 +14,10 @@ import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_sour
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
+import 'package:archilink/features/Profile/data/data_source/profile_local_data_source_impl.dart';
 import 'package:archilink/features/Profile/data/data_source/profile_remote_data_source_impl.dart';
 import 'package:archilink/features/Profile/data/repo/profile_repo_impl.dart';
+import 'package:archilink/features/Profile/domain/data_source/profile_local_data_source.dart';
 import 'package:archilink/features/Profile/domain/data_source/profile_remote_data_source.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:dio/dio.dart';
@@ -23,17 +26,33 @@ import 'package:hive/hive.dart';
 
 final GetIt sl = GetIt.instance;
 
-Future<void> initServiceLocator(Box authBox) async {
+Future<void> initServiceLocator({
+  required Box authBox,
+  required Box profileBox,
+}) async {
   ///----------
   ///Storage
   ///----------
-  sl.registerLazySingleton<LocalStorage>(() => HiveStorage(authBox));
+  sl.registerLazySingleton<LocalStorage>(
+    () => HiveStorage(authBox),
+    instanceName: kAuthStorage,
+  );
+  sl.registerLazySingleton<LocalStorage>(
+    () => HiveStorage(profileBox),
+    instanceName: kProfileStorage,
+  );
 
   ///---------
   ///Local data source
   ///---------
   sl.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSourceImpl(sl()),
+    () => AuthLocalDataSourceImpl(sl<LocalStorage>(instanceName: kAuthStorage)),
+  );
+
+  sl.registerLazySingleton<ProfileLocalDataSource>(
+    () => ProfileLocalDataSourceImpl(
+      sl<LocalStorage>(instanceName: kProfileStorage),
+    ),
   );
 
   ///---------
@@ -81,7 +100,9 @@ Future<void> initServiceLocator(Box authBox) async {
     () => AuthRepoImpl(localDataSource: sl(), remoteDataSource: sl()),
   );
 
-  sl.registerLazySingleton<ProfileRepo>(() => ProfileRepoImpl(sl()));
+  sl.registerLazySingleton<ProfileRepo>(
+    () => ProfileRepoImpl(remoteDataSource: sl(), localDataSource: sl()),
+  );
 
   ///---------
   ///Bloc

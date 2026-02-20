@@ -1,14 +1,13 @@
 
-import 'dart:developer';
+
 
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
-import 'package:archilink/features/chat/presentation/view/app_chat_view.dart';
-import 'package:archilink/features/chat/presentation/view/widgets/chat_app_bar.dart';
-import 'package:archilink/features/chat/presentation/view/widgets/chat_filter_chips_section.dart';
+import 'package:archilink/features/Chat/presentation/view/app_chat_view.dart';
+import 'package:archilink/features/Chat/presentation/view/widgets/chat_app_bar.dart';
+import 'package:archilink/features/Chat/presentation/view/widgets/chat_filter_chips_section.dart';
 import 'package:chatview/chatview.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';

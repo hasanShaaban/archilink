@@ -1,6 +1,7 @@
+import 'dart:developer';
+
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/main_appbar.dart';
-import 'package:archilink/features/Profile/domain/entity/user_profile_entity.dart';
 import 'package:archilink/features/Profile/domain/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/personal_profile_buttons.dart';
@@ -22,7 +23,6 @@ class ProfilePageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    UserProfileEntity? data;
     final double height = MediaQuery.of(context).size.height;
     final double width = MediaQuery.of(context).size.width;
     return DefaultTabController(
@@ -44,7 +44,6 @@ class ProfilePageBody extends StatelessWidget {
                   ),
             ProfielInfoHeader(
               width: width,
-              data: data,
               type: type,
               height: height,
             ),
@@ -69,13 +68,11 @@ class ProfielInfoHeader extends StatelessWidget {
   const ProfielInfoHeader({
     super.key,
     required this.width,
-    required this.data,
     required this.type,
     required this.height,
   });
 
   final double width;
-  final UserProfileEntity? data;
   final ProfileType type;
   final double height;
 
@@ -83,6 +80,13 @@ class ProfielInfoHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
+        if(state is ProfileSuccess){
+          log('Success');
+        }else if (state is ProfileLoading){
+          log('Loading');
+        }else if(state is ProfileFailuer){
+          log(state.errorMessage);
+        }
       },
       builder: (context, state) {
         final bool isLoading = state is ProfileLoading;
@@ -94,14 +98,14 @@ class ProfielInfoHeader extends StatelessWidget {
               children: [
                 ProfileImageSection(
                   width: width,
-                  image: data?.profile.profilePictureUrl,
+                  image: profileData?.profile.profilePictureUrl,
                 ),
                 SizedBox(height: 16),
                 ProfileInfoSection(profileData: profileData?.profile,),
                 SizedBox(height: 16),
                 _buildButtons(type, width, height),
                 SizedBox(height: 8),
-                ProfileStatisticsRow(),
+                ProfileStatisticsRow(statisticsData: profileData?.followStats,),
                 SizedBox(height: 19),
               ],
             ),
