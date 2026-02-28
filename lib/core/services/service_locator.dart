@@ -14,6 +14,11 @@ import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_sour
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
+import 'package:archilink/features/Home/data/data_source/home_remote_data_source_impl.dart';
+import 'package:archilink/features/Home/data/repo/home_repo_impl.dart';
+import 'package:archilink/features/Home/domain/data_source/home_remote_data_source.dart';
+import 'package:archilink/features/Home/domain/repo/home_repo.dart';
+import 'package:archilink/features/Home/presentation/manager/bloc/for_you_bloc.dart';
 import 'package:archilink/features/Profile/data/data_source/profile_local_data_source_impl.dart';
 import 'package:archilink/features/Profile/data/data_source/profile_remote_data_source_impl.dart';
 import 'package:archilink/features/Profile/data/repo/profile_repo_impl.dart';
@@ -64,6 +69,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<ProfileRemoteDataSource>(
     () => ProfileRemoteDataSourceImpl(sl()),
   );
+  sl.registerLazySingleton<HomeRemoteDataSource>(
+    () => HomeRemoteDataSourceImpl(sl()),
+  );
 
   ///----------
   ///Interceptor
@@ -103,10 +111,12 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<ProfileRepo>(
     () => ProfileRepoImpl(remoteDataSource: sl(), localDataSource: sl()),
   );
+  sl.registerLazySingleton<HomeRepo>(() => HomeRepoImpl(sl()));
 
   ///---------
   ///Bloc
   ///---------
   sl.registerLazySingleton(() => AuthCubit(sl()));
   sl.registerLazySingleton(() => CheckUsernameCubit(sl()));
+  sl.registerLazySingleton(() => ForYouBloc(sl()));
 }

@@ -23,6 +23,4 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource{
       throw AppException.handelDioException(e);
     }
   }
-
-  
 }

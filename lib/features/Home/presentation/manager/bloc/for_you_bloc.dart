@@ -1,0 +1,95 @@
+import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/features/Home/domain/entity/feed_item.dart';
+import 'package:archilink/features/Home/domain/entity/global_feed_entity.dart';
+import 'package:archilink/features/Home/domain/entity/post_entity.dart';
+import 'package:archilink/features/Home/domain/repo/home_repo.dart';
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+
+part 'for_you_event.dart';
+part 'for_you_state.dart';
+
+class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
+  final HomeRepo repo;
+
+  ForYouBloc(this.repo) : super(ForYouState()) {
+    on<LoadInitital>(_onLoadInitial);
+    on<LoadMore>(_onLoadMore);
+    on<RefreshFeed>(_onRefresh);
+  }
+
+  Future<void> _onLoadInitial(
+    LoadInitital event,
+    Emitter<ForYouState> emit,
+  ) async {
+    emit(state.copyWith(isInitialLoading: true));
+
+    final result = await repo.getGlobalFeed(page: 1);
+
+    result.fold(
+      (failure) =>
+          emit(state.copyWith(isInitialLoading: false, failure: failure)),
+      (data) {
+        final items = _buildFeedItem(data);
+
+        emit(
+          state.copyWith(
+            items: items,
+            isInitialLoading: false,
+            currentPage: 1,
+            hasReachedMax: data.posts.isEmpty,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onLoadMore(LoadMore event, Emitter<ForYouState> emit) async {
+    if (state.isLoadingMore || state.hasReachedMax) return;
+    emit(state.copyWith(isLoadingMore: true));
+    final nextPage = state.currentPage + 1;
+    final result = await repo.getGlobalFeed(page: nextPage);
+
+    result.fold((failure) => emit(state.copyWith(isLoadingMore: false)), (
+      data,
+    ) {
+      if (data.posts.isEmpty) {
+        emit(state.copyWith(isLoadingMore: false, hasReachedMax: true));
+      } else {
+        final newItems = _injectPosts(
+          existing: state.items,
+          newPosts: data.posts,
+        );
+
+        emit(
+          state.copyWith(
+            items: newItems,
+            isLoadingMore: false,
+            currentPage: nextPage,
+          ),
+        );
+      }
+    });
+  }
+
+  Future<void> _onRefresh(RefreshFeed event, Emitter<ForYouState> emit) async {
+    emit(ForYouState());
+    add(LoadInitital());
+  }
+
+  List<FeedItem> _buildFeedItem(GlobalFeedEntity data) {
+    return data.posts.map((post) => PostItem(post)).toList();
+  }
+
+  List<FeedItem> _injectPosts({
+    required List<FeedItem> existing,
+    required List<PostEntity> newPosts,
+  }) {
+    final updatedList = List<FeedItem>.from(existing);
+    final wrappedPosts = newPosts.map((post) => PostItem(post)).toList();
+
+    updatedList.addAll(wrappedPosts);
+
+    return updatedList;
+  }
+}
