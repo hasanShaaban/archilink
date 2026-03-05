@@ -31,7 +31,7 @@ class AuthBackGround extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(child: Container(
+        Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.bottomCenter,
@@ -41,7 +41,7 @@ class AuthBackGround extends StatelessWidget {
               Colors.black.withOpacity(0.4)
             ])
           ),
-        )),
+        ),
       ],
     );
   }

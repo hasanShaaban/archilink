@@ -48,11 +48,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             "name": name,
             "username": username,
             "email": email,
+            "phone_number": phone,
             "password": password,
             "password_confirmation": confirmPassword,
           },
           "role": role,
-          "login": true,//TODO add phone later
+          "login": true,
         },
       );
       final data = response.data;

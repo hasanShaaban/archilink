@@ -5,6 +5,7 @@ class UserEntity {
   final String email;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? phoneNumber;
 
   const UserEntity({
     required this.id,
@@ -12,6 +13,6 @@ class UserEntity {
     required this.username,
     required this.email,
     required this.createdAt,
-    required this.updatedAt,
+    required this.updatedAt, this.phoneNumber,
   });
 }

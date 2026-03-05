@@ -4,7 +4,6 @@ import 'package:archilink/features/Home/domain/entity/feed_item.dart';
 import 'package:archilink/features/Home/presentation/manager/bloc/for_you_bloc.dart';
 import 'package:archilink/features/Home/presentation/views/widgets/ads_section.dart';
 import 'package:archilink/features/Home/presentation/views/widgets/featured_member_section.dart';
-import 'package:archilink/features/Home/presentation/views/widgets/post_section.dart';
 import 'package:archilink/features/Post/presentation/view/post_details_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +32,7 @@ class _ForYouPageState extends State<ForYouPage> {
     }
   }
 
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -60,7 +60,7 @@ class _ForYouPageState extends State<ForYouPage> {
                 ),
               ),
 
-              /// POSTS
+              /// POSTS//TODO: fill the posts data in the feed cards 
               SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final item = state.items[index];

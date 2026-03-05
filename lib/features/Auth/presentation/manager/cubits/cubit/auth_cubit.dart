@@ -1,4 +1,5 @@
 
+import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -15,7 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await authRepo.login(email: email, password: password);
 
     result.fold(
-      (failure) => emit(AuthError(failure.message)),
+      (failure) => emit(AuthError(failure.message, failure: failure)),
       (_) => emit(AuthAuthenticated()),
     );
   }
@@ -40,7 +41,7 @@ class AuthCubit extends Cubit<AuthState> {
       phone: phone
     );
     result.fold(
-      (failure) => emit(AuthError(failure.message)),
+      (failure) => emit(AuthError(failure.message, failure: failure)),
       (_) => emit(AuthAuthenticated()),
     );
   }

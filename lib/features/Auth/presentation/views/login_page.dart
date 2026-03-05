@@ -1,3 +1,5 @@
+import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/core/functions/snack_bar_builder.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/auth_button.dart';
@@ -42,85 +44,73 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacementNamed(context, MainView.name);
         }
         if (state is AuthError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            appSnackBar(context, state),
+            
+          );
         }
       },
       builder: (context, state) {
-        return Stack(
-          children: [
-            Form(
-              autovalidateMode: autovalidateMode,
-              key: _formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        return Form(
+          autovalidateMode: autovalidateMode,
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: height * 51 / 896),
+                AuthTextField(
+                  height: height,
+                  label: 'Email Address',
+                  hint: 'email@gmail.com',
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  errorText: emailError,
+                  onChanged: (_) => setState(() => emailError = null),
+                ),
+                SizedBox(height: 10),
+                AuthTextField(
+                  height: height,
+                  label: 'Password',
+                  hint: 'Your Password',
+                  controller: passwordController,
+                  isPassword: true,
+                  errorText: passwordError,
+                  onChanged: (_) => setState(() => passwordError = null),
+                ),
+                SizedBox(height: 16),
+                Row(
                   children: [
-                    SizedBox(height: height * 51 / 896),
-                    AuthTextField(
-                      height: height,
-                      label: 'Email Address',
-                      hint: 'email@gmail.com',
-                      controller: emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      errorText: emailError,
-                      onChanged: (_) => setState(() => emailError = null),
-                    ),
-                    SizedBox(height: 10),
-                    AuthTextField(
-                      height: height,
-                      label: 'Password',
-                      hint: 'Your Password',
-                      controller: passwordController,
-                      isPassword: true,
-                      errorText: passwordError,
-                      onChanged: (_) => setState(() => passwordError = null),
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      children: [
-                        RememberMeSection(),
-                        Spacer(),
-                        Text(
-                          'Forgot Password?',
-                          style: AppTextStyle.mallannaSemiBold14.copyWith(
-                            color: AppColors.red,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: height * 42 / 896),
-                    AuthButton(
-                      onPressed: _onLoginPressed,
-                      height: height,
-                      content: Text(
-                        'Login',
-                        style: AppTextStyle.mallannaSemiBold17.copyWith(
-                          color: AppColors.whiteForElements,
-                        ),
+                    RememberMeSection(),
+                    Spacer(),
+                    Text(
+                      'Forgot Password?',
+                      style: AppTextStyle.mallannaSemiBold14.copyWith(
+                        color: AppColors.red,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ),
-            state is AuthLoading
-                ? Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.darkGray.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(child: CircularProgressIndicator()),
+                SizedBox(height: height * 42 / 896),
+                AuthButton(
+                  onPressed: _onLoginPressed,
+                  height: height,
+                  content: Text(
+                    'Login',
+                    style: AppTextStyle.mallannaSemiBold17.copyWith(
+                      color: AppColors.whiteForElements,
                     ),
-                  )
-                : SizedBox(),
-          ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
   }
+
+  
 
   void _onLoginPressed() {
     setState(() {
@@ -128,10 +118,10 @@ class _LoginPageState extends State<LoginPage> {
       passwordError = _passwordValidator(passwordController.text);
     });
     if (emailError == null && passwordError == null) {
-      BlocProvider.of<AuthCubit>(context).login(
-        email: emailController.text,
-        password: passwordController.text,
-      );
+      FocusScope.of(context).unfocus();
+      BlocProvider.of<AuthCubit>(
+        context,
+      ).login(email: emailController.text, password: passwordController.text);
     } else {
       setState(() {
         autovalidateMode = AutovalidateMode.always;
@@ -159,3 +149,4 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 }
+

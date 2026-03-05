@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:archilink/core/functions/snack_bar_builder.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/auth_button.dart';
@@ -51,7 +52,7 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
         if (state is AuthError) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          ).showSnackBar(appSnackBar(context, state));
         }
       },
       builder: (context, state) {
@@ -116,25 +117,31 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
   }
 
   void _onSignUpPressed() {
-    // 1. Enable auto-validation FIRST
+    //Activate the validator 
     setState(() {
       autovalidateMode = AutovalidateMode.always;
     });
 
-    // 2. Manually validate non-FormField inputs
+    //Validate the fields 
     fullNameError = _nameValidator(nameController.text);
     usernameError = _usernameValidator(usernameController.text);
 
-    // 3. Trigger rebuild for manual errors
     setState(() {});
 
-    // 4. Validate FormFields (Role dropdown)
+    //get the validation statues 
     final isFormValid = _formKey.currentState!.validate();
 
-    // 5. Final decision
     if (isFormValid && fullNameError == null && usernameError == null) {
+      //Save the current state 
       _formKey.currentState!.save();
+
+      //Unfocus the fields
+      FocusScope.of(context).unfocus();
+
+      //Get the drafet of the signup
       SignupDraft draft = widget.c.draft;
+
+      //Register request
       BlocProvider.of<AuthCubit>(context).register(
         email: draft.email!,
         password: draft.password!,
@@ -144,7 +151,6 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
         role: widget.c.draft.role!,
         phone: phoneController.text,
       );
-      // submit
     }
   }
 
@@ -182,4 +188,5 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
   }
 }
 
-List<String> usernames = ['hasan', 'hasson1', 'hasson2', 'hhhh'];
+
+

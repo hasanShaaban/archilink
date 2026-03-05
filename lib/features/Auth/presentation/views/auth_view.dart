@@ -1,4 +1,5 @@
 import 'package:archilink/core/services/service_locator.dart';
+import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/features/Auth/domain/auth_step.dart';
 import 'package:archilink/features/Auth/presentation/manager/controller/auth_flow_controller.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
@@ -43,30 +44,57 @@ class AuthViewBody extends StatelessWidget {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         body: SafeArea(
-          child: Stack(
-            children: [
-              const AuthBackGround(),
-
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                switchInCurve: Curves.easeInExpo,
-                switchOutCurve: Curves.easeOutExpo,
-                transitionBuilder: (child, animation) =>
-                    FadeTransition(opacity: animation, child: child),
-                child: Column(
-                  key: ValueKey(step),
-                  children: [
-                    TopSection(step: step),
-                    _pageContainer(step: step, c: controller),
-                    Spacer(),
-                    BottomSection(step: step, controller: controller),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          child: AuthViewBodyStack(step: step, controller: controller),
         ),
       ),
+    );
+  }
+}
+
+class AuthViewBodyStack extends StatelessWidget {
+  const AuthViewBodyStack({
+    super.key,
+    required this.step,
+    required this.controller,
+  });
+
+  final AuthStep step;
+  final AuthFlowController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, state) {
+        return Stack(
+          children: [
+            const AuthBackGround(),
+
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              switchInCurve: Curves.easeInExpo,
+              switchOutCurve: Curves.easeOutExpo,
+              transitionBuilder: (child, animation) =>
+                  FadeTransition(opacity: animation, child: child),
+              child: Column(
+                key: ValueKey(step),
+                children: [
+                  TopSection(step: step),
+                  _pageContainer(step: step, c: controller),
+                  Spacer(),
+                  BottomSection(step: step, controller: controller),
+                ],
+              ),
+            ),
+            if(state is AuthLoading)
+            Container(
+              color: AppColors.darkGray.withOpacity(0.3),
+              child: Center(
+                child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary,),
+              ),
+            )
+          ],
+        );
+      },
     );
   }
 }

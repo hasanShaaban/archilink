@@ -55,6 +55,7 @@ class AuthRepoImpl implements AuthRepo {
         phone: phone,
       );
       await localDataSource.saveToken(model.token);
+      await localDataSource.saveUsername(model.user.username);
       return right(model.toEntity());
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));
