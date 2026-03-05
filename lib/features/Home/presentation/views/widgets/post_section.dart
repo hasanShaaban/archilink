@@ -14,10 +14,7 @@ class FeedSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(lang.feed, style: AppTextStyle.manjariRegular20),
-        ),
+        
         const SizedBox(height: 8),
         PostListView(lang: lang, width: width, height: height)
       ],

@@ -47,14 +47,16 @@ class _AdsSectionState extends State<AdsSection> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          AnimatedAdContainer(currentIndex: _currentIndex, colors: _colors, height: height),
+          const SizedBox(height: 15),
+          AnimatedAdContainer(
+            currentIndex: _currentIndex,
+            colors: _colors,
+            height: height,
+          ),
           SizedBox(height: 10),
-          AdsDotsIndecator(colors: _colors, currentIndex: _currentIndex)
+          AdsDotsIndecator(colors: _colors, currentIndex: _currentIndex),
         ],
       ),
     );
   }
 }
-
-
-

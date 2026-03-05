@@ -19,6 +19,7 @@ class FeaturedMemberSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 20),
           Text(lang.featuredMember, style: AppTextStyle.manjariRegular20),
           const SizedBox(height: 8),
           SizedBox(

@@ -21,7 +21,7 @@ class PostListView extends StatelessWidget {
       padding: EdgeInsets.zero,
       itemCount: 5,
       shrinkWrap: true,
-      physics: BouncingScrollPhysics(),
+      physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         return Column(
           children: [
@@ -47,3 +47,5 @@ class PostListView extends StatelessWidget {
     );
   }
 }
+
+
