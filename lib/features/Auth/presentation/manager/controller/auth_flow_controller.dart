@@ -8,6 +8,12 @@ class AuthFlowController extends ChangeNotifier {
   AuthStep _currentStep = AuthStep.onboarding;
   AuthStep get currentStep => _currentStep;
 
+  bool validEmail = true;
+
+  void setValidEmail(bool isVaild){
+    validEmail = isVaild;
+  }
+
   void goTo(AuthStep step) {
     _currentStep = step;
     notifyListeners();

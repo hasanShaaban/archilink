@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/core/functions/snack_bar_builder.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
@@ -50,6 +51,11 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
           Navigator.pushReplacementNamed(context, MainView.name);
         }
         if (state is AuthError) {
+          if(state.failure is ServerFailure && state.failure.message.contains('The data did not pass the validation')){
+            widget.c.toSignup();
+            widget.c.setValidEmail(false);
+            
+          }
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(appSnackBar(context, state));

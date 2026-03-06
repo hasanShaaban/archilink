@@ -1,4 +1,4 @@
-import 'package:archilink/core/error/failure.dart';
+
 import 'package:archilink/core/functions/snack_bar_builder.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
