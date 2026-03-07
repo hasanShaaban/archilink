@@ -5,4 +5,6 @@ abstract class AuthLocalDataSource {
   Future<void> saveUsername(String username);
   String? getUsername();
   Future<void> clearUsername();
+  Future<void> setRememberMe(bool rememberMe);
+  bool? getRemeberMe();
 }

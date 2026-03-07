@@ -5,6 +5,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource{
   final LocalStorage storage;
   static const _tokenKey = 'ACCESS_TOKEN';
   static const _usernameKey = 'USERNAME';
+  static const _rememberMeKey = 'REMEMBERME';
 
   AuthLocalDataSourceImpl(this.storage);
   @override
@@ -36,6 +37,16 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource{
   @override
   Future<void> saveUsername(String username) async{
     await storage.write(_usernameKey, username);
+  }
+  
+  @override
+  Future<void> setRememberMe(bool rememberMe) async{
+    await storage.write(_rememberMeKey, rememberMe);
+  }
+  
+  @override
+  bool? getRemeberMe() {
+    return storage.read<bool>(_rememberMeKey);
   }
 
   

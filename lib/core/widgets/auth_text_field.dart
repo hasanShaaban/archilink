@@ -1,5 +1,5 @@
-import 'dart:developer';
 
+import 'package:archilink/core/functions/snack_bar_builder.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
@@ -154,7 +154,8 @@ class AuthUsernameField extends StatefulWidget {
     required this.hint,
     required this.controller,
     this.onChanged,
-    required this.isUsernameTaken, this.errorText,
+    required this.isUsernameTaken,
+    this.errorText,
   });
 
   final double height;
@@ -189,7 +190,9 @@ class _AuthUsernameFieldState extends State<AuthUsernameField>
 
     return BlocConsumer<CheckUsernameCubit, CheckUsernameState>(
       listener: (context, state) {
-        log('Username check state: $state');
+        if(state is CheckUsernameFailure){
+          ScaffoldMessenger.of(context).showSnackBar(appSnackBar(context, state.failure, state.message));
+        }
       },
       builder: (context, state) {
         return Column(
@@ -228,16 +231,16 @@ class _AuthUsernameFieldState extends State<AuthUsernameField>
             ),
 
             /// Custom error container (does NOT affect field size)
-            state is CheckUsernameLoading ?
-            SizedBox(
-              width: 16,
-              child: CircularProgressIndicator()) : 
             AnimatedSize(
               duration: const Duration(milliseconds: 100),
               curve: Curves.easeInOut,
               alignment: Alignment.topLeft,
-              child: widget.errorText != null ||  state is CheckUsernameAvailable ||
-                      state is CheckUsernameTaken
+              child:
+                  widget.errorText != null ||
+                      state is CheckUsernameAvailable ||
+                      state is CheckUsernameTaken || 
+                      state is CheckUsernameLoading || 
+                      state is CheckUsernameFailure
                   ? Padding(
                       padding: const EdgeInsets.only(top: 6),
                       child: Container(
@@ -246,18 +249,43 @@ class _AuthUsernameFieldState extends State<AuthUsernameField>
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: state is CheckUsernameTaken ? AppColors.red.withOpacity(0.1) : state is CheckUsernameAvailable ? Theme.of(context).colorScheme.primary.withOpacity(0.1) : AppColors.red.withOpacity(0.1),
+                          color: state is CheckUsernameTaken
+                              ? AppColors.red.withOpacity(0.1)
+                              : state is CheckUsernameAvailable || state is CheckUsernameLoading 
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.primary.withOpacity(0.1)
+                              : AppColors.red.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          widget.errorText != null ? widget.errorText! :
-                          state is CheckUsernameTaken ?
-                          'This username is already in use' : state is CheckUsernameAvailable ?
-                          'accepted' : '',
-                          style: AppTextStyle.interRegular10.copyWith(
-                            color: widget.errorText != null || state is CheckUsernameTaken ? AppColors.red : state is CheckUsernameAvailable ? Theme.of(context).colorScheme.primary : AppColors.red,
-                          ),
-                        ),
+                        child: state is CheckUsernameLoading
+                            ? SizedBox(
+                              height: 11,
+                              width: 11,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1,
+                              ),
+                            )
+                            : Text(
+                                widget.errorText != null
+                                    ? widget.errorText!
+                                    : state is CheckUsernameTaken
+                                    ? 'This username is already in use'
+                                    : state is CheckUsernameAvailable
+                                    ? 'accepted'
+                                    : state is CheckUsernameFailure 
+                                    ? state.message
+                                    :'',
+                                style: AppTextStyle.interRegular10.copyWith(
+                                  color:
+                                      widget.errorText != null ||
+                                          state is CheckUsernameTaken
+                                      ? AppColors.red
+                                      : state is CheckUsernameAvailable
+                                      ? Theme.of(context).colorScheme.primary
+                                      : AppColors.red,
+                                ),
+                              ),
                       ),
                     )
                   : const SizedBox(),

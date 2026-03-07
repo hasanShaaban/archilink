@@ -10,14 +10,17 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
   AuthCubit(this.authRepo) : super(AuthInitial());
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({required String email, required String password, required bool rememberMe}) async {
     emit(AuthLoading());
 
     final result = await authRepo.login(email: email, password: password);
 
     result.fold(
       (failure) => emit(AuthError(failure.message, failure: failure)),
-      (_) => emit(AuthAuthenticated()),
+      (success){
+        authRepo.setRememberMe(rememberMe);
+         emit(AuthAuthenticated());
+      },
     );
   }
 
@@ -42,7 +45,10 @@ class AuthCubit extends Cubit<AuthState> {
     );
     result.fold(
       (failure) => emit(AuthError(failure.message, failure: failure)),
-      (_) => emit(AuthAuthenticated()),
+      (success) {
+        authRepo.setRememberMe(true);
+        emit(AuthAuthenticated());
+      },
     );
   }
 }

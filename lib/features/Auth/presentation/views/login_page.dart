@@ -1,4 +1,5 @@
 
+
 import 'package:archilink/core/functions/snack_bar_builder.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
@@ -25,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool rememberMe = false;
 
   String? emailError, passwordError;
 
@@ -45,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
         }
         if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            appSnackBar(context, state),
+            appSnackBar(context, state.failure, state.message),
             
           );
         }
@@ -81,7 +83,14 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 16),
                 Row(
                   children: [
-                    RememberMeSection(),
+                    RememberMeSection(
+                      checked: rememberMe,
+                      onChanged: (value) {
+                        setState(() {
+                          rememberMe = value;
+                        });
+                      },
+                    ),
                     Spacer(),
                     Text(
                       'Forgot Password?',
@@ -121,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
       FocusScope.of(context).unfocus();
       BlocProvider.of<AuthCubit>(
         context,
-      ).login(email: emailController.text, password: passwordController.text);
+      ).login(email: emailController.text, password: passwordController.text, rememberMe: rememberMe);
     } else {
       setState(() {
         autovalidateMode = AutovalidateMode.always;

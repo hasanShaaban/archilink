@@ -75,4 +75,14 @@ class AuthRepoImpl implements AuthRepo {
       return left(UnknownFailure());
     }
   }
+  
+  @override
+  bool? getRemeberMe() {
+    return localDataSource.getRemeberMe();
+  }
+  
+  @override
+  Future<void> setRememberMe(bool rememeberMe) async{
+   await localDataSource.setRememberMe(rememeberMe); 
+  }
 }

@@ -15,4 +15,6 @@ abstract class AuthRepo {
     String? phone,
   });
   Future<Either<Failure, bool>> checkUsername({required String username});
+  Future<void> setRememberMe(bool rememeberMe);
+  bool? getRemeberMe();
 }

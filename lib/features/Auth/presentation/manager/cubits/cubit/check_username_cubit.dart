@@ -1,3 +1,4 @@
+import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -12,7 +13,7 @@ class CheckUsernameCubit extends Cubit<CheckUsernameState> {
     emit(CheckUsernameLoading());
     final result = await authRepo.checkUsername(username: username);
     result.fold(
-      (failure) => emit(CheckUsernameFailure(message: failure.message)),
+      (failure) => emit(CheckUsernameFailure(message: failure.message, failure: failure)),
       (available) {
         if (available) {
           emit(CheckUsernameAvailable());

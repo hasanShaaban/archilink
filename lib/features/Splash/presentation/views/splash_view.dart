@@ -1,7 +1,10 @@
 import 'dart:ui';
 
+import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
+import 'package:archilink/features/Main/presentation/views/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -12,28 +15,22 @@ class SplashView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(child: SplashViewBody()),
-    );
+    return Scaffold(body: SafeArea(child: SplashViewBody()));
   }
 }
 
 class SplashViewBody extends StatefulWidget {
-  const SplashViewBody({
-    super.key,
-  });
+  const SplashViewBody({super.key});
 
   @override
   State<SplashViewBody> createState() => _SplashViewBodyState();
 }
 
 class _SplashViewBodyState extends State<SplashViewBody> {
-
   double opacity = 0;
 
   @override
   void initState() {
-
     Future.delayed(const Duration(microseconds: 300), () {
       setState(() {
         opacity = 1;
@@ -44,12 +41,17 @@ class _SplashViewBodyState extends State<SplashViewBody> {
       _navigation();
     });
 
-    
     super.initState();
   }
 
   void _navigation() {
-    Navigator.pushReplacementNamed(context, AuthView.name);
+    final AuthRepo repo = sl<AuthRepo>();
+    final bool? rememberMe = repo.getRemeberMe();
+    if (rememberMe != null && rememberMe) {
+      Navigator.pushReplacementNamed(context, MainView.name);
+    } else {
+      Navigator.pushReplacementNamed(context, AuthView.name);
+    }
   }
 
   @override

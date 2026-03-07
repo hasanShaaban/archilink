@@ -14,5 +14,6 @@ final class CheckUsernameAvailable extends CheckUsernameState {
 final class CheckUsernameTaken extends CheckUsernameState {}
 final class CheckUsernameFailure extends CheckUsernameState {
   final String message;
-  const CheckUsernameFailure({required this.message});
+  final Failure failure;
+  const CheckUsernameFailure({required this.message, required this.failure});
 }

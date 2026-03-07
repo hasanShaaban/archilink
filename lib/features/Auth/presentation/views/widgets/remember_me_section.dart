@@ -1,17 +1,14 @@
+
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
+
 import 'package:flutter/material.dart';
 
-class RememberMeSection extends StatefulWidget {
-  const RememberMeSection({super.key, this.text});
-  final String? text;
+class RememberMeSection extends StatelessWidget {
+  const RememberMeSection({super.key, required this.checked, required this.onChanged});
 
-  @override
-  State<RememberMeSection> createState() => _RememberMeSectionState();
-}
-
-class _RememberMeSectionState extends State<RememberMeSection> {
-  bool checked = false;
+  final bool checked;
+  final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +18,7 @@ class _RememberMeSectionState extends State<RememberMeSection> {
       children: [
         GestureDetector(
           onTap: () {
-            setState(() {
-              checked = !checked;
-            });
+            onChanged(!checked);
           },
           child: Stack(
             children: [

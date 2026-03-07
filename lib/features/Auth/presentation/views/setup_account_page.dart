@@ -41,7 +41,7 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
     nameController.dispose();
     super.dispose();
   }
-
+  //TODO: validation error handling, create error model to each used username and used email to sign up
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
@@ -58,7 +58,7 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
           }
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(appSnackBar(context, state));
+          ).showSnackBar(appSnackBar(context, state.failure, state.message));
         }
       },
       builder: (context, state) {
@@ -68,7 +68,7 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
           child: Column(
             children: [
               SizedBox(height: height * 51 / 896),
-              AuthTextField(
+              AuthTextField(//-----------------------------------NAME------------------------
                 height: height,
                 label: 'Name',
                 hint: 'Your Full Name',
@@ -78,7 +78,7 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
                 onChanged: (_) => setState(() => fullNameError = null),
               ),
               const SizedBox(height: 10),
-              AuthUsernameField(
+              AuthUsernameField(//-------------------------------USERNAME-----------------------
                 height: height,
                 label: 'Username',
                 hint: 'Your username',
@@ -88,7 +88,7 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
                 errorText: usernameError,
               ),
               const SizedBox(height: 10),
-              RoleDropDownField(
+              RoleDropDownField(//------------------------------ROLE------------------------------
                 autovalidateMode: autovalidateMode,
                 height: height,
                 label: 'Role',
@@ -99,11 +99,14 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
                   'Mentor Account',
                   'Store Account',
                 ],
-                onSelected: widget.c.setRole,
+                onSelected: (value){
+                  FocusScope.of(context).unfocus();
+                  widget.c.setRole(value);
+                },
                 validator: _roleValidator,
               ),
               const SizedBox(height: 10),
-              PhoneNumberTextField(height: height, controler: phoneController),
+              PhoneNumberTextField(height: height, controler: phoneController),//-----------------------------PHONE-----------------
               SizedBox(height: height * 42 / 896),
               AuthButton(
                 height: height,
@@ -140,6 +143,8 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
     if (isFormValid && fullNameError == null && usernameError == null) {
       //Save the current state 
       _formKey.currentState!.save();
+
+      
 
       //Unfocus the fields
       FocusScope.of(context).unfocus();
