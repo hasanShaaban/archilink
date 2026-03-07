@@ -1,6 +1,7 @@
 import 'package:archilink/core/error/exception_to_faliure_mapper.dart';
 import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/features/Auth/data/models/validation_error_response.dart';
 import 'package:archilink/features/Auth/domain/data_source/auth_local_data_source.dart';
 import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_source.dart';
 import 'package:archilink/features/Auth/domain/entity/auth_token.dart';
@@ -58,31 +59,47 @@ class AuthRepoImpl implements AuthRepo {
       await localDataSource.saveUsername(model.user.username);
       return right(model.toEntity());
     } on AppException catch (e) {
+      if (e is ValidationException) {
+        final data = e.response?.data;
+        if (data != null && data['errors'] != null) {
+          final error = ValidationErrorResponse.fromJson(data);
+          return left(
+            ValidationFailure(
+              message: error.message,
+              fieldErrors: error.errors,
+            ),
+          );
+        }
+      }
       return left(mapExceptionToFailure(e));
     } catch (_) {
       return left(UnknownFailure());
     }
   }
-  
+
   @override
-  Future<Either<Failure, bool>> checkUsername({required String username}) async {
-    try{
-      final available = await remoteDataSource.checkUsername(username: username);
+  Future<Either<Failure, bool>> checkUsername({
+    required String username,
+  }) async {
+    try {
+      final available = await remoteDataSource.checkUsername(
+        username: username,
+      );
       return right(available);
-    }on AppException catch (e) {
+    } on AppException catch (e) {
       return left(mapExceptionToFailure(e));
     } catch (_) {
       return left(UnknownFailure());
     }
   }
-  
+
   @override
   bool? getRemeberMe() {
     return localDataSource.getRemeberMe();
   }
-  
+
   @override
-  Future<void> setRememberMe(bool rememeberMe) async{
-   await localDataSource.setRememberMe(rememeberMe); 
+  Future<void> setRememberMe(bool rememeberMe) async {
+    await localDataSource.setRememberMe(rememeberMe);
   }
 }

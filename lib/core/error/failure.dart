@@ -2,7 +2,8 @@
 import 'package:equatable/equatable.dart';
 abstract class Failure extends Equatable{
   final String message;
-  const Failure({required this.message});
+  final Map<String, List<String>>? fieldErrors;
+  const Failure({required this.message, this.fieldErrors});
 
   @override
   List<Object?> get props => [message,];
@@ -30,7 +31,7 @@ class ForbiddenFailure extends Failure {
 }
 
 class ValidationFailure extends Failure {
-  const ValidationFailure({required super.message});
+  const ValidationFailure({required super.message, super.fieldErrors});
 }
 
 class CacheFailure extends Failure {
@@ -44,3 +45,5 @@ class UnknownFailure extends Failure {
 class NotFoundFailure extends Failure {
   const NotFoundFailure({super.message = 'Not Found'});
 }
+
+

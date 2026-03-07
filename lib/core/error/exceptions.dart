@@ -3,8 +3,9 @@ import 'package:dio/dio.dart';
 abstract class AppException implements Exception {
   final String message;
   final int? code;
+  final Response<dynamic>? response;
 
-  const AppException({required this.message, this.code});
+  const AppException({required this.message, this.code, this.response});
 
   static AppException handelDioException(DioException error) {
     switch (error.type) {
@@ -23,6 +24,8 @@ abstract class AppException implements Exception {
             return const ForbiddenException();
           case 404:
             return const NotFoundException();
+          case 301:
+            return ValidationException(response: error.response);
           default:
             return ServerException(
               message: error.response?.data['message'] ?? 'Server Error',
@@ -64,6 +67,13 @@ class TimeoutException extends AppException {
 
 class CacheException extends AppException {
   const CacheException({super.message = 'Cache error'});
+}
+
+class ValidationException extends AppException {
+  const ValidationException({
+    super.message = 'validation Error',
+    super.response,
+  });
 }
 
 class UnknownException extends AppException {

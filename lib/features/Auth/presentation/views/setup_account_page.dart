@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/core/functions/snack_bar_builder.dart';
 import 'package:archilink/core/utils/app_colors.dart';
@@ -41,20 +42,26 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
     nameController.dispose();
     super.dispose();
   }
+
   //TODO: validation error handling, create error model to each used username and used email to sign up
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
-         if (state is AuthAuthenticated) {
+        if (state is AuthAuthenticated) {
           Navigator.pushReplacementNamed(context, MainView.name);
         }
         if (state is AuthError) {
-          if(state.failure is ServerFailure && state.failure.message.contains('The data did not pass the validation')){
+          if (state.failure is ServerFailure &&
+              state.failure.message.contains(
+                'The data did not pass the validation',
+              )) {}
+          if (state.failure is ValidationFailure) {
+            log(state.message);
+            log(state.failure.fieldErrors.toString());
             widget.c.toSignup();
             widget.c.setValidEmail(false);
-            
           }
           ScaffoldMessenger.of(
             context,
@@ -68,7 +75,8 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
           child: Column(
             children: [
               SizedBox(height: height * 51 / 896),
-              AuthTextField(//-----------------------------------NAME------------------------
+              AuthTextField(
+                //-----------------------------------NAME------------------------
                 height: height,
                 label: 'Name',
                 hint: 'Your Full Name',
@@ -78,7 +86,8 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
                 onChanged: (_) => setState(() => fullNameError = null),
               ),
               const SizedBox(height: 10),
-              AuthUsernameField(//-------------------------------USERNAME-----------------------
+              AuthUsernameField(
+                //-------------------------------USERNAME-----------------------
                 height: height,
                 label: 'Username',
                 hint: 'Your username',
@@ -88,7 +97,8 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
                 errorText: usernameError,
               ),
               const SizedBox(height: 10),
-              RoleDropDownField(//------------------------------ROLE------------------------------
+              RoleDropDownField(
+                //------------------------------ROLE------------------------------
                 autovalidateMode: autovalidateMode,
                 height: height,
                 label: 'Role',
@@ -99,14 +109,17 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
                   'Mentor Account',
                   'Store Account',
                 ],
-                onSelected: (value){
+                onSelected: (value) {
                   FocusScope.of(context).unfocus();
                   widget.c.setRole(value);
                 },
                 validator: _roleValidator,
               ),
               const SizedBox(height: 10),
-              PhoneNumberTextField(height: height, controler: phoneController),//-----------------------------PHONE-----------------
+              PhoneNumberTextField(
+                height: height,
+                controler: phoneController,
+              ), //-----------------------------PHONE-----------------
               SizedBox(height: height * 42 / 896),
               AuthButton(
                 height: height,
@@ -126,25 +139,23 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
   }
 
   void _onSignUpPressed() {
-    //Activate the validator 
+    //Activate the validator
     setState(() {
       autovalidateMode = AutovalidateMode.always;
     });
 
-    //Validate the fields 
+    //Validate the fields
     fullNameError = _nameValidator(nameController.text);
     usernameError = _usernameValidator(usernameController.text);
 
     setState(() {});
 
-    //get the validation statues 
+    //get the validation statues
     final isFormValid = _formKey.currentState!.validate();
 
     if (isFormValid && fullNameError == null && usernameError == null) {
-      //Save the current state 
+      //Save the current state
       _formKey.currentState!.save();
-
-      
 
       //Unfocus the fields
       FocusScope.of(context).unfocus();
@@ -198,6 +209,3 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
     });
   }
 }
-
-
-
