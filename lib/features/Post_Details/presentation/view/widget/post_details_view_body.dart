@@ -1,8 +1,8 @@
 import 'package:archilink/core/utils/temp.dart';
 import 'package:archilink/core/widgets/post.dart';
-import 'package:archilink/features/Post/presentation/view/widget/comment.dart';
-import 'package:archilink/features/Post/presentation/view/widget/post_details_app_bar.dart';
-import 'package:archilink/features/Post/presentation/view/widget/sort_comments_buttons.dart';
+import 'package:archilink/features/Post_Details/presentation/view/widget/comment.dart';
+import 'package:archilink/features/Post_Details/presentation/view/widget/post_details_app_bar.dart';
+import 'package:archilink/features/Post_Details/presentation/view/widget/sort_comments_buttons.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 
