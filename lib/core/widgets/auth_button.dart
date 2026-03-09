@@ -19,7 +19,9 @@ class AuthButton extends StatelessWidget {
       width: double.infinity,
       height: height * 45 / 896,
       child: TextButton(
+        
         style: TextButton.styleFrom(
+          overlayColor: AppColorsFromTheme.grayForTheme(context),
           backgroundColor:!secondary? Theme.of(context).colorScheme.primary : AppColorsFromTheme.secondaryColor(context).withOpacity(0.8),
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(

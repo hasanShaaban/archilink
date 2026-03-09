@@ -163,7 +163,7 @@ class _RoleDropDownBodyState extends State<_RoleDropDownBody> {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: List.generate(3, (i){
+          children: List.generate(2, (i){
             return Column(
               children: [
                 InkWell(

@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 
 import 'package:archilink/core/functions/snack_bar_builder.dart';
 import 'package:archilink/core/utils/app_colors.dart';
@@ -190,8 +191,10 @@ class _AuthUsernameFieldState extends State<AuthUsernameField>
 
     return BlocConsumer<CheckUsernameCubit, CheckUsernameState>(
       listener: (context, state) {
-        if(state is CheckUsernameFailure){
-          ScaffoldMessenger.of(context).showSnackBar(appSnackBar(context, state.failure, state.message));
+        if (state is CheckUsernameFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(appSnackBar(context, state.failure, state.message));
         }
       },
       builder: (context, state) {
@@ -238,8 +241,8 @@ class _AuthUsernameFieldState extends State<AuthUsernameField>
               child:
                   widget.errorText != null ||
                       state is CheckUsernameAvailable ||
-                      state is CheckUsernameTaken || 
-                      state is CheckUsernameLoading || 
+                      state is CheckUsernameTaken ||
+                      state is CheckUsernameLoading ||
                       state is CheckUsernameFailure
                   ? Padding(
                       padding: const EdgeInsets.only(top: 6),
@@ -249,23 +252,24 @@ class _AuthUsernameFieldState extends State<AuthUsernameField>
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: state is CheckUsernameTaken
-                              ? AppColors.red.withOpacity(0.1)
-                              : state is CheckUsernameAvailable || state is CheckUsernameLoading 
+                          color:widget.errorText != null ?AppColors.red.withOpacity(0.1):
+                              state is CheckUsernameAvailable ||
+                                  state is CheckUsernameLoading
                               ? Theme.of(
                                   context,
                                 ).colorScheme.primary.withOpacity(0.1)
-                              : AppColors.red.withOpacity(0.1),
+                              :AppColors.red.withOpacity(0.1),
+
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: state is CheckUsernameLoading
                             ? SizedBox(
-                              height: 11,
-                              width: 11,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 1,
-                              ),
-                            )
+                                height: 11,
+                                width: 11,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1,
+                                ),
+                              )
                             : Text(
                                 widget.errorText != null
                                     ? widget.errorText!
@@ -273,9 +277,9 @@ class _AuthUsernameFieldState extends State<AuthUsernameField>
                                     ? 'This username is already in use'
                                     : state is CheckUsernameAvailable
                                     ? 'accepted'
-                                    : state is CheckUsernameFailure 
+                                    : state is CheckUsernameFailure
                                     ? state.message
-                                    :'',
+                                    : '',
                                 style: AppTextStyle.interRegular10.copyWith(
                                   color:
                                       widget.errorText != null ||

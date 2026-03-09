@@ -30,11 +30,20 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
   AutovalidateMode autovalidateMode = AutovalidateMode.disabled;
   bool isUsernameTaken = false;
 
-  String? fullNameError, usernameError;
+  String? fullNameError, usernameError, phoneError;
 
   final nameController = TextEditingController();
   final usernameController = TextEditingController();
   final phoneController = TextEditingController();
+
+  @override
+  void initState() {
+    nameController.text = widget.c.draft.name ?? '';
+    usernameController.text = widget.c.draft.username ?? '';
+    phoneController.text = widget.c.draft.phone ?? '';
+
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -43,7 +52,6 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
     super.dispose();
   }
 
-  //TODO: validation error handling, create error model to each used username and used email to sign up
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
@@ -53,15 +61,23 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
           Navigator.pushReplacementNamed(context, MainView.name);
         }
         if (state is AuthError) {
-          if (state.failure is ServerFailure &&
-              state.failure.message.contains(
-                'The data did not pass the validation',
-              )) {}
           if (state.failure is ValidationFailure) {
-            log(state.message);
-            log(state.failure.fieldErrors.toString());
-            widget.c.toSignup();
-            widget.c.setValidEmail(false);
+            final errors = state.failure.fieldErrors;
+            if (errors != null) {
+              final validatedEmailError = errors['base.email']?.first;
+              final validatedUsernameError = errors['base.username']?.first;
+
+              if (validatedUsernameError != null) {
+                usernameError = validatedUsernameError;
+              }
+              if (validatedEmailError != null) {
+                widget.c.setValidEmail(
+                  isValid: false,
+                  errorMessage: validatedEmailError,
+                );
+                widget.c.toSignup();
+              }
+            }
           }
           ScaffoldMessenger.of(
             context,
@@ -69,69 +85,74 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
         }
       },
       builder: (context, state) {
-        return Form(
-          key: _formKey,
-          autovalidateMode: autovalidateMode,
-          child: Column(
-            children: [
-              SizedBox(height: height * 51 / 896),
-              AuthTextField(
-                //-----------------------------------NAME------------------------
-                height: height,
-                label: 'Name',
-                hint: 'Your Full Name',
-                controller: nameController,
-                keyboardType: TextInputType.name,
-                errorText: fullNameError,
-                onChanged: (_) => setState(() => fullNameError = null),
-              ),
-              const SizedBox(height: 10),
-              AuthUsernameField(
-                //-------------------------------USERNAME-----------------------
-                height: height,
-                label: 'Username',
-                hint: 'Your username',
-                controller: usernameController,
-                isUsernameTaken: isUsernameTaken,
-                onChanged: onUsernameChanged,
-                errorText: usernameError,
-              ),
-              const SizedBox(height: 10),
-              RoleDropDownField(
-                //------------------------------ROLE------------------------------
-                autovalidateMode: autovalidateMode,
-                height: height,
-                label: 'Role',
-                hint: 'Select your role',
-                value: widget.c.draft.role,
-                options: const [
-                  'Student Account',
-                  'Mentor Account',
-                  'Store Account',
-                ],
-                onSelected: (value) {
-                  FocusScope.of(context).unfocus();
-                  widget.c.setRole(value);
-                },
-                validator: _roleValidator,
-              ),
-              const SizedBox(height: 10),
-              PhoneNumberTextField(
-                height: height,
-                controler: phoneController,
-              ), //-----------------------------PHONE-----------------
-              SizedBox(height: height * 42 / 896),
-              AuthButton(
-                height: height,
-                content: Text(
-                  'Sign Up',
-                  style: AppTextStyle.mallannaSemiBold17.copyWith(
-                    color: AppColors.whiteForElements,
-                  ),
+        return SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            autovalidateMode: autovalidateMode,
+            child: Column(
+              children: [
+                SizedBox(height: height * 51 / 896),
+                AuthTextField(
+                  //-----------------------------------NAME------------------------
+                  height: height,
+                  label: 'Name',
+                  hint: 'Your Full Name',
+                  controller: nameController,
+                  keyboardType: TextInputType.name,
+                  errorText: fullNameError,
+                  onChanged: (_) => setState(() => fullNameError = null),
                 ),
-                onPressed: _onSignUpPressed,
-              ),
-            ],
+                const SizedBox(height: 10),
+                AuthUsernameField(
+                  //-------------------------------USERNAME-----------------------
+                  height: height,
+                  label: 'Username',
+                  hint: 'Your username',
+                  controller: usernameController,
+                  isUsernameTaken: isUsernameTaken,
+                  onChanged: onUsernameChanged,
+                  errorText: usernameError,
+                ),
+                const SizedBox(height: 10),
+                RoleDropDownField(
+                  //------------------------------ROLE------------------------------
+                  autovalidateMode: autovalidateMode,
+                  height: height,
+                  label: 'Role',
+                  hint: 'Select your role',
+                  value: widget.c.draft.role,
+                  options: const [
+                    'Student Account',
+                    'Mentor Account',
+                    'Store Account',
+                  ],
+                  onSelected: (value) {
+                    FocusScope.of(context).unfocus();
+                    widget.c.setRole(value);
+                  },
+                  validator: _roleValidator,
+                ),
+                const SizedBox(height: 10),
+                PhoneNumberTextField(
+                  //-----------------------------PHONE-----------------
+                  height: height,
+                  controler: phoneController,
+                  errorText: phoneError,
+                  onChanged: (_) => setState(() => phoneError = null),
+                ),
+                SizedBox(height: height * 42 / 896),
+                AuthButton(
+                  height: height,
+                  content: Text(
+                    'Sign Up',
+                    style: AppTextStyle.mallannaSemiBold17.copyWith(
+                      color: AppColors.whiteForElements,
+                    ),
+                  ),
+                  onPressed: _onSignUpPressed,
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -147,13 +168,22 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
     //Validate the fields
     fullNameError = _nameValidator(nameController.text);
     usernameError = _usernameValidator(usernameController.text);
+    phoneError = _phoneNumberValidatro(phoneController.text);
+
+    //save username, name and phone to the draft
+    widget.c.setName(nameController.text);
+    widget.c.setUsername(usernameController.text);
+    widget.c.setPhone(phoneController.text);
 
     setState(() {});
 
     //get the validation statues
     final isFormValid = _formKey.currentState!.validate();
 
-    if (isFormValid && fullNameError == null && usernameError == null) {
+    if (isFormValid &&
+        fullNameError == null &&
+        usernameError == null &&
+        phoneError == null) {
       //Save the current state
       _formKey.currentState!.save();
 
@@ -194,18 +224,37 @@ class _SetupAccountPageState extends State<SetupAccountPage> {
     if (value == null || value.isEmpty) {
       return 'This filed is required';
     }
+    final regex = RegExp(r'^[A-Za-z][A-Za-z0-9_@]*$');
+
+    if (!regex.hasMatch(value)) {
+      return "Username must start with a letter and contain only letters, numbers, _ or @";
+    }
+    return null;
+  }
+
+  String? _phoneNumberValidatro(String? value) {
+    if (value != null) {
+      final regex = RegExp(r'^9(3|4|5|6|8|9)[0-9]{7}$');
+      if (value.isNotEmpty && !regex.hasMatch(value)) {
+        return "Enter a valid phone number";
+      }
+    }
     return null;
   }
 
   Timer? _usernameDebounce;
   void onUsernameChanged(String value) {
     setState(() {
-      usernameError = null;
+      usernameError = _usernameValidator(value);
     });
-    _usernameDebounce?.cancel();
 
-    _usernameDebounce = Timer(const Duration(milliseconds: 500), () {
+    _usernameDebounce?.cancel();
+    log(usernameError.toString());
+
+    if(value.isNotEmpty && usernameError == null){
+      _usernameDebounce = Timer(const Duration(milliseconds: 500), () {
       context.read<CheckUsernameCubit>().checkUsername(username: value);
     });
+    }
   }
 }

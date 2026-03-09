@@ -9,9 +9,11 @@ class AuthFlowController extends ChangeNotifier {
   AuthStep get currentStep => _currentStep;
 
   bool validEmail = true;
+  String? validatedErrorMessage;
 
-  void setValidEmail(bool isVaild){
-    validEmail = isVaild;
+  void setValidEmail({required bool isValid, required String? errorMessage}){
+    validEmail = isValid;
+    validatedErrorMessage = errorMessage;
   }
 
   void goTo(AuthStep step) {

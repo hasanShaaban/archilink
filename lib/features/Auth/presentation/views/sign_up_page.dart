@@ -20,10 +20,9 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-
   @override
   void initState() {
-    if(!widget.controller.validEmail){
+    if (!widget.controller.validEmail) {
       emailController.text = widget.controller.draft.email!;
       passwordController.text = widget.controller.draft.password!;
       confirmPasswordController.text = widget.controller.draft.confirmPassword!;
@@ -31,6 +30,7 @@ class _SignupPageState extends State<SignupPage> {
     }
     super.initState();
   }
+
   final _formKey = GlobalKey<FormState>();
 
   final emailController = TextEditingController();
@@ -58,8 +58,12 @@ class _SignupPageState extends State<SignupPage> {
               controller: emailController,
               keyboardType: TextInputType.emailAddress,
               errorText: emailError,
-              onChanged: (_) => setState(() {emailError = null;
-              widget.controller.setValidEmail(true);
+              onChanged: (_) => setState(() {
+                emailError = null;
+                widget.controller.setValidEmail(
+                  isValid: true,
+                  errorMessage: null,
+                );
               }),
             ),
 
@@ -127,7 +131,11 @@ class _SignupPageState extends State<SignupPage> {
   String? _emailValidator(String value) {
     if (value.isEmpty) return 'Email is required';
     if (!value.contains('@')) return 'Enter a valid email';
-    if (!widget.controller.validEmail) return 'This email has already been taken';
+    if (!widget.controller.validEmail) {
+      final errorMessage = widget.controller.validatedErrorMessage;
+      return errorMessage ?? 'This email is invalid';
+    }
+    ;
     return null;
   }
 
