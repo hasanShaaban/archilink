@@ -42,6 +42,7 @@ class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
         );
       },
     );
+    
   }
 
   Future<void> _onLoadMore(LoadMore event, Emitter<ForYouState> emit) async {

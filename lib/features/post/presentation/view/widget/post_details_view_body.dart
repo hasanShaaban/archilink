@@ -21,6 +21,7 @@ class PostDetailsViewBody extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           sliver: SliverToBoxAdapter(
             child: Post(
+              entity: null,
               lang: lang,
               width: width,
               height: height,

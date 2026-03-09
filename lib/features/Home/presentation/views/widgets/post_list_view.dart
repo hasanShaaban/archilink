@@ -28,6 +28,7 @@ class PostListView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Post(
+                entity: null,
                 lang: lang,
                 width: width,
                 height: height,

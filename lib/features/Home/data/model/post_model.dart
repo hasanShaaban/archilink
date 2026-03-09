@@ -1,4 +1,5 @@
 import 'package:archilink/features/Home/data/model/post_owner_model.dart';
+import 'package:archilink/features/Home/data/model/tag_model.dart';
 import 'package:archilink/features/Home/domain/entity/post_entity.dart';
 
 class PostModel {
@@ -6,7 +7,10 @@ class PostModel {
   final String body;
   final DateTime createdAt;
   final PostOwnerModel owner;
-  final List<String> tags;
+  final List<TagModel> tags;
+  final int likesCount;
+  final int commentsCount;
+  final bool likedByMe;
 
   PostModel({
     required this.id,
@@ -14,6 +18,9 @@ class PostModel {
     required this.createdAt,
     required this.owner,
     required this.tags,
+    required this.likesCount,
+    required this.commentsCount,
+    required this.likedByMe,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -22,7 +29,10 @@ class PostModel {
       body: json['body'],
       createdAt: DateTime.parse(json['created_at']),
       owner: PostOwnerModel.fromJson(json['owner']),
-      tags: List<String>.from(json['tags']),
+      tags: (json['tags'] as List).map((e) => TagModel.fromJson(e)).toList(),
+      likesCount: json['likes_count'],
+      commentsCount: json['comments_count'],
+      likedByMe: json['liked_by_me'],
     );
   }
 
@@ -32,7 +42,10 @@ class PostModel {
       body: body,
       createdAt: createdAt,
       owner: owner.toEntity(),
-      tags: tags,
+      tags: tags.map((e) => e.toEntity()).toList(),
+      likesCount: likesCount,
+      commentsCount: commentsCount,
+      likedByMe: likedByMe,
     );
   }
 }

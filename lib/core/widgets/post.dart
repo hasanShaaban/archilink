@@ -4,6 +4,7 @@ import 'package:archilink/core/widgets/post_body.dart';
 import 'package:archilink/core/widgets/post_locaion_date_and_tags.dart';
 import 'package:archilink/core/widgets/post_user_image.dart';
 import 'package:archilink/core/widgets/post_username_and_date.dart';
+import 'package:archilink/features/Home/domain/entity/post_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +18,13 @@ class Post extends StatelessWidget {
     required this.height,
     this.onPostTapped,
     required this.withDetails,
+    required this.entity,
   });
   final S lang;
   final double width, height;
   final VoidCallback? onPostTapped;
   final bool withDetails;
+  final PostEntity? entity;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +37,7 @@ class Post extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-//------------// User image section //-------------------------------------------------------------------------
+              //------------// User image section //-------------------------------------------------------------------------
               GestureDetector(
                 onTap: () {
                   Navigator.of(
@@ -42,7 +45,10 @@ class Post extends StatelessWidget {
                     rootNavigator: true,
                   ).pushNamed(UserProfileView.name);
                 },
-                child: PostUserImage(width: width),
+                child: PostUserImage(
+                  width: width,
+                  imageURL: entity!.owner.profilePictureUrl,
+                ),
               ),
               SizedBox(width: 12),
               Expanded(
@@ -51,7 +57,7 @@ class Post extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-//--------------------// User name and date section //--------------------------------------------------------
+                      //--------------------// User name and date section //--------------------------------------------------------
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -67,7 +73,7 @@ class Post extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 9),
-//--------------------// Post body section //---------------------------------------------------------------
+                      //--------------------// Post body section //---------------------------------------------------------------
                       PostBody(
                         width: width,
                         height: height,
@@ -75,7 +81,7 @@ class Post extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       withDetails ? PostLocationDateAndTags() : SizedBox(),
-//--------------------// Post actions section //------------------------------------------------------------
+                      //--------------------// Post actions section //------------------------------------------------------------
                       PostActions(width: width),
                     ],
                   ),

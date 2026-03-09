@@ -27,7 +27,7 @@ class _ForYouPageState extends State<ForYouPage> {
 
   void _onScroll() {
     if (_controller.position.pixels >=
-        _controller.position.maxScrollExtent - 300) {
+        _controller.position.maxScrollExtent - 150) {
       context.read<ForYouBloc>().add(LoadMore());
     }
   }
@@ -71,6 +71,7 @@ class _ForYouPageState extends State<ForYouPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Post(
+                            entity: item.post,
                             lang: lang,
                             width: MediaQuery.of(context).size.width,
                             height: MediaQuery.of(context).size.height,
