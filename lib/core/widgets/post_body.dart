@@ -9,10 +9,12 @@ class PostBody extends StatelessWidget {
     required this.width,
     required this.height,
     required this.withDetails,
+    required this.body,
   });
 
   final double width, height;
   final bool withDetails;
+  final String body;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class PostBody extends StatelessWidget {
           width: width * 305 / 402,
           child: withDetails
               ? Text(
-                  'Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own. Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own.',
+                  body,
                   style: AppTextStyle.mallannaRegular14.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                     height: 1.2,
@@ -30,7 +32,7 @@ class PostBody extends StatelessWidget {
                 )
               : ExpandableText(
                   //-----------------body
-                  'Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own. Sometimes being an INFP feels like your heart is a sponge, soaking up everyone else’s emotions while you’re still figuring out how to handle your own.',
+                  body,
                 ),
         ),
         SizedBox(height: 9),

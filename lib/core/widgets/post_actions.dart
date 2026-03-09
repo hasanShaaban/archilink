@@ -9,9 +9,14 @@ class PostActions extends StatelessWidget {
   const PostActions({
     super.key,
     required this.width,
+    required this.likesCount,
+    required this.commentsCount,
+    required this.likedByMe,
   });
 
   final double width;
+  final int likesCount, commentsCount;
+  final bool likedByMe;
 
   @override
   Widget build(BuildContext context) {
@@ -22,31 +27,42 @@ class PostActions extends StatelessWidget {
         children: [
           Row(
             children: [
-              PostLikeButton(),
+              PostLikeButton(likedByMe: likedByMe, likesCount: likesCount),
               SizedBox(width: width * 25 / 402),
-              PostCommentButton()
+              PostCommentButton(commentsCount: commentsCount,),
             ],
           ),
           PostShareButton(),
-          PostSaveButton()
+          PostSaveButton(),
         ],
       ),
     );
   }
 }
 
-
 class PostLikeButton extends StatefulWidget {
-  const PostLikeButton({super.key});
+  const PostLikeButton({
+    super.key,
+    required this.likesCount,
+    required this.likedByMe,
+  });
+  final int likesCount;
+  final bool likedByMe;
 
   @override
   State<PostLikeButton> createState() => _PostLikeButtonState();
 }
 
 class _PostLikeButtonState extends State<PostLikeButton> {
+  late bool liked;
+  late int likeCount;
+  @override
+  void initState() {
+    liked = widget.likedByMe;
+    likeCount = widget.likesCount;
+    super.initState();
+  }
 
-  bool liked = false;
-  int likeCount = 1200;
   @override
   Widget build(BuildContext context) {
     return PostActionButton(
@@ -54,32 +70,34 @@ class _PostLikeButtonState extends State<PostLikeButton> {
       withCount: true,
       onTap: () {
         setState(() {
-              liked = !liked;
-              if(liked){
-                likeCount += 1;
-              }else{
-                likeCount -= 1;
-              }
-            });
+          liked = !liked;
+          if (liked) {
+            likeCount += 1;
+          } else {
+            likeCount -= 1;
+          }
+        });
       },
       icon: SvgPicture.asset(
-         liked ? Assets.assetsIconsFilldLike : Assets.assetsIconsLike ,
-            color: liked ? null: Theme.of(context).colorScheme.onSurface,
-            width: 24,
+        liked ? Assets.assetsIconsFilldLike : Assets.assetsIconsLike,
+        color: liked ? null : Theme.of(context).colorScheme.onSurface,
+        width: 24,
       ),
     );
   }
 }
 
 class PostCommentButton extends StatelessWidget {
-  const PostCommentButton({super.key});
+  const PostCommentButton({super.key, required this.commentsCount});
+
+  final int commentsCount;
 
   @override
   Widget build(BuildContext context) {
     return PostActionButton(
       onTap: () {},
       withCount: true,
-      count: 500,
+      count: commentsCount,
       icon: SvgPicture.asset(
         Assets.assetsIconsComment,
         color: Theme.of(context).colorScheme.onSurface,
@@ -96,7 +114,11 @@ class PostShareButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return PostActionButton(
       onTap: () {},
-      icon: SvgPicture.asset(Assets.assetsIconsSharePost, width: 24, color: Theme.of(context).colorScheme.onSurface,),
+      icon: SvgPicture.asset(
+        Assets.assetsIconsSharePost,
+        width: 24,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
       withCount: false,
     );
   }
@@ -128,4 +150,3 @@ class _PostSaveButtonState extends State<PostSaveButton> {
     );
   }
 }
-

@@ -1,19 +1,22 @@
+import 'package:archilink/core/functions/post_date_formater.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
+import 'package:archilink/features/Home/domain/entity/post_owner_entity.dart';
 import 'package:flutter/material.dart';
 
 class PostUserNameAndDate extends StatelessWidget {
-  const PostUserNameAndDate({super.key, required this.withDetails});
+  const PostUserNameAndDate({super.key, required this.withDetails, required this.date, required this.owner});
   final bool withDetails;
-
+  final String date;
+  final PostOwnerEntity owner;
   @override
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
-        text: 'Hasan Shaaban', //-----------------name
+        text: owner.name, //-----------------name
         style: AppTextStyle.interMedium14.copyWith(color: Theme.of(context).colorScheme.onSurface),
         children: [
           !withDetails? TextSpan(
-            text: '  3 Oct', //-----------------date
+            text: '  ${formatPostDate(date)}', //-----------------date
             style: AppTextStyle.interMedium14.copyWith(
               color: Theme.of(context).colorScheme.tertiary,
             ),
@@ -23,4 +26,6 @@ class PostUserNameAndDate extends StatelessWidget {
     );
   }
 }
+
+
 

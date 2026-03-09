@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/post_actions.dart';
 import 'package:archilink/core/widgets/post_body.dart';
@@ -61,9 +63,15 @@ class Post extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          PostUserNameAndDate(withDetails: withDetails),
+                          PostUserNameAndDate(
+                            withDetails: withDetails,
+                            date: entity!.createdAt.toString(),
+                            owner: entity!.owner,
+                          ),
                           InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              log(entity!.createdAt.toString());
+                            },
                             child: SvgPicture.asset(
                               Assets.assetsIconsMoreVertical,
                               color: Theme.of(context).colorScheme.onSurface,
@@ -75,6 +83,7 @@ class Post extends StatelessWidget {
                       const SizedBox(height: 9),
                       //--------------------// Post body section //---------------------------------------------------------------
                       PostBody(
+                        body: entity!.body,
                         width: width,
                         height: height,
                         withDetails: withDetails,
@@ -82,7 +91,12 @@ class Post extends StatelessWidget {
                       SizedBox(height: 16),
                       withDetails ? PostLocationDateAndTags() : SizedBox(),
                       //--------------------// Post actions section //------------------------------------------------------------
-                      PostActions(width: width),
+                      PostActions(
+                        width: width,
+                        likesCount: entity!.likesCount,
+                        commentsCount: entity!.commentsCount,
+                        likedByMe: entity!.likedByMe,
+                      ),
                     ],
                   ),
                 ),
