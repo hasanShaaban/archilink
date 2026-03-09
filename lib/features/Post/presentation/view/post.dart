@@ -1,11 +1,11 @@
 import 'dart:developer';
 
 import 'package:archilink/core/utils/assets.dart';
-import 'package:archilink/core/widgets/post_actions.dart';
-import 'package:archilink/core/widgets/post_body.dart';
-import 'package:archilink/core/widgets/post_locaion_date_and_tags.dart';
-import 'package:archilink/core/widgets/post_user_image.dart';
-import 'package:archilink/core/widgets/post_username_and_date.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/post_actions.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/post_body.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/post_locaion_date_and_tags.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/post_user_image.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/post_username_and_date.dart';
 import 'package:archilink/features/Home/domain/entity/post_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/generated/l10n.dart';

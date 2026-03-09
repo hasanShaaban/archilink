@@ -1,6 +1,6 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/expandable_text.dart';
-import 'package:archilink/core/widgets/post_image_listview.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/post_image_listview.dart';
 import 'package:flutter/material.dart';
 
 class PostBody extends StatelessWidget {

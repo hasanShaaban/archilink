@@ -1,5 +1,5 @@
 import 'package:archilink/core/utils/app_text_style.dart';
-import 'package:archilink/core/widgets/post.dart';
+import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Home/domain/entity/feed_item.dart';
 import 'package:archilink/features/Home/presentation/manager/bloc/for_you_bloc.dart';
 import 'package:archilink/features/Home/presentation/views/widgets/ads_section.dart';

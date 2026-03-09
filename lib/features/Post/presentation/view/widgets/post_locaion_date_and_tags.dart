@@ -1,6 +1,6 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
-import 'package:archilink/core/widgets/exapndable_tags.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/exapndable_tags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

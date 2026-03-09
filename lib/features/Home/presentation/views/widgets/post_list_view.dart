@@ -1,4 +1,4 @@
-import 'package:archilink/core/widgets/post.dart';
+import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Post_Details/presentation/view/post_details_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
