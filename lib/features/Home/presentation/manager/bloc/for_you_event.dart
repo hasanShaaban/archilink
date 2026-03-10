@@ -10,3 +10,11 @@ sealed class ForYouEvent extends Equatable {
 class LoadInitital extends ForYouEvent{}
 class LoadMore extends ForYouEvent{}
 class RefreshFeed extends ForYouEvent{}
+class UpdatePostLike extends ForYouEvent{
+  final int postId;
+  final bool liked;
+  final int likesCount;
+
+  const UpdatePostLike(this.postId, this.liked, this.likesCount);
+  
+}

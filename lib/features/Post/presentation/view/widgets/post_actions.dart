@@ -14,11 +14,11 @@ class PostActions extends StatelessWidget {
     required this.likesCount,
     required this.commentsCount,
     required this.likedByMe,
+    required this.postId,
   });
 
-
   final double width;
-  final int likesCount, commentsCount;
+  final int likesCount, commentsCount, postId;
   final bool likedByMe;
 
   @override
@@ -30,7 +30,11 @@ class PostActions extends StatelessWidget {
         children: [
           Row(
             children: [
-              PostLikeButton(),
+              PostLikeButton(
+                liked: likedByMe,
+                likesCount: likesCount,
+                postId: postId,
+              ),
               SizedBox(width: width * 25 / 402),
               PostCommentButton(commentsCount: commentsCount),
             ],
@@ -43,31 +47,33 @@ class PostActions extends StatelessWidget {
   }
 }
 
-class PostLikeButton extends StatefulWidget {
-  const PostLikeButton({super.key});
+class PostLikeButton extends StatelessWidget {
+  final int postId, likesCount;
+  final bool liked;
+  const PostLikeButton({
+    super.key,
+    required this.postId,
+    required this.likesCount,
+    required this.liked,
+  });
 
-  @override
-  State<PostLikeButton> createState() => _PostLikeButtonState();
-}
-
-class _PostLikeButtonState extends State<PostLikeButton> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PostLikeCubit, PostLikeState>(
-      builder: (context, state) {
-        return PostActionButton(
-          count: state.likeCount,
-          withCount: true,
-          onTap: () {
-            context.read<PostLikeCubit>().toggleLike();
-          },
-          icon: SvgPicture.asset(
-            state.liked ? Assets.assetsIconsFilldLike : Assets.assetsIconsLike,
-            color: state.liked ? null : Theme.of(context).colorScheme.onSurface,
-            width: 24,
-          ),
+    return PostActionButton(
+      count: likesCount,
+      withCount: true,
+      onTap: () {
+        context.read<PostLikeCubit>().toggleLike(
+          postId: postId,
+          liked: liked,
+          likeCount: likesCount,
         );
       },
+      icon: SvgPicture.asset(
+        liked ? Assets.assetsIconsFilldLike : Assets.assetsIconsLike,
+        color: liked ? null : Theme.of(context).colorScheme.onSurface,
+        width: 24,
+      ),
     );
   }
 }

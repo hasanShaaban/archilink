@@ -43,7 +43,6 @@ class _ForYouPageState extends State<ForYouPage> {
     var lang = S.of(context);
     return RefreshIndicator(
       onRefresh: () async {
-        
         context.read<ForYouBloc>().add(RefreshFeed());
       },
       child: BlocBuilder<ForYouBloc, ForYouState>(
@@ -60,7 +59,7 @@ class _ForYouPageState extends State<ForYouPage> {
                 ),
               ),
 
-              /// POSTS//TODO: fill the posts data in the feed cards 
+              /// POSTS//TODO: fill the posts data in the feed cards
               SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final item = state.items[index];

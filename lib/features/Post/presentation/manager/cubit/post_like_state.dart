@@ -3,15 +3,14 @@ part of 'post_like_cubit.dart';
 class PostLikeState extends Equatable {
   final bool liked;
   final int likeCount;
-  const PostLikeState({required this.liked, required this.likeCount});
+  final int postId;
 
-  PostLikeState copyWith({bool? liked, int? likeCount}) {
-    return PostLikeState(
-      liked: liked ?? this.liked,
-      likeCount: likeCount ?? this.likeCount,
-    );
-  }
+  const PostLikeState({
+    required this.liked,
+    required this.likeCount,
+    required this.postId,
+  });
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [liked, likeCount, likeCount];
 }

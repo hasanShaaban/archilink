@@ -1,9 +1,5 @@
-import 'dart:developer';
 
-import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/assets.dart';
-import 'package:archilink/features/Post/domain/repo/post_repo.dart';
-import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_actions.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_body.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_locaion_date_and_tags.dart';
@@ -13,7 +9,6 @@ import 'package:archilink/features/Home/domain/entity/post_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Post extends StatelessWidget {
@@ -34,86 +29,78 @@ class Post extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => PostLikeCubit(
-        sl<PostRepo>(),
-        postId: entity!.id,
-        liked: entity!.likedByMe,
-        likeCount: entity!.likesCount,
-      ),
-      child: GestureDetector(
-        onTap: onPostTapped,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: SizedBox(
-            width: double.infinity,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //------------// User image section //-------------------------------------------------------------------------
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(
-                      context,
-                      rootNavigator: true,
-                    ).pushNamed(UserProfileView.name);
-                  },
-                  child: PostUserImage(
-                    width: width,
-                    imageURL: entity!.owner.profilePictureUrl,
+    return GestureDetector(
+      onTap: onPostTapped,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: SizedBox(
+          width: double.infinity,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              //------------// User image section //-------------------------------------------------------------------------
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pushNamed(UserProfileView.name);
+                },
+                child: PostUserImage(
+                  width: width,
+                  imageURL: entity!.owner.profilePictureUrl,
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(top: width * 34 / 402 / 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //--------------------// User name and date section //--------------------------------------------------------
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          PostUserNameAndDate(
+                            withDetails: withDetails,
+                            date: entity!.createdAt.toString(),
+                            owner: entity!.owner,
+                          ),
+                          InkWell(
+                            onTap: () {
+                            },
+                            child: SvgPicture.asset(
+                              Assets.assetsIconsMoreVertical,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              width: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 9),
+                      //--------------------// Post body section //---------------------------------------------------------------
+                      PostBody(
+                        body: entity!.body,
+                        width: width,
+                        height: height,
+                        withDetails: withDetails,
+                      ),
+                      SizedBox(height: 16),
+                      withDetails ? PostLocationDateAndTags() : SizedBox(),
+                      //--------------------// Post actions section //------------------------------------------------------------
+                      PostActions(
+                        width: width,
+                        postId: entity!.id,
+                        likesCount: entity!.likesCount,
+                        commentsCount: entity!.commentsCount,
+                        likedByMe: entity!.likedByMe,
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: width * 34 / 402 / 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        //--------------------// User name and date section //--------------------------------------------------------
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            PostUserNameAndDate(
-                              withDetails: withDetails,
-                              date: entity!.createdAt.toString(),
-                              owner: entity!.owner,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                log(entity!.createdAt.toString());
-                              },
-                              child: SvgPicture.asset(
-                                Assets.assetsIconsMoreVertical,
-                                color: Theme.of(context).colorScheme.onSurface,
-                                width: 24,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 9),
-                        //--------------------// Post body section //---------------------------------------------------------------
-                        PostBody(
-                          body: entity!.body,
-                          width: width,
-                          height: height,
-                          withDetails: withDetails,
-                        ),
-                        SizedBox(height: 16),
-                        withDetails ? PostLocationDateAndTags() : SizedBox(),
-                        //--------------------// Post actions section //------------------------------------------------------------
-                        PostActions(
-                          width: width,
-                          likesCount: entity!.likesCount,
-                          commentsCount: entity!.commentsCount,
-                          likedByMe: entity!.likedByMe,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Home/domain/entity/feed_item.dart';
 import 'package:archilink/features/Home/domain/entity/global_feed_entity.dart';
 import 'package:archilink/features/Home/domain/entity/post_entity.dart';
 import 'package:archilink/features/Home/domain/repo/home_repo.dart';
+import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -12,7 +15,14 @@ part 'for_you_state.dart';
 class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
   final HomeRepo repo;
 
-  ForYouBloc(this.repo) : super(ForYouState()) {
+  ForYouBloc(this.repo, PostLikeCubit interactions) : super(ForYouState()) {
+    interactions.stream.listen((event) {
+      log('emitted event, -------------');
+      if (event == null) return;
+      log('emitted event, Liked : ${event.liked}');
+      add(UpdatePostLike(event.postId, event.liked, event.likeCount));
+    });
+    on<UpdatePostLike>(_onUpdatePostLike);
     on<LoadInitital>(_onLoadInitial);
     on<LoadMore>(_onLoadMore);
     on<RefreshFeed>(_onRefresh);
@@ -42,7 +52,6 @@ class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
         );
       },
     );
-    
   }
 
   Future<void> _onLoadMore(LoadMore event, Emitter<ForYouState> emit) async {
@@ -92,5 +101,20 @@ class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
     updatedList.addAll(wrappedPosts);
 
     return updatedList;
+  }
+
+  void _onUpdatePostLike(UpdatePostLike event, Emitter<ForYouState> emit) {
+    final updatedItems = state.items.map((item) {
+      if (item is PostItem && item.post.id == event.postId) {
+        return PostItem(
+          item.post.copyWith(
+            likedByMe: event.liked,
+            likesCount: event.likesCount,
+          ),
+        );
+      }
+      return item;
+    }).toList();
+    emit(state.copyWith(items: updatedItems));
   }
 }

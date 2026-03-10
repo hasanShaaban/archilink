@@ -20,4 +20,26 @@ class PostEntity {
     required this.commentsCount,
     required this.likedByMe,
   });
+
+  PostEntity copyWith({
+    int? id,
+    String? body,
+    DateTime? createdAt,
+    PostOwnerEntity? owner,
+    List<TagEntity>? tags,
+    int? likesCount,
+    int? commentsCount,
+    bool? likedByMe,
+  }) {
+    return PostEntity(
+      id: id ?? this.id,
+      body: body ?? this.body,
+      createdAt: createdAt ?? this.createdAt,
+      owner: owner ?? this.owner,
+      tags: tags ?? this.tags,
+      likesCount: likesCount ?? this.likesCount,
+      commentsCount: commentsCount ?? this.commentsCount,
+      likedByMe: likedByMe ?? this.likedByMe,
+    );
+  }
 }
