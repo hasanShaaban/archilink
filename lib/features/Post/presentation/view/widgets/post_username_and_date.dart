@@ -26,6 +26,3 @@ class PostUserNameAndDate extends StatelessWidget {
     );
   }
 }
-
-
-
