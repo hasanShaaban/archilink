@@ -1,8 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_action_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PostActions extends StatelessWidget {
@@ -13,6 +15,7 @@ class PostActions extends StatelessWidget {
     required this.commentsCount,
     required this.likedByMe,
   });
+
 
   final double width;
   final int likesCount, commentsCount;
@@ -27,9 +30,9 @@ class PostActions extends StatelessWidget {
         children: [
           Row(
             children: [
-              PostLikeButton(likedByMe: likedByMe, likesCount: likesCount),
+              PostLikeButton(),
               SizedBox(width: width * 25 / 402),
-              PostCommentButton(commentsCount: commentsCount,),
+              PostCommentButton(commentsCount: commentsCount),
             ],
           ),
           PostShareButton(),
@@ -41,48 +44,30 @@ class PostActions extends StatelessWidget {
 }
 
 class PostLikeButton extends StatefulWidget {
-  const PostLikeButton({
-    super.key,
-    required this.likesCount,
-    required this.likedByMe,
-  });
-  final int likesCount;
-  final bool likedByMe;
+  const PostLikeButton({super.key});
 
   @override
   State<PostLikeButton> createState() => _PostLikeButtonState();
 }
 
 class _PostLikeButtonState extends State<PostLikeButton> {
-  late bool liked;
-  late int likeCount;
-  @override
-  void initState() {
-    liked = widget.likedByMe;
-    likeCount = widget.likesCount;
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return PostActionButton(
-      count: likeCount,
-      withCount: true,
-      onTap: () {
-        setState(() {
-          liked = !liked;
-          if (liked) {
-            likeCount += 1;
-          } else {
-            likeCount -= 1;
-          }
-        });
+    return BlocBuilder<PostLikeCubit, PostLikeState>(
+      builder: (context, state) {
+        return PostActionButton(
+          count: state.likeCount,
+          withCount: true,
+          onTap: () {
+            context.read<PostLikeCubit>().toggleLike();
+          },
+          icon: SvgPicture.asset(
+            state.liked ? Assets.assetsIconsFilldLike : Assets.assetsIconsLike,
+            color: state.liked ? null : Theme.of(context).colorScheme.onSurface,
+            width: 24,
+          ),
+        );
       },
-      icon: SvgPicture.asset(
-        liked ? Assets.assetsIconsFilldLike : Assets.assetsIconsLike,
-        color: liked ? null : Theme.of(context).colorScheme.onSurface,
-        width: 24,
-      ),
     );
   }
 }
