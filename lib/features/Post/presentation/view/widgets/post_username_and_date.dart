@@ -1,6 +1,6 @@
 import 'package:archilink/core/functions/post_date_formater.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
-import 'package:archilink/features/Home/domain/entity/post_owner_entity.dart';
+import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
 import 'package:flutter/material.dart';
 
 class PostUserNameAndDate extends StatelessWidget {

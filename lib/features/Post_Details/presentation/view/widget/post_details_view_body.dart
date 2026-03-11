@@ -1,5 +1,5 @@
 import 'package:archilink/core/utils/temp.dart';
-import 'package:archilink/features/Home/domain/entity/post_entity.dart';
+import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/comment.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/post_details_app_bar.dart';
@@ -23,7 +23,7 @@ class PostDetailsViewBody extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           sliver: SliverToBoxAdapter(
             child: Post(
-              entity: null,
+              entity: post,
               lang: lang,
               width: width,
               height: height,

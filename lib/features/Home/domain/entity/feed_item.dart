@@ -1,6 +1,6 @@
 
 
-import 'package:archilink/features/Home/domain/entity/post_entity.dart';
+import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 
 abstract class FeedItem {
   const FeedItem();

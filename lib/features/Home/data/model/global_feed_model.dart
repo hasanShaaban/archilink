@@ -1,5 +1,5 @@
 import 'package:archilink/features/Home/data/model/pagination_model.dart';
-import 'package:archilink/features/Home/data/model/post_model.dart';
+import 'package:archilink/features/Post/data/models/post_model.dart';
 import 'package:archilink/features/Home/domain/entity/global_feed_entity.dart';
 
 class GlobalFeedModel {

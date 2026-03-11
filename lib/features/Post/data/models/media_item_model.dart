@@ -1,5 +1,5 @@
-import 'package:archilink/features/Home/data/model/media_urls_model.dart';
-import 'package:archilink/features/Home/domain/entity/media_item_entity.dart';
+import 'package:archilink/features/Post/data/models/media_urls_model.dart';
+import 'package:archilink/features/Post/domain/entity/media_item_entity.dart';
 
 class MediaItemModel {
   final int id;

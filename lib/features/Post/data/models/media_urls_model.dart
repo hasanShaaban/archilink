@@ -1,4 +1,4 @@
-import 'package:archilink/features/Home/domain/entity/media_urls_entity.dart';
+import 'package:archilink/features/Post/domain/entity/media_urls_entity.dart';
 
 class MediaUrlsModel {
   final String thumbnail;

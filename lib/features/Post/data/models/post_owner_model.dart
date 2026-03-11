@@ -1,4 +1,4 @@
-import 'package:archilink/features/Home/domain/entity/post_owner_entity.dart';
+import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
 
 class PostOwnerModel {
   final int id;

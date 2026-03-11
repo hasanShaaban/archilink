@@ -1,6 +1,6 @@
-import 'package:archilink/features/Home/domain/entity/media_item_entity.dart';
-import 'package:archilink/features/Home/domain/entity/post_owner_entity.dart';
-import 'package:archilink/features/Home/domain/entity/tag_entity.dart';
+import 'package:archilink/features/Post/domain/entity/media_item_entity.dart';
+import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
+import 'package:archilink/features/Post/domain/entity/tag_entity.dart';
 
 class PostEntity {
   final int id;

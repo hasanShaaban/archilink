@@ -2,7 +2,7 @@
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Home/domain/entity/feed_item.dart';
 import 'package:archilink/features/Home/domain/entity/global_feed_entity.dart';
-import 'package:archilink/features/Home/domain/entity/post_entity.dart';
+import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Home/domain/repo/home_repo.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:bloc/bloc.dart';

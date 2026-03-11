@@ -1,4 +1,4 @@
-import 'package:archilink/features/Home/domain/entity/tag_entity.dart';
+import 'package:archilink/features/Post/domain/entity/tag_entity.dart';
 
 class TagModel {
   final String name;

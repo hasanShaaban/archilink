@@ -1,7 +1,7 @@
-import 'package:archilink/features/Home/data/model/media_item_model.dart';
-import 'package:archilink/features/Home/data/model/post_owner_model.dart';
-import 'package:archilink/features/Home/data/model/tag_model.dart';
-import 'package:archilink/features/Home/domain/entity/post_entity.dart';
+import 'package:archilink/features/Post/data/models/media_item_model.dart';
+import 'package:archilink/features/Post/data/models/post_owner_model.dart';
+import 'package:archilink/features/Post/data/models/tag_model.dart';
+import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 
 class PostModel {
   final int id;

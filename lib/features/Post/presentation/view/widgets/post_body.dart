@@ -1,6 +1,6 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/expandable_text.dart';
-import 'package:archilink/features/Home/domain/entity/media_item_entity.dart';
+import 'package:archilink/features/Post/domain/entity/media_item_entity.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_image_listview.dart';
 import 'package:flutter/material.dart';
 

@@ -4,7 +4,7 @@ import 'package:archilink/features/Post/presentation/view/widgets/post_body.dart
 import 'package:archilink/features/Post/presentation/view/widgets/post_locaion_date_and_tags.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_user_image.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_username_and_date.dart';
-import 'package:archilink/features/Home/domain/entity/post_entity.dart';
+import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +86,7 @@ class Post extends StatelessWidget {
                         withDetails: withDetails,
                       ),
                       SizedBox(height: 16),
-                      withDetails ? PostLocationDateAndTags() : SizedBox(),
+                      withDetails ? PostLocationDateAndTags(date: entity!.createdAt.toString(), tags: entity!.tags,) : SizedBox(),
                       //--------------------// Post actions section //------------------------------------------------------------
                       PostActions(
                         width: width,

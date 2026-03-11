@@ -1,16 +1,23 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Post/domain/entity/tag_entity.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/exapndable_tags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 
 class PostLocationDateAndTags extends StatelessWidget {
   const PostLocationDateAndTags({
     super.key,
+    required this.date,
+    required this.tags,
   });
+  final String date;
+  final List<TagEntity> tags;
 
   @override
   Widget build(BuildContext context) {
+    final formatedDate = formatPostDate(date);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -34,7 +41,7 @@ class PostLocationDateAndTags extends StatelessWidget {
         Row(
           children: [
             Text(
-              '3 October 2025',
+              formatedDate['date']!,
               style: AppTextStyle.interMedium12.copyWith(
                 color: Theme.of(context).colorScheme.tertiary,
               ),
@@ -43,7 +50,7 @@ class PostLocationDateAndTags extends StatelessWidget {
             SvgPicture.asset(Assets.assetsIconsDot),
             const SizedBox(width: 8),
             Text(
-              '08:50 PM',
+              formatedDate['time']!,
               style: AppTextStyle.interMedium12.copyWith(
                 color: Theme.of(context).colorScheme.tertiary,
               ),
@@ -51,30 +58,21 @@ class PostLocationDateAndTags extends StatelessWidget {
           ],
         ),
         SizedBox(height: 8),
-        ExpandableTags(
-          tags: [
-            'Revit',
-            '3D Max',
-            'Auto CAD',
-            'Graduation Project Assist',
-            'Architecture',
-            'Design',
-            'Inspiration',
-            '3DModeling',
-            'SketchUp',
-            'Sustainability',
-            'Interior',
-            'Urban',
-            'Concrete',
-            'Minimalism',
-            'Render',
-            'Lighting',
-            'Landscape',
-          ],
-        ),
-        SizedBox(height: 16)
+        ExpandableTags(tags: tags.map((e) => e.name).toList()),
+        SizedBox(height: 16),
       ],
     );
   }
 }
 
+Map<String, String> formatPostDate(String isoDate) {
+  final dateTime = DateTime.parse(isoDate).toLocal();
+
+  final dateFormatter = DateFormat('d MMMM yyyy');
+  final timeFormatter = DateFormat('hh:mm a');
+
+  return {
+    'date': dateFormatter.format(dateTime),
+    'time': timeFormatter.format(dateTime),
+  };
+}
