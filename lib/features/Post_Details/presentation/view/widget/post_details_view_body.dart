@@ -1,4 +1,5 @@
 import 'package:archilink/core/utils/temp.dart';
+import 'package:archilink/features/Home/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/comment.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/post_details_app_bar.dart';
@@ -7,7 +8,8 @@ import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 
 class PostDetailsViewBody extends StatelessWidget {
-  const PostDetailsViewBody({super.key});
+  const PostDetailsViewBody({super.key, required this.post});
+  final PostEntity post;
 
   @override
   Widget build(BuildContext context) {

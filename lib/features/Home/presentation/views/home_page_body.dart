@@ -27,8 +27,7 @@ class HomePageBody extends StatelessWidget {
             children: [
               BlocProvider(
                 create: (context) =>
-                    ForYouBloc(sl<HomeRepo>(), sl<PostLikeCubit>())
-                      ..add(LoadInitital()),
+                    ForYouBloc(sl<HomeRepo>(), sl<PostLikeCubit>()),
                 child: ForYouPage(),
               ),
               FollowingPostsPage(),

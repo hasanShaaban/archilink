@@ -1,3 +1,4 @@
+import 'package:archilink/features/Home/data/model/media_item_model.dart';
 import 'package:archilink/features/Home/data/model/post_owner_model.dart';
 import 'package:archilink/features/Home/data/model/tag_model.dart';
 import 'package:archilink/features/Home/domain/entity/post_entity.dart';
@@ -8,6 +9,7 @@ class PostModel {
   final DateTime createdAt;
   final PostOwnerModel owner;
   final List<TagModel> tags;
+  final List<MediaItemModel> mediaItems;
   final int likesCount;
   final int commentsCount;
   final bool likedByMe;
@@ -21,6 +23,7 @@ class PostModel {
     required this.likesCount,
     required this.commentsCount,
     required this.likedByMe,
+    required this.mediaItems,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +33,9 @@ class PostModel {
       createdAt: DateTime.parse(json['created_at']),
       owner: PostOwnerModel.fromJson(json['owner']),
       tags: (json['tags'] as List).map((e) => TagModel.fromJson(e)).toList(),
+      mediaItems: (json['media_items'] as List)
+          .map((e) => MediaItemModel.fromJson(e))
+          .toList(),
       likesCount: json['likes_count'],
       commentsCount: json['comments_count'],
       likedByMe: json['liked_by_me'],
@@ -43,6 +49,7 @@ class PostModel {
       createdAt: createdAt,
       owner: owner.toEntity(),
       tags: tags.map((e) => e.toEntity()).toList(),
+      mediaItems: mediaItems.map((e) => e.toEntity()).toList(),
       likesCount: likesCount,
       commentsCount: commentsCount,
       likedByMe: likedByMe,

@@ -1,5 +1,6 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/expandable_text.dart';
+import 'package:archilink/features/Home/domain/entity/media_item_entity.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_image_listview.dart';
 import 'package:flutter/material.dart';
 
@@ -10,11 +11,13 @@ class PostBody extends StatelessWidget {
     required this.height,
     required this.withDetails,
     required this.body,
+    required this.mediaItems,
   });
 
   final double width, height;
   final bool withDetails;
   final String body;
+  final List<MediaItemEntity> mediaItems;
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +39,11 @@ class PostBody extends StatelessWidget {
                 ),
         ),
         SizedBox(height: 9),
-        SizedBox(
-          height: height * 158 / 847,
-          child: PostImagesListView(width: width),
-        ),
+        if (mediaItems.isNotEmpty)
+          SizedBox(
+            height: height * 158 / 847,
+            child: PostImagesListView(width: width, mediaItems: mediaItems),
+          ),
       ],
     );
   }

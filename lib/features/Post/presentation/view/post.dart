@@ -1,4 +1,3 @@
-
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_actions.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_body.dart';
@@ -68,8 +67,7 @@ class Post extends StatelessWidget {
                             owner: entity!.owner,
                           ),
                           InkWell(
-                            onTap: () {
-                            },
+                            onTap: () {},
                             child: SvgPicture.asset(
                               Assets.assetsIconsMoreVertical,
                               color: Theme.of(context).colorScheme.onSurface,
@@ -82,6 +80,7 @@ class Post extends StatelessWidget {
                       //--------------------// Post body section //---------------------------------------------------------------
                       PostBody(
                         body: entity!.body,
+                        mediaItems: entity!.mediaItems,
                         width: width,
                         height: height,
                         withDetails: withDetails,

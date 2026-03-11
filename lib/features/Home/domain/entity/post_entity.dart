@@ -1,3 +1,4 @@
+import 'package:archilink/features/Home/domain/entity/media_item_entity.dart';
 import 'package:archilink/features/Home/domain/entity/post_owner_entity.dart';
 import 'package:archilink/features/Home/domain/entity/tag_entity.dart';
 
@@ -7,6 +8,7 @@ class PostEntity {
   final DateTime createdAt;
   final PostOwnerEntity owner;
   final List<TagEntity> tags;
+  final List<MediaItemEntity> mediaItems;
   final int likesCount;
   final int commentsCount;
   final bool likedByMe;
@@ -19,6 +21,7 @@ class PostEntity {
     required this.likesCount,
     required this.commentsCount,
     required this.likedByMe,
+    required this.mediaItems,
   });
 
   PostEntity copyWith({
@@ -30,6 +33,7 @@ class PostEntity {
     int? likesCount,
     int? commentsCount,
     bool? likedByMe,
+    List<MediaItemEntity>? mediaItems
   }) {
     return PostEntity(
       id: id ?? this.id,
@@ -40,6 +44,7 @@ class PostEntity {
       likesCount: likesCount ?? this.likesCount,
       commentsCount: commentsCount ?? this.commentsCount,
       likedByMe: likedByMe ?? this.likedByMe,
+      mediaItems: mediaItems ?? this.mediaItems
     );
   }
 }

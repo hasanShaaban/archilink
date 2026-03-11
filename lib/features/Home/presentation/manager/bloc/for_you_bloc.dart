@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Home/domain/entity/feed_item.dart';
@@ -17,9 +16,7 @@ class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
 
   ForYouBloc(this.repo, PostLikeCubit interactions) : super(ForYouState()) {
     interactions.stream.listen((event) {
-      log('emitted event, -------------');
       if (event == null) return;
-      log('emitted event, Liked : ${event.liked}');
       add(UpdatePostLike(event.postId, event.liked, event.likeCount));
     });
     on<UpdatePostLike>(_onUpdatePostLike);

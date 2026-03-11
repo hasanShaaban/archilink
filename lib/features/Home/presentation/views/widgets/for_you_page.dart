@@ -21,6 +21,7 @@ class _ForYouPageState extends State<ForYouPage> {
 
   @override
   void initState() {
+    context.read<ForYouBloc>().add(LoadInitital());
     _controller.addListener(_onScroll);
     super.initState();
   }
@@ -75,10 +76,11 @@ class _ForYouPageState extends State<ForYouPage> {
                             width: MediaQuery.of(context).size.width,
                             height: MediaQuery.of(context).size.height,
                             onPostTapped: () {
+                              //TODO: Navigate to post details
                               Navigator.of(
                                 context,
                                 rootNavigator: true,
-                              ).pushNamed(PostDetailsView.name);
+                              ).pushNamed(PostDetailsView.name, arguments: {'post':item.post});
                             },
                             withDetails: false,
                           ),
