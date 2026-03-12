@@ -1,4 +1,5 @@
 import 'package:archilink/core/utils/app_text_style.dart';
+import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Home/domain/entity/feed_item.dart';
 import 'package:archilink/features/Home/presentation/manager/bloc/for_you_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:archilink/features/Post_Details/presentation/view/post_details_v
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ForYouPage extends StatefulWidget {
   const ForYouPage({super.key});
@@ -48,8 +50,14 @@ class _ForYouPageState extends State<ForYouPage> {
       },
       child: BlocBuilder<ForYouBloc, ForYouState>(
         builder: (context, state) {
+          final bool isSkeleton = state.isInitialLoading && state.items.isEmpty;
+          final List<FeedItem> items = isSkeleton
+              ? fakeFeedItems()
+              : state.items;
+          final String? errorMessage = state.failure?.message;
           return CustomScrollView(
             controller: _controller,
+            physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(child: const AdsSection()),
               SliverToBoxAdapter(child: const FeaturedMemberSection()),
@@ -61,25 +69,33 @@ class _ForYouPageState extends State<ForYouPage> {
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
-                  final item = state.items[index];
+                  final item = items[index];
 
                   if (item is PostItem) {
                     return Column(
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Post(
-                            entity: item.post,
-                            lang: lang,
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                            onPostTapped: () {
-                              Navigator.of(
-                                context,
-                                rootNavigator: true,
-                              ).pushNamed(PostDetailsView.name, arguments: {'post':item.post});
-                            },
-                            withDetails: false,
+                          child: Skeletonizer(
+                            enabled: isSkeleton,
+                            child: Post(
+                              entity: item.post,
+                              lang: lang,
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height,
+                              onPostTapped: isSkeleton
+                                  ? null
+                                  : () {
+                                      Navigator.of(
+                                        context,
+                                        rootNavigator: true,
+                                      ).pushNamed(
+                                        PostDetailsView.name,
+                                        arguments: {'post': item.post},
+                                      );
+                                    },
+                              withDetails: false,
+                            ),
                           ),
                         ),
                         Divider(
@@ -91,8 +107,35 @@ class _ForYouPageState extends State<ForYouPage> {
                   }
 
                   return const SizedBox();
-                }, childCount: state.items.length),
+                }, childCount: items.length),
               ),
+
+              if (errorMessage != null && items.isEmpty && !isSkeleton)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 32,
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 36,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          errorMessage,
+                          textAlign: TextAlign.center,
+                          style: AppTextStyle.manjariRegular20.copyWith(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 
               /// LOADING MORE INDICATOR
               if (state.isLoadingMore)
