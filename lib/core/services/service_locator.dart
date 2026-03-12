@@ -24,7 +24,10 @@ import 'package:archilink/features/Post/data/repo/post_repo_impl.dart';
 import 'package:archilink/features/Post/domain/data_soource/post_remote_data_source.dart';
 import 'package:archilink/features/Post/domain/repo/post_repo.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
-import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
+import 'package:archilink/features/Post_Details/data/data_source/post_details_remote_data_source_impl.dart';
+import 'package:archilink/features/Post_Details/data/repo/post_details_repo_impl.dart';
+import 'package:archilink/features/Post_Details/domain/data_source/post_details_remote_data_source.dart';
+import 'package:archilink/features/Post_Details/domain/repo/post_details_repo.dart';
 import 'package:archilink/features/Profile/data/data_source/profile_local_data_source_impl.dart';
 import 'package:archilink/features/Profile/data/data_source/profile_remote_data_source_impl.dart';
 import 'package:archilink/features/Profile/data/repo/profile_repo_impl.dart';
@@ -81,6 +84,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<PostRemoteDataSource>(
     () => PostRemoteDataSourceImpl(sl()),
   );
+  sl.registerLazySingleton<PostDetailsRemoteDataSource>(
+    () => PostDetailsRemoteDataSourceImpl(sl()),
+  );
 
   ///----------
   ///Interceptor
@@ -116,12 +122,12 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<AuthRepo>(
     () => AuthRepoImpl(localDataSource: sl(), remoteDataSource: sl()),
   );
-
   sl.registerLazySingleton<ProfileRepo>(
     () => ProfileRepoImpl(remoteDataSource: sl(), localDataSource: sl()),
   );
   sl.registerLazySingleton<HomeRepo>(() => HomeRepoImpl(sl()));
   sl.registerLazySingleton<PostRepo>(() => PostRepoImpl(sl()));
+  sl.registerLazySingleton<PostDetailsRepo>(() => PostDetailsRepoImpl(sl()));
 
   ///---------
   ///Bloc
@@ -129,5 +135,7 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton(() => AuthCubit(sl()));
   sl.registerLazySingleton(() => CheckUsernameCubit(sl()));
   sl.registerLazySingleton(() => PostLikeCubit(sl()));
-  sl.registerLazySingleton(() => ForYouBloc(sl<HomeRepo>(),sl<PostLikeCubit>()));
+  sl.registerLazySingleton(
+    () => ForYouBloc(sl<HomeRepo>(), sl<PostLikeCubit>()),
+  );
 }

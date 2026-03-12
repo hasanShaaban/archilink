@@ -9,9 +9,40 @@ import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class PostDetailsViewBody extends StatelessWidget {
-  const PostDetailsViewBody({super.key,});
+class PostDetailsViewBody extends StatefulWidget {
+  const PostDetailsViewBody({super.key});
 
+  @override
+  State<PostDetailsViewBody> createState() => _PostDetailsViewBodyState();
+}
+
+class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+
+    const threshold = 200;
+
+    if (maxScroll - currentScroll <= threshold) {
+      context.read<PostDetailsBloc>().add(LoadMoreComments());
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +52,7 @@ class PostDetailsViewBody extends StatelessWidget {
     return BlocBuilder<PostDetailsBloc, PostDetailsState>(
       builder: (context, state) {
         return CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverToBoxAdapter(child: PostDetailsAppBar(lang: lang)),
             SliverPadding(
@@ -63,9 +95,17 @@ class PostDetailsViewBody extends StatelessWidget {
               delegate: SliverChildBuilderDelegate((context, index) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Comment(width: width, comment: commentsTree[index]),
+                  child: Comment(width: width, entity: state.comments[index]),
                 );
-              }, childCount: commentsTree.length),
+              }, childCount: state.comments.length),
+            ),
+            SliverToBoxAdapter(
+              child: state.isLoadingMoreComments
+                  ? const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : const SizedBox(),
             ),
           ],
         );

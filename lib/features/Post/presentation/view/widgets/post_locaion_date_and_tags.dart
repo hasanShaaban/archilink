@@ -17,7 +17,7 @@ class PostLocationDateAndTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatedDate = formatPostDate(date);
+    final formatedDate = formatPostDetailsDate(date);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -65,7 +65,7 @@ class PostLocationDateAndTags extends StatelessWidget {
   }
 }
 
-Map<String, String> formatPostDate(String isoDate) {
+Map<String, String> formatPostDetailsDate(String isoDate) {
   final dateTime = DateTime.parse(isoDate).toLocal();
 
   final dateFormatter = DateFormat('d MMMM yyyy');

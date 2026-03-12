@@ -1,3 +1,4 @@
+import 'dart:async';
 
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Home/domain/entity/feed_item.dart';
@@ -13,9 +14,9 @@ part 'for_you_state.dart';
 
 class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
   final HomeRepo repo;
-
+  late final StreamSubscription _likeSubscription;
   ForYouBloc(this.repo, PostLikeCubit interactions) : super(ForYouState()) {
-    interactions.stream.listen((event) {
+    _likeSubscription = interactions.stream.listen((event) {
       if (event == null) return;
       add(UpdatePostLike(event.postId, event.liked, event.likeCount));
     });
@@ -113,5 +114,11 @@ class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
       return item;
     }).toList();
     emit(state.copyWith(items: updatedItems));
+  }
+
+  @override
+  Future<void> close() {
+    _likeSubscription.cancel();
+    return super.close();
   }
 }

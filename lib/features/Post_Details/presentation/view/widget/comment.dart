@@ -1,5 +1,8 @@
+import 'package:archilink/core/functions/post_date_formater.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/post_locaion_date_and_tags.dart';
+import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/comment_like_button.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
@@ -9,13 +12,14 @@ class Comment extends StatefulWidget {
   const Comment({
     super.key,
     required this.width,
-    required this.comment,
     this.indent = 0,
+    required this.entity,
   });
 
   final double width;
-  final Map comment;
+
   final double indent;
+  final CommentEntity entity;
 
   @override
   State<Comment> createState() => _CommentState();
@@ -26,12 +30,13 @@ class _CommentState extends State<Comment> {
 
   @override
   Widget build(BuildContext context) {
-    List replies = widget.comment['replies'];
     var lang = S.of(context);
     return Padding(
-      padding: EdgeInsets.only(top: 8, bottom: 8,
-      left: lang.local == 'en' ? widget.indent : 0,
-      right: lang.local == 'ar' ? widget.indent : 0
+      padding: EdgeInsets.only(
+        top: 8,
+        bottom: 8,
+        left: lang.local == 'en' ? widget.indent : 0,
+        right: lang.local == 'ar' ? widget.indent : 0,
       ),
       child: Column(
         children: [
@@ -58,13 +63,13 @@ class _CommentState extends State<Comment> {
                     Row(
                       children: [
                         Text(
-                          widget.comment['user'],
+                          widget.entity.owner.name,
                           style: AppTextStyle.interMedium14.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         Text(
-                          ' ${widget.comment['time']}',
+                          ' ${formatPostDate(widget.entity.createdAt)}',
                           style: AppTextStyle.interMedium14.copyWith(
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
@@ -75,7 +80,7 @@ class _CommentState extends State<Comment> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      widget.comment['comment'],
+                      widget.entity.body,
                       style: AppTextStyle.mallannaRegular14.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                         height: 1.2,
@@ -116,49 +121,73 @@ class _CommentState extends State<Comment> {
               ),
             ],
           ),
-          replies.isNotEmpty
-              ? GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _showReplies = !_showReplies;
-                    });
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        _showReplies ? 'Hide Replies' : 'Show Replies',
-                        style: AppTextStyle.interMedium12.copyWith(
-                          color: Theme.of(context).colorScheme.tertiary,
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      SvgPicture.asset(
-                        _showReplies
-                            ? Assets.assetsIconsUpArrow
-                            : Assets.assetsIconsDownArrow,
-                        color: Theme.of(context).colorScheme.tertiary,
-                        width: 16,
-                      ),
-                    ],
-                  ),
-                )
-              : SizedBox(),
-          AnimatedCrossFade(
-            firstChild: const SizedBox.shrink(),
-            secondChild: Column(
-              children: replies.map((reply) => Container(
-                decoration: BoxDecoration(
-                  border: Border(left: lang.local == 'en' ? BorderSide(color: Theme.of(context).colorScheme.secondary): BorderSide(),
-                  right: lang.local == 'ar' ? BorderSide(color: Theme.of(context).colorScheme.secondary): BorderSide())
-                ),
-                child: Comment(width: widget.width, comment: reply, indent: widget.width * 16/402,))).toList(),
-            ),
-            crossFadeState: _showReplies
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            duration: const Duration(milliseconds: 300),
-          ),
+          // replies.isNotEmpty
+          //     ? GestureDetector(
+          //         onTap: () {
+          //           setState(() {
+          //             _showReplies = !_showReplies;
+          //           });
+          //         },
+          //         child: Row(
+          //           mainAxisAlignment: MainAxisAlignment.end,
+          //           children: [
+          //             Text(
+          //               _showReplies ? 'Hide Replies' : 'Show Replies',
+          //               style: AppTextStyle.interMedium12.copyWith(
+          //                 color: Theme.of(context).colorScheme.tertiary,
+          //               ),
+          //             ),
+          //             SizedBox(width: 4),
+          //             SvgPicture.asset(
+          //               _showReplies
+          //                   ? Assets.assetsIconsUpArrow
+          //                   : Assets.assetsIconsDownArrow,
+          //               color: Theme.of(context).colorScheme.tertiary,
+          //               width: 16,
+          //             ),
+          //           ],
+          //         ),
+          //       )
+          //     : SizedBox(),
+          //TODO: add the replies in separate request
+          // AnimatedCrossFade(
+          //   firstChild: const SizedBox.shrink(),
+          //   secondChild: Column(
+          //     children: replies
+          //         .map(
+          //           (reply) => Container(
+          //             decoration: BoxDecoration(
+          //               border: Border(
+          //                 left: lang.local == 'en'
+          //                     ? BorderSide(
+          //                         color: Theme.of(
+          //                           context,
+          //                         ).colorScheme.secondary,
+          //                       )
+          //                     : BorderSide(),
+          //                 right: lang.local == 'ar'
+          //                     ? BorderSide(
+          //                         color: Theme.of(
+          //                           context,
+          //                         ).colorScheme.secondary,
+          //                       )
+          //                     : BorderSide(),
+          //               ),
+          //             ),
+          //             child: Comment(
+          //               width: widget.width,
+          //               comment: reply,
+          //               indent: widget.width * 16 / 402,
+          //             ),
+          //           ),
+          //         )
+          //         .toList(),
+          //   ),
+          //   crossFadeState: _showReplies
+          //       ? CrossFadeState.showSecond
+          //       : CrossFadeState.showFirst,
+          //   duration: const Duration(milliseconds: 300),
+          // ),
         ],
       ),
     );

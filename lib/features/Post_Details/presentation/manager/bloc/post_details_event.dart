@@ -6,12 +6,21 @@ sealed class PostDetailsEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
-class ToggleLikePost extends PostDetailsEvent{}
-class SyncPostLike extends PostDetailsEvent{
+
+class ToggleLikePost extends PostDetailsEvent {}
+
+class LoadComments extends PostDetailsEvent {}
+
+class LoadMoreComments extends PostDetailsEvent {}
+
+class SyncPostLike extends PostDetailsEvent {
   final int postId;
   final bool liked;
   final int likesCont;
 
-  const SyncPostLike({required this.postId, required this.liked, required this.likesCont});
-
+  const SyncPostLike({
+    required this.postId,
+    required this.liked,
+    required this.likesCont,
+  });
 }
