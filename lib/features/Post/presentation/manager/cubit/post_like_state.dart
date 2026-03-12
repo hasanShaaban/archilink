@@ -12,5 +12,5 @@ class PostLikeState extends Equatable {
   });
 
   @override
-  List<Object> get props => [liked, likeCount, likeCount];
+  List<Object> get props => [liked, likeCount, postId];
 }

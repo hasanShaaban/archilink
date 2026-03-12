@@ -24,6 +24,7 @@ import 'package:archilink/features/Post/data/repo/post_repo_impl.dart';
 import 'package:archilink/features/Post/domain/data_soource/post_remote_data_source.dart';
 import 'package:archilink/features/Post/domain/repo/post_repo.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
+import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
 import 'package:archilink/features/Profile/data/data_source/profile_local_data_source_impl.dart';
 import 'package:archilink/features/Profile/data/data_source/profile_remote_data_source_impl.dart';
 import 'package:archilink/features/Profile/data/repo/profile_repo_impl.dart';

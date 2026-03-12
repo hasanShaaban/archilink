@@ -8,7 +8,7 @@ class ForYouState extends Equatable{
   final Failure? failure;
   final int currentPage;
 
-  ForYouState({
+  const ForYouState({
     this.items = const [],
     this.isInitialLoading = false,
     this.isLoadingMore = false,

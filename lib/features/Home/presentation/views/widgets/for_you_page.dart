@@ -59,8 +59,6 @@ class _ForYouPageState extends State<ForYouPage> {
                   child: Text(lang.feed, style: AppTextStyle.manjariRegular20),
                 ),
               ),
-
-              /// POSTS//TODO: fill the posts data in the feed cards
               SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final item = state.items[index];
@@ -76,7 +74,6 @@ class _ForYouPageState extends State<ForYouPage> {
                             width: MediaQuery.of(context).size.width,
                             height: MediaQuery.of(context).size.height,
                             onPostTapped: () {
-                              //TODO: Navigate to post details
                               Navigator.of(
                                 context,
                                 rootNavigator: true,
