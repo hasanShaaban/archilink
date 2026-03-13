@@ -1,5 +1,6 @@
 import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/network/api_service.dart';
+import 'package:archilink/features/Post/data/models/post_model.dart';
 import 'package:archilink/features/Post_Details/data/models/post_comments_model.dart';
 import 'package:archilink/features/Post_Details/domain/data_source/post_details_remote_data_source.dart';
 import 'package:archilink/features/Post_Details/domain/entity/post_comments_entity.dart';
@@ -34,6 +35,20 @@ class PostDetailsRemoteDataSourceImpl implements PostDetailsRemoteDataSource {
         throw ServerException(message: 'something went wrong');
       }
       return data['liked'] as bool;
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<PostModel> refreshPostDetails(int postId) async {
+    try {
+      final reseponse = await apiService.get('post-center/post/$postId');
+      final data = reseponse.data?['data'];
+      if (data == null) {
+        throw ServerException(message: 'Invalid data response');
+      }
+      return PostModel.fromJson(data);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }
