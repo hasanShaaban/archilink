@@ -25,6 +25,8 @@ class SyncPostLike extends PostDetailsEvent {
   });
 }
 
+class RefreshPostDetails extends PostDetailsEvent {}
+
 class ToggleCommentLike extends PostDetailsEvent {
   final int commentId;
 

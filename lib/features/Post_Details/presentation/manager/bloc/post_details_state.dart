@@ -3,7 +3,7 @@ part of 'post_details_bloc.dart';
 class PostDetailsState extends Equatable {
   final PostEntity post;
   final List<CommentEntity> comments;
-
+  final bool isLoadingPost;
   final bool isLoadingComments;
   final bool isLoadingMoreComments;
   final bool hasReachedMax;
@@ -20,11 +20,13 @@ class PostDetailsState extends Equatable {
     this.hasReachedMax = false,
     this.currentPage = 1,
     this.failure,
+    this.isLoadingPost = false,
   });
 
   PostDetailsState copyWith({
     PostEntity? post,
     List<CommentEntity>? comments,
+    bool? isLoadingPost,
     bool? isLoadingComments,
     bool? isLoadingMoreComments,
     bool? hasReachedMax,
@@ -35,6 +37,7 @@ class PostDetailsState extends Equatable {
       post: post ?? this.post,
       comments: comments ?? this.comments,
       isLoadingComments: isLoadingComments ?? this.isLoadingComments,
+      isLoadingPost: isLoadingPost ?? this.isLoadingPost,
       isLoadingMoreComments:
           isLoadingMoreComments ?? this.isLoadingMoreComments,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
@@ -48,6 +51,7 @@ class PostDetailsState extends Equatable {
     post,
     comments,
     isLoadingComments,
+    isLoadingPost,
     isLoadingMoreComments,
     hasReachedMax,
     currentPage,

@@ -35,6 +35,7 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     on<LoadComments>(_onLoadComments);
     on<LoadMoreComments>(_onLoadMoreComments);
     on<ToggleCommentLike>(_onToggleCommentLike);
+    on<RefreshPostDetails>(_onRefreshPostDetails);
   }
 
   Future<void> _onLoadComments(
@@ -141,6 +142,22 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
       updatedComments[index] = comment;
       emit(state.copyWith(comments: updatedComments));
     }, (_) {});
+  }
+
+  Future<void> _onRefreshPostDetails(
+    RefreshPostDetails event,
+    Emitter<PostDetailsState> emit,
+  ) async {
+    emit(state.copyWith(isLoadingPost: true));
+    final result = await repo.refreshPostDetails(state.post.id);
+    result.fold(
+      (failure) {
+        emit(state.copyWith(isLoadingPost: false, failure: failure));
+      },
+      (data) {
+        emit(state.copyWith(isLoadingPost: false, post: data));
+      },
+    );
   }
 
   @override

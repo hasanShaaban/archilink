@@ -55,6 +55,7 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
         List<CommentEntity> fakeComments = fakeCommentEntities(count: 5);
         return RefreshIndicator(
           onRefresh: () async {
+            context.read<PostDetailsBloc>().add(RefreshPostDetails());
             context.read<PostDetailsBloc>().add(LoadComments());
           },
           child: CustomScrollView(
