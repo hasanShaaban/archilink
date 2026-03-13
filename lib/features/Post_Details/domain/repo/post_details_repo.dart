@@ -7,4 +7,6 @@ abstract class PostDetailsRepo {
     int postId,
     int page,
   );
+
+  Future<Either<Failure, bool>> toggleCommentLike(int commentId);
 }

@@ -1,5 +1,6 @@
-
+import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
+import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
 import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/comment.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/post_details_app_bar.dart';
@@ -7,6 +8,7 @@ import 'package:archilink/features/Post_Details/presentation/view/widget/sort_co
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class PostDetailsViewBody extends StatefulWidget {
   const PostDetailsViewBody({super.key});
@@ -50,63 +52,86 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
     double height = MediaQuery.of(context).size.height;
     return BlocBuilder<PostDetailsBloc, PostDetailsState>(
       builder: (context, state) {
-        return CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverToBoxAdapter(child: PostDetailsAppBar(lang: lang)),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverToBoxAdapter(
-                child: Post(
-                  entity: state.post,
-                  lang: lang,
-                  width: width,
-                  height: height,
-                  withDetails: true,
+        List<CommentEntity> fakeComments = fakeCommentEntities(count: 5);
+        return RefreshIndicator(
+          onRefresh: () async {
+            context.read<PostDetailsBloc>().add(LoadComments());
+          },
+          child: CustomScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            controller: _scrollController,
+            slivers: [
+              SliverToBoxAdapter(child: PostDetailsAppBar(lang: lang)),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                sliver: SliverToBoxAdapter(
+                  child: Post(
+                    entity: state.post,
+                    lang: lang,
+                    width: width,
+                    height: height,
+                    withDetails: true,
+                  ),
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Divider(
-                height: 0,
-                thickness: 1,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-            ),
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _StickyHeaderDelegate(
-                height: 56,
-                child: Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: SortCommentsButton(lang: lang),
+              SliverToBoxAdapter(
+                child: Divider(
+                  height: 0,
+                  thickness: 1,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Divider(
-                height: 0,
-                thickness: 1,
-                color: Theme.of(context).colorScheme.secondary,
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _StickyHeaderDelegate(
+                  height: 56,
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: SortCommentsButton(lang: lang),
+                  ),
+                ),
               ),
-            ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Comment(width: width, entity: state.comments[index]),
-                );
-              }, childCount: state.comments.length),
-            ),
-            SliverToBoxAdapter(
-              child: state.isLoadingMoreComments
-                  ? const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : const SizedBox(),
-            ),
-          ],
+              SliverToBoxAdapter(
+                child: Divider(
+                  height: 0,
+                  thickness: 1,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  childCount: state.isLoadingComments
+                      ? fakeComments.length
+                      : state.comments.length,
+                  (context, index) {
+                    return Skeletonizer(
+                      enabled: state.isLoadingComments,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Comment(
+                          key: state.isLoadingComments
+                              ? null
+                              : ValueKey(state.comments[index].id),
+                          width: width,
+                          entity: state.isLoadingComments
+                              ? fakeComments[index]
+                              : state.comments[index],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: state.isLoadingMoreComments
+                    ? const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    : const SizedBox(),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -117,10 +142,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
   final double height;
 
-  _StickyHeaderDelegate({
-    required this.child,
-    this.height = 56,
-  });
+  _StickyHeaderDelegate({required this.child, this.height = 56});
 
   @override
   Widget build(
@@ -141,6 +163,3 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(_StickyHeaderDelegate oldDelegate) =>
       oldDelegate.child != child || oldDelegate.height != height;
 }
-
-
-

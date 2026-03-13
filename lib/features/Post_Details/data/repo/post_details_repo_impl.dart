@@ -24,4 +24,16 @@ class PostDetailsRepoImpl implements PostDetailsRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> toggleCommentLike(int commentId) async {
+    try {
+      final reseponse = await remoteDataSource.toggleCommentLike(commentId);
+      return right(reseponse);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

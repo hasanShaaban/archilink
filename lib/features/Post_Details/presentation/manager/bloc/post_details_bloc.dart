@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/core/utils/temp.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
@@ -33,6 +34,7 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     on<SyncPostLike>(_onSyncPostLike);
     on<LoadComments>(_onLoadComments);
     on<LoadMoreComments>(_onLoadMoreComments);
+    on<ToggleCommentLike>(_onToggleCommentLike);
   }
 
   Future<void> _onLoadComments(
@@ -108,6 +110,37 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
         ),
       ),
     );
+  }
+
+  Future<void> _onToggleCommentLike(
+    ToggleCommentLike event,
+    Emitter<PostDetailsState> emit,
+  ) async {
+    final index = state.comments.indexWhere((c) => c.id == event.commentId);
+
+    if (index == -1) return;
+
+    final comment = state.comments[index];
+
+    final newLiked = !comment.likedByMe;
+    final newCount = newLiked ? comment.likesCount + 1 : comment.likesCount - 1;
+
+    final updatedComment = comment.copyWith(
+      likedByMe: newLiked,
+      likesCount: newCount,
+    );
+
+    final updatedComments = List<CommentEntity>.from(state.comments);
+    updatedComments[index] = updatedComment;
+
+    emit(state.copyWith(comments: updatedComments));
+
+    final result = await repo.toggleCommentLike(event.commentId);
+
+    result.fold((failure) {
+      updatedComments[index] = comment;
+      emit(state.copyWith(comments: updatedComments));
+    }, (_) {});
   }
 
   @override

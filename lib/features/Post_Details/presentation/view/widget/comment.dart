@@ -81,9 +81,11 @@ class _CommentState extends State<Comment> {
                         ),
                         Spacer(),
                         CommentLikeButton(
+                          // -----------------------------------like button
                           isLiked: widget.entity.likedByMe,
                           likeCount: widget.entity.likesCount,
-                        ), // -----------------------------------like button
+                          commentId: widget.entity.id,
+                        ),
                       ],
                     ),
                     SizedBox(height: 4),

@@ -20,4 +20,26 @@ class CommentEntity {
     required this.repliesCount,
     required this.likedByMe,
   });
+
+  CommentEntity copyWith({
+    int? id,
+    String? body,
+    String? createdAt,
+    int? parentId,
+    int? likesCount,
+    int? repliesCount,
+    bool? likedByMe,
+    CommentOwnerEntity? owner,
+  }) {
+    return CommentEntity(
+      id: id ?? this.id,
+      body: body ?? this.body,
+      createdAt: createdAt ?? this.createdAt,
+      parentId: parentId ?? this.parentId,
+      likesCount: likesCount ?? this.likesCount,
+      repliesCount: repliesCount ?? this.repliesCount,
+      likedByMe: likedByMe ?? this.likedByMe,
+      owner: owner ?? this.owner,
+    );
+  }
 }

@@ -40,10 +40,11 @@ class Post extends StatelessWidget {
               //------------// User image section //-------------------------------------------------------------------------
               GestureDetector(
                 onTap: () {
-                  Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).pushNamed(UserProfileView.name);
+                  //TODO implement navigating to user profile
+                  // Navigator.of(
+                  //   context,
+                  //   rootNavigator: true,
+                  // ).pushNamed(UserProfileView.name);
                 },
                 child: PostUserImage(
                   width: width,

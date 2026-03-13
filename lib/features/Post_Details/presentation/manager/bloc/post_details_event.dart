@@ -24,3 +24,12 @@ class SyncPostLike extends PostDetailsEvent {
     required this.likesCont,
   });
 }
+
+class ToggleCommentLike extends PostDetailsEvent {
+  final int commentId;
+
+  const ToggleCommentLike(this.commentId);
+
+  @override
+  List<Object> get props => [commentsTree];
+}
