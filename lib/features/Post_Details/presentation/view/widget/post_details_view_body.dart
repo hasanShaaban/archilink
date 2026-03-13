@@ -1,5 +1,4 @@
-import 'package:archilink/core/utils/temp.dart';
-import 'package:archilink/features/Post/domain/entity/post_entity.dart';
+
 import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/comment.dart';
@@ -120,7 +119,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   _StickyHeaderDelegate({
     required this.child,
-    this.height = 56, // <— choose a value slightly larger than your button
+    this.height = 56,
   });
 
   @override
@@ -142,3 +141,6 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(_StickyHeaderDelegate oldDelegate) =>
       oldDelegate.child != child || oldDelegate.height != height;
 }
+
+
+

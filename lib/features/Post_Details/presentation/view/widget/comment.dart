@@ -1,7 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:archilink/core/functions/post_date_formater.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
-import 'package:archilink/features/Post/presentation/view/widgets/post_locaion_date_and_tags.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/comment_like_button.dart';
 import 'package:archilink/generated/l10n.dart';
@@ -49,7 +50,8 @@ class _CommentState extends State<Comment> {
                 child: ClipOval(
                   child: SvgPicture.asset(
                     //change it to Cached Network Image
-                    Assets.assetsIconsUser, //---------------image
+                    Assets
+                        .assetsIconsUser, //====================================image
                     color: Theme.of(context).colorScheme.onSurface,
                     width: 24,
                   ),
@@ -58,28 +60,35 @@ class _CommentState extends State<Comment> {
               SizedBox(width: 8),
               Expanded(
                 child: Column(
+                  //==================================================user name and comment body
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
                         Text(
+                          //---------------------------------------------------user name
                           widget.entity.owner.name,
                           style: AppTextStyle.interMedium14.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         Text(
+                          //--------------------------------------------------comment date
                           ' ${formatPostDate(widget.entity.createdAt)}',
                           style: AppTextStyle.interMedium14.copyWith(
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
                         ),
                         Spacer(),
-                        CommentLikeButton(),
+                        CommentLikeButton(
+                          isLiked: widget.entity.likedByMe,
+                          likeCount: widget.entity.likesCount,
+                        ), // -----------------------------------like button
                       ],
                     ),
                     SizedBox(height: 4),
                     Text(
+                      // -----------------------------------------------------comment body
                       widget.entity.body,
                       style: AppTextStyle.mallannaRegular14.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
@@ -121,34 +130,36 @@ class _CommentState extends State<Comment> {
               ),
             ],
           ),
-          // replies.isNotEmpty
-          //     ? GestureDetector(
-          //         onTap: () {
-          //           setState(() {
-          //             _showReplies = !_showReplies;
-          //           });
-          //         },
-          //         child: Row(
-          //           mainAxisAlignment: MainAxisAlignment.end,
-          //           children: [
-          //             Text(
-          //               _showReplies ? 'Hide Replies' : 'Show Replies',
-          //               style: AppTextStyle.interMedium12.copyWith(
-          //                 color: Theme.of(context).colorScheme.tertiary,
-          //               ),
-          //             ),
-          //             SizedBox(width: 4),
-          //             SvgPicture.asset(
-          //               _showReplies
-          //                   ? Assets.assetsIconsUpArrow
-          //                   : Assets.assetsIconsDownArrow,
-          //               color: Theme.of(context).colorScheme.tertiary,
-          //               width: 16,
-          //             ),
-          //           ],
-          //         ),
-          //       )
-          //     : SizedBox(),
+          widget.entity.repliesCount > 0
+              ? GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _showReplies = !_showReplies;
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        _showReplies
+                            ? 'Hide Replies'
+                            : 'Show ${widget.entity.repliesCount} Replies',
+                        style: AppTextStyle.interMedium12.copyWith(
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      SvgPicture.asset(
+                        _showReplies
+                            ? Assets.assetsIconsUpArrow
+                            : Assets.assetsIconsDownArrow,
+                        color: Theme.of(context).colorScheme.tertiary,
+                        width: 16,
+                      ),
+                    ],
+                  ),
+                )
+              : SizedBox(),
           //TODO: add the replies in separate request
           // AnimatedCrossFade(
           //   firstChild: const SizedBox.shrink(),

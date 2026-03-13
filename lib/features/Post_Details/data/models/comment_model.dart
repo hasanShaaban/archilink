@@ -7,6 +7,10 @@ class CommentModel extends CommentEntity {
     required super.body,
     required super.createdAt,
     required super.owner,
+    required super.likesCount,
+    required super.repliesCount,
+    required super.likedByMe,
+    required super.parentId,
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
@@ -14,7 +18,11 @@ class CommentModel extends CommentEntity {
       id: json['id'],
       body: json['body'],
       createdAt: json['created_at'],
+      likesCount: json['likes_count'],
+      repliesCount: json['replies_count'],
+      likedByMe: json['liked_by_me'] == 0 ? false : true,
       owner: CommentOwnerModel.fromJson(json['owner']),
+      parentId: json['parent_id'],
     );
   }
 }
