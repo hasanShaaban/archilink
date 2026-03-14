@@ -1,5 +1,4 @@
 // ignore_for_file: deprecated_member_use
-
 import 'package:archilink/core/functions/post_date_formater.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
@@ -14,11 +13,11 @@ class Comment extends StatefulWidget {
     super.key,
     required this.width,
     this.indent = 0,
-    required this.entity,
+    required this.entity, this.onReply,
   });
 
   final double width;
-
+  final Function(CommentEntity)? onReply;
   final double indent;
   final CommentEntity entity;
 
@@ -114,12 +113,17 @@ class _CommentState extends State<Comment> {
                   color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Text(
-                  'Reply',
-                  style: AppTextStyle.interMedium12.copyWith(
-                    color: Theme.of(context).colorScheme.tertiary,
+              GestureDetector(
+                onTap: () {
+                  widget.onReply?.call(widget.entity);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    'Reply',
+                    style: AppTextStyle.interMedium12.copyWith(
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
                   ),
                 ),
               ),

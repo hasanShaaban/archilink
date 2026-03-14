@@ -77,6 +77,11 @@ abstract class AppTextStyle {
     fontFamily: 'Inter',
     fontWeight: FontWeight.normal
   );
+  static const TextStyle interRegular16 = TextStyle(
+    fontSize: 16,
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.normal
+  );
   static const TextStyle interMedium14 = TextStyle(
     fontSize: 14,
     fontFamily: 'Inter',

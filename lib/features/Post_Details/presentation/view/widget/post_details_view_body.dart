@@ -11,7 +11,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class PostDetailsViewBody extends StatefulWidget {
-  const PostDetailsViewBody({super.key});
+  const PostDetailsViewBody({super.key, this.onReply});
+  final Function(CommentEntity)? onReply;
 
   @override
   State<PostDetailsViewBody> createState() => _PostDetailsViewBodyState();
@@ -66,50 +67,59 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 sliver: SliverToBoxAdapter(
-                  child: Post(
-                    entity: state.post,
-                    lang: lang,
-                    width: width,
-                    height: height,
-                    withDetails: true,
+                  child: Skeletonizer(
+                    enabled: state.isLoadingPost,
+                    child: Post(
+                      entity: state.post,
+                      lang: lang,
+                      width: width,
+                      height: height,
+                      withDetails: true,
+                    ),
                   ),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: Divider(
-                  height: 0,
-                  thickness: 1,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
+
               SliverPersistentHeader(
                 pinned: true,
                 delegate: _StickyHeaderDelegate(
                   height: 56,
-                  child: Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    child: SortCommentsButton(lang: lang),
+                  child: Column(
+                    children: [
+                      Divider(
+                        height: 0,
+                        thickness: 1,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      Container(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        child: SortCommentsButton(lang: lang),
+                      ),
+                      Divider(
+                        height: 0,
+                        thickness: 1,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                    ],
                   ),
                 ),
               ),
               SliverToBoxAdapter(
-                child: Divider(
-                  height: 0,
-                  thickness: 1,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  childCount: state.isLoadingComments
+                child: ListView.builder(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: state.isLoadingComments
                       ? fakeComments.length
                       : state.comments.length,
-                  (context, index) {
+                  itemBuilder: (context, index) {
                     return Skeletonizer(
                       enabled: state.isLoadingComments,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Comment(
+                          onReply: widget.onReply,
                           key: state.isLoadingComments
                               ? null
                               : ValueKey(state.comments[index].id),

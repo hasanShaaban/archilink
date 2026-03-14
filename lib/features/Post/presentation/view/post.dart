@@ -5,7 +5,6 @@ import 'package:archilink/features/Post/presentation/view/widgets/post_locaion_d
 import 'package:archilink/features/Post/presentation/view/widgets/post_user_image.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_username_and_date.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
-import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
