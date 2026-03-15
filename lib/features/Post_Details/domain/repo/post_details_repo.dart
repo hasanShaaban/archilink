@@ -9,6 +9,10 @@ abstract class PostDetailsRepo {
     int postId,
     int page,
   );
+  Future<Either<Failure, PostCommentsEntity>> getCommentReplies(
+    int commentId,
+    int page,
+  );
 
   Future<Either<Failure, bool>> toggleCommentLike(int commentId);
   Future<Either<Failure, PostEntity>> refreshPostDetails(int postId);

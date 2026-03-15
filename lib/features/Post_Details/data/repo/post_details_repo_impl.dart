@@ -28,6 +28,21 @@ class PostDetailsRepoImpl implements PostDetailsRepo {
   }
 
   @override
+  Future<Either<Failure, PostCommentsEntity>> getCommentReplies(
+    int commentId,
+    int page,
+  ) async {
+    try {
+      final result = await remoteDataSource.getCommentReplies(commentId, page);
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
   Future<Either<Failure, bool>> toggleCommentLike(int commentId) async {
     try {
       final reseponse = await remoteDataSource.toggleCommentLike(commentId);

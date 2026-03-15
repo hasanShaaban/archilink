@@ -25,6 +25,23 @@ class SyncPostLike extends PostDetailsEvent {
   });
 }
 
+class LoadReplies extends PostDetailsEvent {
+  final int commentId;
+  const LoadReplies(this.commentId);
+
+  @override
+  List<Object> get props => [commentId];
+}
+
+class LoadMoreReplies extends PostDetailsEvent {
+  final int commentId;
+
+  const LoadMoreReplies(this.commentId);
+
+  @override
+  List<Object> get props => [commentId];
+}
+
 class RefreshPostDetails extends PostDetailsEvent {}
 
 class ToggleCommentLike extends PostDetailsEvent {

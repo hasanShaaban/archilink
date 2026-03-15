@@ -4,7 +4,12 @@ import 'package:archilink/features/Post_Details/domain/entity/post_comments_enti
 
 abstract class PostDetailsRemoteDataSource {
   Future<PostCommentsEntity> getPostComments(int postId, int page);
+  Future<PostCommentsEntity> getCommentReplies(int commentId, int page);
   Future<bool> toggleCommentLike(int commentId);
   Future<PostModel> refreshPostDetails(int postId);
-  Future<AddCommentResponseEntity> addComment({required int postId, required String body, int? parentId});
+  Future<AddCommentResponseEntity> addComment({
+    required int postId,
+    required String body,
+    int? parentId,
+  });
 }

@@ -29,6 +29,22 @@ class PostDetailsRemoteDataSourceImpl implements PostDetailsRemoteDataSource {
   }
 
   @override
+  Future<PostCommentsEntity> getCommentReplies(int commentId, int page) async {
+    try {
+      final response = await apiService.get(
+        'comments/$commentId/replies?page=$page',
+      );
+      final data = response.data?['data'];
+      if (data == null) {
+        throw ServerException(message: "Invalid data response");
+      }
+      return PostCommentsModel.fromJson(response.data!);
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
   Future<bool> toggleCommentLike(int commentId) async {
     try {
       final response = await apiService.post('comments/$commentId/toggle-like');

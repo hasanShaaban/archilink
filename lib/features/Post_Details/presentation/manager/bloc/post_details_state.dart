@@ -2,7 +2,7 @@ part of 'post_details_bloc.dart';
 
 class PostDetailsState extends Equatable {
   final PostEntity post;
-  final List<CommentEntity> comments;
+  final List<CommentNode> comments;
   final bool isLoadingPost;
   final bool isLoadingComments;
   final bool isLoadingMoreComments;
@@ -25,7 +25,7 @@ class PostDetailsState extends Equatable {
 
   PostDetailsState copyWith({
     PostEntity? post,
-    List<CommentEntity>? comments,
+    List<CommentNode>? comments,
     bool? isLoadingPost,
     bool? isLoadingComments,
     bool? isLoadingMoreComments,
@@ -57,3 +57,5 @@ class PostDetailsState extends Equatable {
     currentPage,
   ];
 }
+
+

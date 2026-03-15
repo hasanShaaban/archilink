@@ -4,6 +4,7 @@ import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
 import 'package:archilink/features/Post/domain/entity/tag_entity.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
+import 'package:archilink/features/Post_Details/domain/entity/comment_node.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_owner_entity.dart';
 
 PostEntity fakePostEntity({int id = 0}) {
@@ -54,9 +55,12 @@ CommentEntity fakeCommentEntity({int id = 0, int? parentId}) {
   );
 }
 
-List<CommentEntity> fakeCommentEntities({int count = 5}) {
-  return List<CommentEntity>.generate(
+List<CommentNode> fakeCommentEntities({int count = 5}) {
+  return List<CommentNode>.generate(
     count,
-    (index) => fakeCommentEntity(id: index),
+    (index) => CommentNode(
+      comment: fakeCommentEntity(id: index),
+      replies: [],
+    ),
   );
 }

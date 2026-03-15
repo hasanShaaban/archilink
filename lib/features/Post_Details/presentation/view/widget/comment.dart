@@ -3,23 +3,27 @@ import 'package:archilink/core/functions/post_date_formater.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
+import 'package:archilink/features/Post_Details/domain/entity/comment_node.dart';
+import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/comment_like_button.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class Comment extends StatefulWidget {
   const Comment({
     super.key,
     required this.width,
     this.indent = 0,
-    required this.entity, this.onReply,
+    required this.entity,
+    this.onReply,
   });
 
   final double width;
   final Function(CommentEntity)? onReply;
   final double indent;
-  final CommentEntity entity;
+  final CommentNode entity;
 
   @override
   State<Comment> createState() => _CommentState();
@@ -66,14 +70,14 @@ class _CommentState extends State<Comment> {
                       children: [
                         Text(
                           //---------------------------------------------------user name
-                          widget.entity.owner.name,
+                          widget.entity.comment.owner.name,
                           style: AppTextStyle.interMedium14.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         Text(
                           //--------------------------------------------------comment date
-                          ' ${formatPostDate(widget.entity.createdAt)}',
+                          ' ${formatPostDate(widget.entity.comment.createdAt)}',
                           style: AppTextStyle.interMedium14.copyWith(
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
@@ -81,16 +85,16 @@ class _CommentState extends State<Comment> {
                         Spacer(),
                         CommentLikeButton(
                           // -----------------------------------like button
-                          isLiked: widget.entity.likedByMe,
-                          likeCount: widget.entity.likesCount,
-                          commentId: widget.entity.id,
+                          isLiked: widget.entity.comment.likedByMe,
+                          likeCount: widget.entity.comment.likesCount,
+                          commentId: widget.entity.comment.id,
                         ),
                       ],
                     ),
                     SizedBox(height: 4),
                     Text(
                       // -----------------------------------------------------comment body
-                      widget.entity.body,
+                      widget.entity.comment.body,
                       style: AppTextStyle.mallannaRegular14.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                         height: 1.2,
@@ -115,7 +119,7 @@ class _CommentState extends State<Comment> {
               ),
               GestureDetector(
                 onTap: () {
-                  widget.onReply?.call(widget.entity);
+                  widget.onReply?.call(widget.entity.comment);
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -136,12 +140,17 @@ class _CommentState extends State<Comment> {
               ),
             ],
           ),
-          widget.entity.repliesCount > 0
+          widget.entity.comment.repliesCount > 0
               ? GestureDetector(
                   onTap: () {
                     setState(() {
                       _showReplies = !_showReplies;
                     });
+                    if (_showReplies) {
+                      context.read<PostDetailsBloc>().add(
+                        LoadReplies(widget.entity.comment.id),
+                      );
+                    }
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -149,7 +158,7 @@ class _CommentState extends State<Comment> {
                       Text(
                         _showReplies
                             ? 'Hide Replies'
-                            : 'Show ${widget.entity.repliesCount} Replies',
+                            : 'Show ${widget.entity.comment.repliesCount} Replies',
                         style: AppTextStyle.interMedium12.copyWith(
                           color: Theme.of(context).colorScheme.tertiary,
                         ),
@@ -166,45 +175,45 @@ class _CommentState extends State<Comment> {
                   ),
                 )
               : SizedBox(),
-          //TODO: add the replies in separate request
-          // AnimatedCrossFade(
-          //   firstChild: const SizedBox.shrink(),
-          //   secondChild: Column(
-          //     children: replies
-          //         .map(
-          //           (reply) => Container(
-          //             decoration: BoxDecoration(
-          //               border: Border(
-          //                 left: lang.local == 'en'
-          //                     ? BorderSide(
-          //                         color: Theme.of(
-          //                           context,
-          //                         ).colorScheme.secondary,
-          //                       )
-          //                     : BorderSide(),
-          //                 right: lang.local == 'ar'
-          //                     ? BorderSide(
-          //                         color: Theme.of(
-          //                           context,
-          //                         ).colorScheme.secondary,
-          //                       )
-          //                     : BorderSide(),
-          //               ),
-          //             ),
-          //             child: Comment(
-          //               width: widget.width,
-          //               comment: reply,
-          //               indent: widget.width * 16 / 402,
-          //             ),
-          //           ),
-          //         )
-          //         .toList(),
-          //   ),
-          //   crossFadeState: _showReplies
-          //       ? CrossFadeState.showSecond
-          //       : CrossFadeState.showFirst,
-          //   duration: const Duration(milliseconds: 300),
-          // ),
+          AnimatedCrossFade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: Column(
+              children: widget.entity.replies
+                  .map(
+                    (reply) => Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          left: lang.local == 'en'
+                              ? BorderSide(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                )
+                              : BorderSide(),
+                          right: lang.local == 'ar'
+                              ? BorderSide(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                )
+                              : BorderSide(),
+                        ),
+                      ),
+                      child: Comment(
+                        width: widget.width,
+                        entity: reply,
+                        indent: widget.width * 16 / 402,
+                        onReply: widget.onReply,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+            crossFadeState: _showReplies
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 300),
+          ),
         ],
       ),
     );

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
@@ -28,6 +30,7 @@ class CommentLikeButton extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
+            log('tapped');
             context.read<PostDetailsBloc>().add(ToggleCommentLike(commentId));
           },
           child: SvgPicture.asset(

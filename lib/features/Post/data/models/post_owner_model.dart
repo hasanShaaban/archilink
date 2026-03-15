@@ -18,7 +18,7 @@ class PostOwnerModel {
       id: json['id'],
       name: json['name'],
       username: json['username'],
-      profilePictureUrl: json['profile_picture_url'],
+      profilePictureUrl: json['user_avatar'],
     );
   }
 

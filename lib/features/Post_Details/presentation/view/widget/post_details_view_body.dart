@@ -1,6 +1,7 @@
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
+import 'package:archilink/features/Post_Details/domain/entity/comment_node.dart';
 import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/comment.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/post_details_app_bar.dart';
@@ -53,7 +54,7 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
     double height = MediaQuery.of(context).size.height;
     return BlocBuilder<PostDetailsBloc, PostDetailsState>(
       builder: (context, state) {
-        List<CommentEntity> fakeComments = fakeCommentEntities(count: 5);
+        List<CommentNode> fakeComments = fakeCommentEntities(count: 5);
         return RefreshIndicator(
           onRefresh: () async {
             context.read<PostDetailsBloc>().add(RefreshPostDetails());
@@ -122,7 +123,7 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
                           onReply: widget.onReply,
                           key: state.isLoadingComments
                               ? null
-                              : ValueKey(state.comments[index].id),
+                              : ValueKey(state.comments[index].comment.id),
                           width: width,
                           entity: state.isLoadingComments
                               ? fakeComments[index]
