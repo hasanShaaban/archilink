@@ -23,6 +23,9 @@ class SyncPostLike extends PostDetailsEvent {
     required this.liked,
     required this.likesCont,
   });
+
+  @override
+  List<Object> get props => [postId, liked, likesCont];
 }
 
 class LoadReplies extends PostDetailsEvent {
@@ -50,5 +53,7 @@ class ToggleCommentLike extends PostDetailsEvent {
   const ToggleCommentLike(this.commentId);
 
   @override
-  List<Object> get props => [commentsTree];
+  List<Object> get props => [commentId];
 }
+
+

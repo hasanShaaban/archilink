@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:archilink/core/error/failure.dart';
-import 'package:archilink/core/utils/temp.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_node.dart';
@@ -102,41 +101,49 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     LoadReplies event,
     Emitter<PostDetailsState> emit,
   ) async {
-    final index = state.comments.indexWhere(
-      (c) => c.comment.id == event.commentId,
+    final loadingComments = _updateCommentNode(
+      state.comments,
+      event.commentId,
+      (node) => node.copyWith(isLoadingReplies: true),
     );
 
-    if (index == -1) return;
+    if (identical(loadingComments, state.comments)) return;
 
-    final updatedComments = List<CommentNode>.from(state.comments);
-
-    final node = updatedComments[index];
-
-    updatedComments[index] = node.copyWith(isLoadingReplies: true);
-
-    emit(state.copyWith(comments: updatedComments));
+    emit(state.copyWith(comments: loadingComments));
 
     final result = await repo.getCommentReplies(event.commentId, 1);
 
     result.fold(
       (failure) {
-        updatedComments[index] = node.copyWith(isLoadingReplies: false);
+        final failedComments = _updateCommentNode(
+          state.comments,
+          event.commentId,
+          (node) => node.copyWith(isLoadingReplies: false),
+        );
 
-        emit(state.copyWith(comments: updatedComments));
+        if (!identical(failedComments, state.comments)) {
+          emit(state.copyWith(comments: failedComments));
+        }
       },
       (data) {
         final replies = data.comments
             .map((e) => CommentNode(comment: e))
             .toList();
 
-        updatedComments[index] = node.copyWith(
-          isLoadingReplies: false,
-          replies: replies,
-          currentRepliesPage: data.pagination.currentPage,
-          repliesReachedMax: !data.pagination.hasMore,
+        final updatedComments = _updateCommentNode(
+          state.comments,
+          event.commentId,
+          (node) => node.copyWith(
+            isLoadingReplies: false,
+            replies: replies,
+            currentRepliesPage: data.pagination.currentPage,
+            repliesReachedMax: !data.pagination.hasMore,
+          ),
         );
 
-        emit(state.copyWith(comments: updatedComments));
+        if (!identical(updatedComments, state.comments)) {
+          emit(state.copyWith(comments: updatedComments));
+        }
       },
     );
   }
@@ -145,45 +152,62 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     LoadMoreReplies event,
     Emitter<PostDetailsState> emit,
   ) async {
-    final index = state.comments.indexWhere(
-      (c) => c.comment.id == event.commentId,
+    CommentNode? targetNode;
+    _updateCommentNode(state.comments, event.commentId, (node) {
+      targetNode = node;
+      return node;
+    });
+
+    if (targetNode == null) return;
+    if (targetNode!.isLoadingMoreReplies || targetNode!.repliesReachedMax) {
+      return;
+    }
+
+    final loadingComments = _updateCommentNode(
+      state.comments,
+      event.commentId,
+      (node) => node.copyWith(isLoadingMoreReplies: true),
     );
 
-    if (index == -1) return;
+    if (identical(loadingComments, state.comments)) return;
 
-    final node = state.comments[index];
+    emit(state.copyWith(comments: loadingComments));
 
-    if (node.isLoadingMoreReplies || node.repliesReachedMax) return;
-
-    final updatedComments = List<CommentNode>.from(state.comments);
-
-    updatedComments[index] = node.copyWith(isLoadingMoreReplies: true);
-
-    emit(state.copyWith(comments: updatedComments));
-
-    final nextPage = node.currentRepliesPage + 1;
+    final nextPage = targetNode!.currentRepliesPage + 1;
 
     final result = await repo.getCommentReplies(event.commentId, nextPage);
 
     result.fold(
       (failure) {
-        updatedComments[index] = node.copyWith(isLoadingMoreReplies: false);
+        final failedComments = _updateCommentNode(
+          state.comments,
+          event.commentId,
+          (node) => node.copyWith(isLoadingMoreReplies: false),
+        );
 
-        emit(state.copyWith(comments: updatedComments));
+        if (!identical(failedComments, state.comments)) {
+          emit(state.copyWith(comments: failedComments));
+        }
       },
       (data) {
         final replies = data.comments
             .map((e) => CommentNode(comment: e))
             .toList();
 
-        updatedComments[index] = node.copyWith(
-          isLoadingMoreReplies: false,
-          replies: [...node.replies, ...replies],
-          currentRepliesPage: data.pagination.currentPage,
-          repliesReachedMax: !data.pagination.hasMore,
+        final updatedComments = _updateCommentNode(
+          state.comments,
+          event.commentId,
+          (node) => node.copyWith(
+            isLoadingMoreReplies: false,
+            replies: [...node.replies, ...replies],
+            currentRepliesPage: data.pagination.currentPage,
+            repliesReachedMax: !data.pagination.hasMore,
+          ),
         );
 
-        emit(state.copyWith(comments: updatedComments));
+        if (!identical(updatedComments, state.comments)) {
+          emit(state.copyWith(comments: updatedComments));
+        }
       },
     );
   }
@@ -279,6 +303,37 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
 
       return node;
     }).toList();
+  }
+
+  List<CommentNode> _updateCommentNode(
+    List<CommentNode> nodes,
+    int commentId,
+    CommentNode Function(CommentNode node) updater,
+  ) {
+    var didChange = false;
+
+    final updated = nodes.map((node) {
+      if (node.comment.id == commentId) {
+        didChange = true;
+        return updater(node);
+      }
+
+      if (node.replies.isNotEmpty) {
+        final updatedReplies = _updateCommentNode(
+          node.replies,
+          commentId,
+          updater,
+        );
+        if (!identical(updatedReplies, node.replies)) {
+          didChange = true;
+          return node.copyWith(replies: updatedReplies);
+        }
+      }
+
+      return node;
+    }).toList();
+
+    return didChange ? updated : nodes;
   }
 
   @override
