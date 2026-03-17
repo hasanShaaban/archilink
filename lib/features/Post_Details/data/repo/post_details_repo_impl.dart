@@ -4,6 +4,7 @@ import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post_Details/domain/data_source/post_details_remote_data_source.dart';
 import 'package:archilink/features/Post_Details/domain/entity/add_comment_response_entity.dart';
+import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
 import 'package:archilink/features/Post_Details/domain/entity/post_comments_entity.dart';
 import 'package:archilink/features/Post_Details/domain/repo/post_details_repo.dart';
 import 'package:dartz/dartz.dart';
@@ -67,7 +68,7 @@ class PostDetailsRepoImpl implements PostDetailsRepo {
   }
 
   @override
-  Future<Either<Failure, AddCommentResponseEntity>> addComment({
+  Future<Either<Failure, CommentEntity>> addComment({
     required int postId,
     required String body,
     int? parentId,

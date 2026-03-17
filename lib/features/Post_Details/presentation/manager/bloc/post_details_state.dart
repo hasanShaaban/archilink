@@ -7,6 +7,7 @@ class PostDetailsState extends Equatable {
   final bool isLoadingComments;
   final bool isLoadingMoreComments;
   final bool hasReachedMax;
+  final bool isAddingcomment;
 
   final int currentPage;
 
@@ -21,6 +22,7 @@ class PostDetailsState extends Equatable {
     this.currentPage = 1,
     this.failure,
     this.isLoadingPost = false,
+    this.isAddingcomment = false
   });
 
   PostDetailsState copyWith({
@@ -30,6 +32,7 @@ class PostDetailsState extends Equatable {
     bool? isLoadingComments,
     bool? isLoadingMoreComments,
     bool? hasReachedMax,
+    bool? isAddingcomment,
     int? currentPage,
     Failure? failure,
   }) {
@@ -41,6 +44,7 @@ class PostDetailsState extends Equatable {
       isLoadingMoreComments:
           isLoadingMoreComments ?? this.isLoadingMoreComments,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      isAddingcomment: isAddingcomment ?? this.isAddingcomment,
       currentPage: currentPage ?? this.currentPage,
       failure: failure,
     );
@@ -55,7 +59,6 @@ class PostDetailsState extends Equatable {
     isLoadingMoreComments,
     hasReachedMax,
     currentPage,
+    isAddingcomment
   ];
 }
-
-

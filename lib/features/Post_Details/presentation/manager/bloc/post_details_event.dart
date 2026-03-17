@@ -56,4 +56,12 @@ class ToggleCommentLike extends PostDetailsEvent {
   List<Object> get props => [commentId];
 }
 
+class AddComment extends PostDetailsEvent {
+  final String body;
+  final int? parentId;
 
+  const AddComment({required this.body, this.parentId});
+
+  @override
+  List<Object> get props => [body, parentId ?? -1];
+}

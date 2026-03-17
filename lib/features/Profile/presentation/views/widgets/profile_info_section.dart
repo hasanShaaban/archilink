@@ -4,9 +4,7 @@ import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:flutter/material.dart';
 
 class ProfileInfoSection extends StatelessWidget {
-  const ProfileInfoSection({
-    super.key, required this.profileData,
-  });
+  const ProfileInfoSection({super.key, required this.profileData});
 
   final ProfileEntity? profileData;
 
@@ -34,7 +32,7 @@ class ProfileInfoSection extends StatelessWidget {
         ),
         SizedBox(height: 8),
         Text(
-          profileData != null ? profileData!.bio ?? 'bio' : 'bio',
+          profileData != null ? profileData!.details.bio ?? 'bio' : 'bio',
           style: AppTextStyle.interRegular12.copyWith(
             color: Theme.of(context).colorScheme.onSurface,
           ),
@@ -57,4 +55,3 @@ class ProfileInfoSection extends StatelessWidget {
     );
   }
 }
-

@@ -1,14 +1,18 @@
-
-import 'package:archilink/features/Profile/domain/entity/follow_state_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_statistics_column.dart';
 import 'package:flutter/material.dart';
 
 class ProfileStatisticsRow extends StatelessWidget {
   const ProfileStatisticsRow({
-    super.key, this.statisticsData,
+    super.key,
+    required this.followers,
+    required this.following,
+    required this.posts,
+    required this.projects,
   });
-
-  final FollowStatsEntity? statisticsData;
+  final int followers;
+  final int following;
+  final int posts;
+  final int projects;
 
   @override
   Widget build(BuildContext context) {
@@ -17,14 +21,12 @@ class ProfileStatisticsRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          ProfileStatisticsColumn(title: 'Posts', count: '50',),
-          ProfileStatisticsColumn(title: 'Projects', count: '80',),
-          ProfileStatisticsColumn(title: 'Followers', count: statisticsData != null ? '${statisticsData!.followerCount}' : '0',),
-          ProfileStatisticsColumn(title: 'Following', count: statisticsData != null ? '${statisticsData!.followedCount}' : '0',),
+          ProfileStatisticsColumn(title: 'Posts', count: '$posts'),
+          ProfileStatisticsColumn(title: 'Projects', count: '$projects'),
+          ProfileStatisticsColumn(title: 'Followers', count: '$followers'),
+          ProfileStatisticsColumn(title: 'Following', count: '$following'),
         ],
       ),
     );
   }
 }
-
-

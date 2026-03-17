@@ -1,4 +1,4 @@
-import 'package:archilink/features/Profile/domain/profile_type.dart';
+import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/views/profile_page_body.dart';
 import 'package:flutter/material.dart';
 

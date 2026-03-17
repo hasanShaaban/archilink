@@ -30,6 +30,7 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     });
 
     on<SyncPostLike>(_onSyncPostLike);
+    
     on<LoadComments>(_onLoadComments);
     on<LoadMoreComments>(_onLoadMoreComments);
     on<LoadReplies>(_onLoadReplies);

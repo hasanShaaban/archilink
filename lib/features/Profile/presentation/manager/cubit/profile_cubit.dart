@@ -1,4 +1,5 @@
-import 'package:archilink/features/Profile/domain/entity/user_profile_entity.dart';
+
+import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';

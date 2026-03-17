@@ -10,7 +10,7 @@ sealed class ProfileState extends Equatable {
 final class ProfileInitial extends ProfileState {}
 final class ProfileLoading extends ProfileState {}
 final class ProfileSuccess extends ProfileState {
-  final UserProfileEntity profileData;
+  final ProfileEntity profileData;
 
   const ProfileSuccess(this.profileData);
 }

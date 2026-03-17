@@ -5,8 +5,11 @@ import 'package:archilink/features/Post/presentation/view/widgets/post_locaion_d
 import 'package:archilink/features/Post/presentation/view/widgets/post_user_image.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_username_and_date.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
+import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
+import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Post extends StatelessWidget {
@@ -39,11 +42,11 @@ class Post extends StatelessWidget {
               //------------// User image section //-------------------------------------------------------------------------
               GestureDetector(
                 onTap: () {
-                  //TODO implement navigating to user profile
-                  // Navigator.of(
-                  //   context,
-                  //   rootNavigator: true,
-                  // ).pushNamed(UserProfileView.name);
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pushNamed(UserProfileView.name);
+                  context.read<ProfileCubit>().getUserProfile(entity!.owner.username);
                 },
                 child: PostUserImage(
                   width: width,

@@ -2,9 +2,11 @@ import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/network/api_service.dart';
 import 'package:archilink/features/Post/data/models/post_model.dart';
 import 'package:archilink/features/Post_Details/data/models/add_comment_response_model.dart';
+import 'package:archilink/features/Post_Details/data/models/comment_model.dart';
 import 'package:archilink/features/Post_Details/data/models/post_comments_model.dart';
 import 'package:archilink/features/Post_Details/domain/data_source/post_details_remote_data_source.dart';
 import 'package:archilink/features/Post_Details/domain/entity/add_comment_response_entity.dart';
+import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
 import 'package:archilink/features/Post_Details/domain/entity/post_comments_entity.dart';
 import 'package:dio/dio.dart';
 
@@ -73,7 +75,7 @@ class PostDetailsRemoteDataSourceImpl implements PostDetailsRemoteDataSource {
   }
 
   @override
-  Future<AddCommentResponseEntity> addComment({
+  Future<CommentEntity> addComment({
     required int postId,
     required String body,
     int? parentId,
@@ -88,7 +90,7 @@ class PostDetailsRemoteDataSourceImpl implements PostDetailsRemoteDataSource {
         'posts/$postId/comment',
         body: requestBody,
       );
-      return AddCommentResponseModel.fromJson(response.data!);
+      return CommentModel.fromJson(response.data!);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }

@@ -2,7 +2,7 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Home/presentation/views/home_page_body.dart';
-import 'package:archilink/features/Profile/domain/profile_type.dart';
+import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/profile_page_body.dart';
 import 'package:archilink/features/Main/presentation/views/widgets/nav_bar_icon_and_label.dart';
