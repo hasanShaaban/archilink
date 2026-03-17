@@ -1,15 +1,7 @@
-
+import 'package:archilink/features/Profile/data/model/profile_model.dart';
+import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 
 abstract class ProfileLocalDataSource {
-  Future<void> saveProfileData({
-    required String name,
-    required String username,
-    required String email,
-    String? bio,
-    String? location,
-    String? profilePictureUrl,
-    required int followers,
-    required int following,
-  });
-  // UserProfileEntity? getProfileData();//TODO: implement this to get the saved data from local storage
+  Future<void> saveProfileData(Map<String, dynamic> profileData);
+  ProfileModel? getCachedProfile();
 }

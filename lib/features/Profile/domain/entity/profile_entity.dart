@@ -1,4 +1,7 @@
-class ProfileEntity {
+
+import 'package:equatable/equatable.dart';
+
+class ProfileEntity extends Equatable {
   final String name;
   final String username;
   final String? profilePictureUrl;
@@ -8,7 +11,7 @@ class ProfileEntity {
   final int projectCount;
   final String role;
   final ProfileDetailsEntity details;
- 
+
   const ProfileEntity({
     required this.name,
     required this.username,
@@ -20,16 +23,29 @@ class ProfileEntity {
     required this.role,
     required this.details,
   });
+
+  @override
+  List<Object?> get props => [
+    name,
+    username,
+    profilePictureUrl,
+    followersCount,
+    followingCount,
+    postsCount,
+    projectCount,
+    role,
+    details,
+  ];
 }
- 
-class ProfileDetailsEntity {
+
+class ProfileDetailsEntity extends Equatable {
   final String? bio;
   final List<AcademicExperienceEntity> academicExperiences;
   final List<ContactInfoEntity> contactInfo;
   final List<String> skills;
   final String? location;
   final DateTime joinedAt;
- 
+
   const ProfileDetailsEntity({
     this.bio,
     required this.academicExperiences,
@@ -38,14 +54,28 @@ class ProfileDetailsEntity {
     this.location,
     required this.joinedAt,
   });
+
+  @override
+  List<Object?> get props => [
+    bio,
+    academicExperiences,
+    contactInfo,
+    skills,
+    location,
+    joinedAt,
+  ];
 }
- 
-class AcademicExperienceEntity {
-  // Extend fields here once the API returns data
+
+class AcademicExperienceEntity extends Equatable {
   const AcademicExperienceEntity();
+
+  @override
+  List<Object?> get props => [];
 }
- 
-class ContactInfoEntity {
-  // Extend fields here once the API returns data
+
+class ContactInfoEntity extends Equatable {
   const ContactInfoEntity();
+
+  @override
+  List<Object?> get props => [];
 }

@@ -27,19 +27,20 @@ class PostListView extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Post(
-                entity: null,
-                lang: lang,
-                width: width,
-                height: height,
-                onPostTapped: () {
-                  Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).pushNamed(PostDetailsView.name);
-                },
-                withDetails: false,
-              ),
+              child: SizedBox(height: 100),
+              // Post(
+              //   entity: null,
+              //   lang: lang,
+              //   width: width,
+              //   height: height,
+              //   onPostTapped: () {
+              //     Navigator.of(
+              //       context,
+              //       rootNavigator: true,
+              //     ).pushNamed(PostDetailsView.name);
+              //   },
+              //   withDetails: false,
+              // ),
             ),
             Divider(height: 1, color: Theme.of(context).colorScheme.secondary),
           ],
@@ -48,5 +49,3 @@ class PostListView extends StatelessWidget {
     );
   }
 }
-
-
