@@ -90,7 +90,11 @@ class PostDetailsRemoteDataSourceImpl implements PostDetailsRemoteDataSource {
         'posts/$postId/comment',
         body: requestBody,
       );
-      return CommentModel.fromJson(response.data!);
+      final data = response.data?['data'];
+      if (data == null) {
+        throw ServerException(message: 'Invalid data response');
+      }
+      return CommentModel.fromJson(data['comment']);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }

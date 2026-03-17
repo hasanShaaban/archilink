@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
+import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_node.dart';
+import 'package:archilink/features/Post_Details/domain/entity/comment_owner_entity.dart';
 import 'package:archilink/features/Post_Details/domain/repo/post_details_repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -30,13 +32,126 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     });
 
     on<SyncPostLike>(_onSyncPostLike);
-    
+
     on<LoadComments>(_onLoadComments);
     on<LoadMoreComments>(_onLoadMoreComments);
     on<LoadReplies>(_onLoadReplies);
     on<LoadMoreReplies>(_onLoadMoreReplies);
     on<ToggleCommentLike>(_onToggleCommentLike);
     on<RefreshPostDetails>(_onRefreshPostDetails);
+    on<AddComment>(_onAddComment);
+  }
+  Future<void> _onAddComment(
+    AddComment event,
+    Emitter<PostDetailsState> emit,
+  ) async {
+    final tempId = DateTime.now().millisecondsSinceEpoch;
+    final cachedProfile = await repo.getCachedProfile();
+    final tempNode = cachedProfile.fold(
+      (_) {
+        return CommentNode(
+          isPending: true,
+          comment: CommentEntity(
+            id: tempId,
+            body: event.body,
+            createdAt: DateTime.now().toIso8601String(),
+            owner: CommentOwnerEntity(
+              id: 0,
+              name: 'Unknown',
+              username: 'unknown',
+            ),
+            likesCount: 0,
+            repliesCount: 0,
+            likedByMe: false,
+          ),
+        );
+      },
+      (profile) {
+        return CommentNode(
+          isPending: true,
+          comment: CommentEntity(
+            id: tempId,
+            body: event.body,
+            createdAt: DateTime.now().toIso8601String(),
+            owner: CommentOwnerEntity(
+              id: 0,
+              name: profile.name,
+              username: profile.username,
+            ),
+            likesCount: 0,
+            repliesCount: 0,
+            likedByMe: false,
+          ),
+        );
+      },
+    );
+    final withTemp = _insertTempComment(event.parentId, tempNode);
+    emit(state.copyWith(comments: withTemp));
+
+    final result = await repo.addComment(
+      postId: state.post.id,
+      body: event.body,
+      parentId: event.parentId,
+    );
+    result.fold(
+      (failure) {
+        final reverted = _removeTempComment(event.parentId, tempId);
+        // failure in state → UI listens and shows a Snackbar, then clears it
+        emit(state.copyWith(comments: reverted, failure: failure));
+      },
+      (realComment) {
+        final confirmed = _replaceTempComment(
+          event.parentId,
+          tempId,
+          CommentNode(comment: realComment),
+        );
+        emit(state.copyWith(comments: confirmed));
+      },
+    );
+  }
+
+  /// Inserts [tempNode] at the top of the correct level.
+  List<CommentNode> _insertTempComment(int? parentId, CommentNode tempNode) {
+    if (parentId == null) {
+      return [tempNode, ...state.comments];
+    }
+    return _updateCommentNode(
+      state.comments,
+      parentId,
+      (node) => node.copyWith(replies: [tempNode, ...node.replies]),
+    );
+  }
+
+  /// Replaces the pending node identified by [tempId] with [realNode].
+  List<CommentNode> _replaceTempComment(
+    int? parentId,
+    int tempId,
+    CommentNode realNode,
+  ) {
+    CommentNode swap(CommentNode n) => n.comment.id == tempId ? realNode : n;
+
+    if (parentId == null) {
+      return state.comments.map(swap).toList();
+    }
+    return _updateCommentNode(
+      state.comments,
+      parentId,
+      (node) => node.copyWith(replies: node.replies.map(swap).toList()),
+    );
+  }
+
+  /// Removes the pending node identified by [tempId].
+  List<CommentNode> _removeTempComment(int? parentId, int tempId) {
+    bool isNotTemp(CommentNode n) => n.comment.id != tempId;
+
+    if (parentId == null) {
+      return state.comments.where(isNotTemp).toList();
+    }
+    return _updateCommentNode(
+      state.comments,
+      parentId,
+      (node) => node.copyWith(replies: node.replies.where(isNotTemp).toList()),
+    );
   }
 
   Future<void> _onLoadComments(

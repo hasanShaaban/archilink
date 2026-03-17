@@ -4,7 +4,9 @@ import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Post_Details/data/models/reply_target.dart';
+import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CommentTextField extends StatefulWidget {
@@ -46,11 +48,17 @@ class _CommentTextFieldState extends State<CommentTextField> {
   void _submitComment() {
     if (!_hasText) return;
 
-    final comment = _controller.text.trim();
-
-    log('Comment submitted: $comment');
-
+    context.read<PostDetailsBloc>().add(
+      AddComment(
+        body: _controller.text.trim(),
+        parentId: widget.replyTarget.commentId,
+      ),
+    );
     _controller.clear();
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (widget.replyTarget.isReply) {
+      widget.onCancelReply();
+    }
   }
 
   @override

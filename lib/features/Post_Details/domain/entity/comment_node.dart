@@ -9,6 +9,8 @@ class CommentNode {
   final int currentRepliesPage;
   final bool repliesReachedMax;
 
+  final bool isPending;
+
   CommentNode({
     required this.comment,
     this.replies = const [],
@@ -16,6 +18,7 @@ class CommentNode {
     this.isLoadingMoreReplies = false,
     this.currentRepliesPage = 1,
     this.repliesReachedMax = false,
+    this.isPending = false,
   });
 
   CommentNode copyWith({
@@ -25,6 +28,8 @@ class CommentNode {
     bool? isLoadingMoreReplies,
     int? currentRepliesPage,
     bool? repliesReachedMax,
+    bool? isPending,
+
   }) {
     return CommentNode(
       comment: comment ?? this.comment,
@@ -33,6 +38,8 @@ class CommentNode {
       isLoadingMoreReplies: isLoadingMoreReplies ?? this.isLoadingMoreReplies,
       currentRepliesPage: currentRepliesPage ?? this.currentRepliesPage,
       repliesReachedMax: repliesReachedMax ?? this.repliesReachedMax,
+      isPending: isPending ?? this.isPending,
+
     );
   }
 }
