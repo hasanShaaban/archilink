@@ -5,7 +5,7 @@ import 'package:archilink/features/Post_Details/data/models/reply_target.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
 import 'package:archilink/features/Post_Details/domain/repo/post_details_repo.dart';
 import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
-import 'package:archilink/features/Post_Details/presentation/view/widget/comment%20text_field.dart';
+import 'package:archilink/features/Post_Details/presentation/view/widget/comment_text_field.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/post_details_view_body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,7 +61,18 @@ class _PostDetailsViewState extends State<PostDetailsView> {
           commentFocus: _commentFocus,
           onCancelReply: _cancelReply,
         ),
-        body: SafeArea(child: PostDetailsViewBody(onReply: _onReply)),
+        body: SafeArea(
+          child: GestureDetector(
+            behavior: HitTestBehavior.deferToChild,
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              if (_replyTarget.isReply) {
+                _cancelReply();
+              }
+            },
+            child: PostDetailsViewBody(onReply: _onReply),
+          ),
+        ),
       ),
     );
   }

@@ -118,7 +118,12 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     return _updateCommentNode(
       state.comments,
       parentId,
-      (node) => node.copyWith(replies: [tempNode, ...node.replies]),
+      (node) => node.copyWith(
+        comment: node.comment.copyWith(
+          repliesCount: node.comment.repliesCount + 1,
+        ),
+        replies: [tempNode, ...node.replies],
+      ),
     );
   }
 
@@ -150,7 +155,19 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     return _updateCommentNode(
       state.comments,
       parentId,
-      (node) => node.copyWith(replies: node.replies.where(isNotTemp).toList()),
+      (node) {
+        final hadTemp = node.replies.any((r) => r.comment.id == tempId);
+        final updatedReplies = node.replies.where(isNotTemp).toList();
+        return node.copyWith(
+          comment: hadTemp
+              ? node.comment.copyWith(
+                  repliesCount:
+                      (node.comment.repliesCount - 1).clamp(0, 1 << 30).toInt(),
+                )
+              : node.comment,
+          replies: updatedReplies,
+        );
+      },
     );
   }
 
@@ -185,7 +202,11 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     LoadMoreComments event,
     Emitter<PostDetailsState> emit,
   ) async {
-    if (state.isLoadingComments || state.hasReachedMax) return;
+    if (state.isLoadingComments ||
+        state.isLoadingMoreComments ||
+        state.hasReachedMax) {
+      return;
+    }
 
     emit(state.copyWith(isLoadingMoreComments: true));
 
@@ -197,10 +218,12 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
         emit(state.copyWith(isLoadingMoreComments: false, failure: failure));
       },
       (data) {
-        final updatedComments = [
-          ...state.comments,
-          ...data.comments.map((c) => CommentNode(comment: c)),
-        ];
+        final existingIds = state.comments.map((n) => n.comment.id).toSet();
+        final newNodes = data.comments
+            .where((c) => !existingIds.contains(c.id))
+            .map((c) => CommentNode(comment: c))
+            .toList();
+        final updatedComments = [...state.comments, ...newNodes];
         emit(
           state.copyWith(
             comments: updatedComments,
@@ -242,9 +265,16 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
         }
       },
       (data) {
-        final replies = data.comments
-            .map((e) => CommentNode(comment: e))
-            .toList();
+        final pendingReplies =
+            _findNode(state.comments, event.commentId)
+                    ?.replies
+                    .where((r) => r.isPending)
+                    .toList() ??
+                const <CommentNode>[];
+        final replies = [
+          ...pendingReplies,
+          ...data.comments.map((e) => CommentNode(comment: e)),
+        ];
 
         final updatedComments = _updateCommentNode(
           state.comments,
@@ -450,6 +480,15 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     }).toList();
 
     return didChange ? updated : nodes;
+  }
+
+  CommentNode? _findNode(List<CommentNode> nodes, int id) {
+    for (final node in nodes) {
+      if (node.comment.id == id) return node;
+      final found = _findNode(node.replies, id);
+      if (found != null) return found;
+    }
+    return null;
   }
 
   @override

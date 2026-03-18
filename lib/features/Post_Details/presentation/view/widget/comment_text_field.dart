@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
@@ -80,13 +78,6 @@ class _CommentTextFieldState extends State<CommentTextField> {
         /// allows multiline
         minLines: 1,
         maxLines: 6,
-
-        onTapOutside: (event) {
-          FocusManager.instance.primaryFocus?.unfocus();
-          if (widget.replyTarget.isReply) {
-            widget.onCancelReply();
-          }
-        },
 
         /// after 6 lines text scrolls upward automatically
         keyboardType: TextInputType.multiline,

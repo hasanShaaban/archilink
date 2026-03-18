@@ -1,3 +1,4 @@
+import 'package:archilink/core/functions/snack_bar_builder.dart';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
@@ -52,7 +53,14 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
     var lang = S.of(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    return BlocBuilder<PostDetailsBloc, PostDetailsState>(
+    return BlocConsumer<PostDetailsBloc, PostDetailsState>(
+      listener: (context, state) {
+        if (state.failure != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            appSnackBar(context, state.failure!, state.failure!.message),
+          );
+        }
+      },
       builder: (context, state) {
         List<CommentNode> fakeComments = fakeCommentEntities(count: 5);
         return RefreshIndicator(
