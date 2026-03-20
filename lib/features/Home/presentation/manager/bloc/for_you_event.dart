@@ -7,14 +7,16 @@ sealed class ForYouEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadInitital extends ForYouEvent{}
-class LoadMore extends ForYouEvent{}
-class RefreshFeed extends ForYouEvent{}
-class UpdatePostLike extends ForYouEvent{
+class LoadInitital extends ForYouEvent {}
+
+class LoadMore extends ForYouEvent {}
+
+class RefreshFeed extends ForYouEvent {}
+
+class UpdatePostLike extends ForYouEvent {
   final int postId;
   final bool liked;
   final int likesCount;
 
   const UpdatePostLike(this.postId, this.liked, this.likesCount);
-  
 }

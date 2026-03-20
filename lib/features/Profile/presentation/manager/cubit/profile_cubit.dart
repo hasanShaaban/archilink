@@ -4,7 +4,7 @@ import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-part 'profile_state.dart';
+part 'profile_cubit_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   final ProfileRepo profileRepo;

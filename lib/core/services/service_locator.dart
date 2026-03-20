@@ -34,6 +34,7 @@ import 'package:archilink/features/Profile/data/repo/profile_repo_impl.dart';
 import 'package:archilink/features/Profile/domain/data_source/profile_local_data_source.dart';
 import 'package:archilink/features/Profile/domain/data_source/profile_remote_data_source.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
+import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
@@ -135,6 +136,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton(() => AuthCubit(sl()));
   sl.registerLazySingleton(() => CheckUsernameCubit(sl()));
   sl.registerLazySingleton(() => PostLikeCubit(sl()));
+  sl.registerLazySingleton(
+    () => ProfileBloc(sl<ProfileRepo>(), sl<PostLikeCubit>()),
+  );
   sl.registerLazySingleton(
     () => ForYouBloc(sl<HomeRepo>(), sl<PostLikeCubit>()),
   );
