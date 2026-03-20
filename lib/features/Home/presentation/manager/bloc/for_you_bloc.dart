@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Home/domain/entity/feed_item.dart';
-import 'package:archilink/features/Home/domain/entity/global_feed_entity.dart';
+import 'package:archilink/features/Post/domain/entity/posts_entity.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Home/domain/repo/home_repo.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
@@ -85,7 +85,7 @@ class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
     add(LoadInitital());
   }
 
-  List<FeedItem> _buildFeedItem(GlobalFeedEntity data) {
+  List<FeedItem> _buildFeedItem(PostsEntity data) {
     return data.posts.map((post) => PostItem(post)).toList();
   }
 

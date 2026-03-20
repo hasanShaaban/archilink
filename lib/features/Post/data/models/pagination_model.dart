@@ -1,4 +1,4 @@
-import 'package:archilink/features/Home/domain/entity/pagination_entity.dart';
+import 'package:archilink/features/Post/domain/entity/pagination_entity.dart';
 
 class PaginationModel {
   final int currentPage;

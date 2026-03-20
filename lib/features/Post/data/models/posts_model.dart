@@ -1,20 +1,20 @@
-import 'package:archilink/features/Home/data/model/pagination_model.dart';
+import 'package:archilink/features/Post/data/models/pagination_model.dart';
 import 'package:archilink/features/Post/data/models/post_model.dart';
-import 'package:archilink/features/Home/domain/entity/global_feed_entity.dart';
+import 'package:archilink/features/Post/domain/entity/posts_entity.dart';
 
-class GlobalFeedModel {
+class PostsModel {
   final List<PostModel> posts;
   final PaginationModel pagination;
 
-  GlobalFeedModel({
+  PostsModel({
     required this.posts,
     required this.pagination,
   });
 
-  factory GlobalFeedModel.fromJson(Map<String, dynamic> json) {
+  factory PostsModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
 
-    return GlobalFeedModel(
+    return PostsModel(
       posts: (data['posts'] as List)
           .map((e) => PostModel.fromJson(e))
           .toList(),
@@ -22,8 +22,8 @@ class GlobalFeedModel {
     );
   }
 
-  GlobalFeedEntity toEntity() {
-    return GlobalFeedEntity(
+  PostsEntity toEntity() {
+    return PostsEntity(
       posts: posts.map((e) => e.toEntity()).toList(),
       pagination: pagination.toEntity(),
     );

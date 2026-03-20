@@ -1,11 +1,11 @@
-import 'package:archilink/features/Home/domain/entity/pagination_entity.dart';
+import 'package:archilink/features/Post/domain/entity/pagination_entity.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 
-class GlobalFeedEntity {
+class PostsEntity {
   final List<PostEntity> posts;
   final PaginationEntity pagination;
 
-  const GlobalFeedEntity({
+  const PostsEntity({
     required this.posts,
     required this.pagination,
   });
