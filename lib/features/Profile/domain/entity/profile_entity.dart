@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 
 class ProfileEntity extends Equatable {
@@ -42,7 +41,7 @@ class ProfileDetailsEntity extends Equatable {
   final String? bio;
   final List<AcademicExperienceEntity> academicExperiences;
   final List<ContactInfoEntity> contactInfo;
-  final List<String> skills;
+  final List<SkillsEntity> skills;
   final String? location;
   final DateTime joinedAt;
 
@@ -66,16 +65,47 @@ class ProfileDetailsEntity extends Equatable {
   ];
 }
 
-class AcademicExperienceEntity extends Equatable {
-  const AcademicExperienceEntity();
+class SkillsEntity extends Equatable {
+  final String name;
+  final int id;
+
+  const SkillsEntity({required this.name, required this.id});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [name, id];
+}
+
+class AcademicExperienceEntity extends Equatable {
+  final String university;
+  final String degree;
+  final String fieldOfStudy;
+  final int startYear;
+  final int? endYear;
+
+  const AcademicExperienceEntity({
+    required this.university,
+    required this.degree,
+    required this.fieldOfStudy,
+    required this.startYear,
+    this.endYear,
+  });
+
+  @override
+  List<Object?> get props => [
+    university,
+    degree,
+    fieldOfStudy,
+    startYear,
+    endYear,
+  ];
 }
 
 class ContactInfoEntity extends Equatable {
-  const ContactInfoEntity();
+  final String platform;
+  final String? url;
+  final String username;
+  const ContactInfoEntity({required this.platform, this.url,required this.username});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [platform, url, username];
 }

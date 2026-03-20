@@ -22,6 +22,7 @@ class PostDetailsViewBody extends StatefulWidget {
 
 class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
   final ScrollController _scrollController = ScrollController();
+  int _lastTopLevelCount = 0;
 
   @override
   void initState() {
@@ -60,6 +61,18 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
             appSnackBar(context, state.failure!, state.failure!.message),
           );
         }
+        if (state.comments.length > _lastTopLevelCount &&
+            state.comments.isNotEmpty &&
+            state.comments.first.isPending) {
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              0,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOut,
+            );
+          }
+        }
+        _lastTopLevelCount = state.comments.length;
       },
       builder: (context, state) {
         List<CommentNode> fakeComments = fakeCommentEntities(count: 5);
@@ -127,15 +140,20 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
                       enabled: state.isLoadingComments,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Comment(
-                          onReply: widget.onReply,
-                          key: state.isLoadingComments
-                              ? null
-                              : ValueKey(state.comments[index].comment.id),
-                          width: width,
-                          entity: state.isLoadingComments
-                              ? fakeComments[index]
-                              : state.comments[index],
+                        child: InkWell(
+                          onLongPress: () {
+                            //TODO implement comment options (edit, delete, report)
+                          },
+                          child: Comment(
+                            onReply: widget.onReply,
+                            key: state.isLoadingComments
+                                ? null
+                                : ValueKey(state.comments[index].comment.id),
+                            width: width,
+                            entity: state.isLoadingComments
+                                ? fakeComments[index]
+                                : state.comments[index],
+                          ),
                         ),
                       ),
                     );

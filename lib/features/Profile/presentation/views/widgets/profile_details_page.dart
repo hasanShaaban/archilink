@@ -1,16 +1,15 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/expandable_text.dart';
+import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/connect_info_row.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_details_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class ProfileDetailsPage extends StatelessWidget {
-  const ProfileDetailsPage({
-    super.key,
-  });
-
+  const ProfileDetailsPage({super.key, required this.entity});
+  final ProfileEntity entity;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -42,11 +41,9 @@ class ProfileDetailsPage extends StatelessWidget {
                       ),
                       SizedBox(width: 8),
                       Text(
-                        'Bachelor of Architecture from Homs University.',
+                        '${entity.details.academicExperiences.first.degree} of ${entity.details.academicExperiences.first.fieldOfStudy} from ${entity.details.academicExperiences.first.university}.',
                         style: AppTextStyle.interRegular12.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -54,22 +51,38 @@ class ProfileDetailsPage extends StatelessWidget {
                 ],
               ),
             ),
-        
+
             SizedBox(height: 8),
-            ProfileDetailsContainer(title: 'Contact Info', content: Column(
-              children: [
-                ConnectInfoRow(title: 'Hasan_SH',icon: Assets.assetsIconsFacebook,),
-                SizedBox(height: 8,),
-                ConnectInfoRow(title: 'Has_an', icon: Assets.assetsIconsInstagram),
-                SizedBox(height: 8,),
-                ConnectInfoRow(title: 'HasanA.SH', icon: Assets.assetsIconsLinkedin),
-                SizedBox(height: 8,),
-                ConnectInfoRow(title: '0931439996', icon: Assets.assetsIconsCall)
-              ],
-            ))
+            ProfileDetailsContainer(
+              title: 'Contact Info',
+              content: Column(
+                children: [
+                  ConnectInfoRow(
+                    title: 'Hasan_SH',
+                    icon: Assets.assetsIconsFacebook,
+                  ),
+                  SizedBox(height: 8),
+                  ConnectInfoRow(
+                    title: 'Has_an',
+                    icon: Assets.assetsIconsInstagram,
+                  ),
+                  SizedBox(height: 8),
+                  ConnectInfoRow(
+                    title: 'HasanA.SH',
+                    icon: Assets.assetsIconsLinkedin,
+                  ),
+                  SizedBox(height: 8),
+                  ConnectInfoRow(
+                    title: '0931439996',
+                    icon: Assets.assetsIconsCall,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+

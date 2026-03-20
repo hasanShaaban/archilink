@@ -1,3 +1,4 @@
+import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/generated/l10n.dart';
@@ -16,11 +17,28 @@ class SortCommentsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(children: [
-        Text(lang.sortComments, style: AppTextStyle.interSemiBold12),
-        SizedBox(width: 8),
-        SvgPicture.asset(Assets.assetsIconsDownArrow, color: Theme.of(context).colorScheme.onSurface, width: 16,)
-      ],),
+      child: PopupMenuButton<String>(
+        borderRadius: BorderRadius.circular(15),
+        color: AppColorsFromTheme.grayForTheme(context),
+        tooltip: '',
+        onSelected: (_) {},
+        itemBuilder: (context) => const [
+          PopupMenuItem(value: 'most_liked', child: Text('Most liked')),
+          PopupMenuItem(value: 'oldest', child: Text('Oldest')),
+          PopupMenuItem(value: 'newest', child: Text('Newest')),
+        ],
+        child: Row(
+          children: [
+            Text(lang.sortComments, style: AppTextStyle.interSemiBold12),
+            SizedBox(width: 8),
+            SvgPicture.asset(
+              Assets.assetsIconsDownArrow,
+              color: Theme.of(context).colorScheme.onSurface,
+              width: 16,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

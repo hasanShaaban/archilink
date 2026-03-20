@@ -59,7 +59,7 @@ class ProfilePageBody extends StatelessWidget {
                 body: TabBarView(
                   children: [
                     ProfilePostsPage(width: width, height: height),
-                    ProfileDetailsPage(),
+                    ProfileDetailsPage(entity: profileData,),
                   ],
                 ),
               ),
