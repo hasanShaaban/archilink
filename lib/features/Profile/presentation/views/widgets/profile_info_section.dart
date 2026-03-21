@@ -23,7 +23,7 @@ class ProfileInfoSection extends StatelessWidget {
             ),
             SizedBox(width: 8),
             Text(
-              profileData != null ? profileData!.username : 'username',
+              profileData != null ? '@${profileData!.username}' : 'username',
               style: AppTextStyle.interRegular12.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),

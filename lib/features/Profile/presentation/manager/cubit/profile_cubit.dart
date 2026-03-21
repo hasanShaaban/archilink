@@ -6,7 +6,7 @@ import 'package:equatable/equatable.dart';
 
 part 'profile_cubit_state.dart';
 
-class ProfileCubit extends Cubit<ProfileState> {
+class ProfileCubit extends Cubit<ProfileCubitState> {
   final ProfileRepo profileRepo;
   ProfileCubit(this.profileRepo) : super(ProfileInitial());
 

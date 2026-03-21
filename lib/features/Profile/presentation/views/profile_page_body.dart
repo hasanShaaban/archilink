@@ -2,6 +2,7 @@ import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/main_appbar.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
+import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/personal_profile_buttons.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_details_page.dart';
@@ -15,25 +16,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class ProfilePageBody extends StatelessWidget {
+class ProfilePageBody extends StatefulWidget {
   const ProfilePageBody({super.key, required this.type});
 
   final ProfileType type;
 
   @override
+  State<ProfilePageBody> createState() => _ProfilePageBodyState();
+}
+
+class _ProfilePageBodyState extends State<ProfilePageBody> {
+  
+
+  @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
     final double width = MediaQuery.of(context).size.width;
-    return BlocBuilder<ProfileCubit, ProfileState>(
+    return BlocBuilder<ProfileCubit, ProfileCubitState>(
       builder: (context, state) {
         if (state is ProfileSuccess) {
+          BlocProvider.of<ProfileBloc>(context).add(LoadInitialProfilePosts());
           ProfileEntity profileData = state.profileData;
           return DefaultTabController(
             length: 2,
             child: Scaffold(
               body: NestedScrollView(
+
                 headerSliverBuilder: (_, _) => [
-                  type == ProfileType.personalProfile
+                  widget.type == ProfileType.personalProfile
                       ? MainAppBar(withTabbar: false)
                       : SliverToBoxAdapter(
                           child: AppBar(
@@ -47,7 +57,7 @@ class ProfilePageBody extends StatelessWidget {
                         ),
                   ProfielInfoHeader(
                     width: width,
-                    type: type,
+                    type: widget.type,
                     height: height,
                     profileData: profileData,
                   ),
@@ -59,7 +69,7 @@ class ProfilePageBody extends StatelessWidget {
                 body: TabBarView(
                   children: [
                     ProfilePostsPage(width: width, height: height),
-                    ProfileDetailsPage(entity: profileData,),
+                    ProfileDetailsPage(entity: profileData),
                   ],
                 ),
               ),

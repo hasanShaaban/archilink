@@ -48,7 +48,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     LoadMoreProfilePosts event,
     Emitter<ProfileState> emit,
   ) async {
-    if (state.isInitialLoading || state.hasReachedMax) return;
+    if (state.isLoadingMore || state.hasReachedMax) return;
     emit(state.copyWith(isLoadingMore: true));
     final nextPage = state.currentPage + 1;
     final result = await repo.getMyPosts(nextPage);
