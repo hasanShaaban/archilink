@@ -1,6 +1,5 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
-import 'package:archilink/core/widgets/expandable_text.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/connect_info_row.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_details_container.dart';
@@ -19,14 +18,14 @@ class ProfileDetailsPage extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 18),
-            ProfileDetailsContainer(
-              title: 'About me',
-              content: ExpandableText(
-                style: AppTextStyle.interRegular12,
-                trimLines: 2,
-                '  I am a licensed architect with 3 years of experience in designing residential, commercial, and public spaces. My work focuses on blending functionality with aesthetics, creating sustainable and user-centered environments. Skilled in AutoCAD, Revit, and 3D visualization tools, I translate concepts into detailed plans that bring clients’ visions to life. I am passionate about innovative design, efficient project management, and delivering high-quality results from concept to completion.',
-              ),
-            ),
+            // ProfileDetailsContainer(
+            //   title: 'About me',
+            //   content: ExpandableText(
+            //     style: AppTextStyle.interRegular12,
+            //     trimLines: 2,
+            //     '  I am a licensed architect with 3 years of experience in designing residential, commercial, and public spaces. My work focuses on blending functionality with aesthetics, creating sustainable and user-centered environments. Skilled in AutoCAD, Revit, and 3D visualization tools, I translate concepts into detailed plans that bring clients’ visions to life. I am passionate about innovative design, efficient project management, and delivering high-quality results from concept to completion.',
+            //   ),
+            // ),
             SizedBox(height: 8),
             ProfileDetailsContainer(
               title: 'Academic Experience',
@@ -34,6 +33,7 @@ class ProfileDetailsPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
+
                       SizedBox(width: 8),
                       SvgPicture.asset(
                         Assets.assetsIconsDot,

@@ -68,4 +68,22 @@ class ProfileRepoImpl implements ProfileRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, PostsEntity>> getProfilePosts({
+    required String username,
+    required int page,
+  }) async {
+    try {
+      final model = await remoteDataSource.getProfilePosts(
+        username: username,
+        page: page,
+      );
+      return right(model.toEntity());
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

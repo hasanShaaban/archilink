@@ -32,7 +32,24 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       if (data == null) {
         throw ServerException(message: 'Invalid profile reponse');
       }
-      return PostsModel.fromJson(response.data);
+      return PostsModel.fromJson(data);
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<PostsModel> getProfilePosts({
+    required String username,
+    required int page,
+  }) async {
+    try {
+      final response = await apiService.get('user/$username/posts?page=$page');
+      final data = response.data?['data'];
+      if (data == null) {
+        throw ServerException(message: 'Invalid profile reponse');
+      }
+      return PostsModel.fromJson(data['page']);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }

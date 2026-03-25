@@ -17,7 +17,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource{
       if(data == null){
         throw ServerException(message: "Invalid data response");
       }
-      return PostsModel.fromJson(response.data!);
+      return PostsModel.fromJson(data);
 
     }on DioException catch(e){
       throw AppException.handelDioException(e);

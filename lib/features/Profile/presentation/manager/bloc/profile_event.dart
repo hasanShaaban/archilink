@@ -7,9 +7,17 @@ sealed class ProfileEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadInitialProfilePosts extends ProfileEvent {}
+class LoadInitialProfilePosts extends ProfileEvent {
+  final String? username;
 
-class LoadMoreProfilePosts extends ProfileEvent {}
+  const LoadInitialProfilePosts({this.username});
+}
+
+class LoadMoreProfilePosts extends ProfileEvent {
+  final String? username;
+
+  const LoadMoreProfilePosts({this.username});
+}
 
 class RefreshProfilePosts extends ProfileEvent {}
 

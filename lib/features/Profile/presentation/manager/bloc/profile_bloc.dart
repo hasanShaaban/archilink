@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
+import 'package:archilink/features/Post/domain/entity/posts_entity.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:bloc/bloc.dart';
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
 part 'profile_event.dart';
@@ -29,7 +31,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     emit(state.copyWith(isInitialLoading: true));
-    final result = await repo.getMyPosts(1);
+    late final Either<Failure, PostsEntity> result;
+    if (event.username != null) {
+      result = await repo.getProfilePosts(username: event.username!, page: 1);
+    } else {
+      result = await repo.getMyPosts(1);
+    }
     result.fold(
       (failure) =>
           emit(state.copyWith(isInitialLoading: false, failure: failure)),

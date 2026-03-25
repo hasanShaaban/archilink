@@ -8,6 +8,7 @@ import 'package:archilink/features/Post_Details/domain/entity/comment_node.dart'
 import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
 import 'package:archilink/features/Post_Details/presentation/view/widget/comment_like_button.dart';
 import 'package:archilink/generated/l10n.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -56,10 +57,12 @@ class _CommentState extends State<Comment> {
         final entity =
             _findNode(state.comments, widget.entity.comment.id) ??
             widget.entity;
-        final pendingReplies =
-            entity.replies.where((reply) => reply.isPending).toList();
-        final confirmedReplies =
-            entity.replies.where((reply) => !reply.isPending).toList();
+        final pendingReplies = entity.replies
+            .where((reply) => reply.isPending)
+            .toList();
+        final confirmedReplies = entity.replies
+            .where((reply) => !reply.isPending)
+            .toList();
         final hasPendingReply = pendingReplies.isNotEmpty;
         final hasReplies =
             entity.comment.repliesCount > 0 || entity.replies.isNotEmpty;
@@ -75,11 +78,10 @@ class _CommentState extends State<Comment> {
         if (shouldFetchReplies) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
-            context.read<PostDetailsBloc>().add(
-                  LoadReplies(entity.comment.id),
-                );
+            context.read<PostDetailsBloc>().add(LoadReplies(entity.comment.id));
           });
         }
+        final image = entity.comment.owner.profilePictureUrl;
         return Skeletonizer(
           effect: ShimmerEffect(
             baseColor: AppColorsFromTheme.lightGray(context),
@@ -106,15 +108,38 @@ class _CommentState extends State<Comment> {
                           context,
                         ).colorScheme.secondary,
                         child: ClipOval(
-                          child: Skeleton.ignore(
-                            child: SvgPicture.asset(
-                              //change it to Cached Network Image
-                              Assets
-                                  .assetsIconsUser, //====================================image
-                              color: Theme.of(context).colorScheme.onSurface,
-                              width: 24,
-                            ),
-                          ),
+                          child: image != null
+                              ? CachedNetworkImage(
+                                  fit: BoxFit.cover,
+                                  width: widget.width * 34 / 402,
+                                  height: widget.width * 34 / 402,
+                                  errorWidget: (context, url, error) =>
+                                      SvgPicture.asset(
+                                        Assets.assetsIconsUser,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                        width: 24,
+                                      ),
+                                  placeholder: (context, url) => Skeletonizer(
+                                    child: Container(
+                                      width: widget.width * 34 / 402,
+                                      height: widget.width * 34 / 402,
+                                    ),
+                                  ),
+                                  imageUrl: image,
+                                )
+                              : Skeleton.ignore(
+                                  child: SvgPicture.asset(
+                                    //change it to Cached Network Image
+                                    Assets
+                                        .assetsIconsUser, //====================================image
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    width: 24,
+                                  ),
+                                ),
                         ),
                       ),
                       SizedBox(width: 8),

@@ -12,13 +12,12 @@ class PostsModel {
   });
 
   factory PostsModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'];
 
     return PostsModel(
-      posts: (data['posts'] as List)
+      posts: (json['posts'] as List)
           .map((e) => PostModel.fromJson(e))
           .toList(),
-      pagination: PaginationModel.fromJson(data['pagination']),
+      pagination: PaginationModel.fromJson(json['pagination']),
     );
   }
 
