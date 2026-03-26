@@ -23,4 +23,18 @@ class HomeRepoImpl implements HomeRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, PostsEntity>> getFollowingFeed({
+    required int page,
+  }) async {
+    try {
+      final result = await remoteDataSource.getFollowingFeed(page: page);
+      return right(result.toEntity());
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

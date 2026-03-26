@@ -4,4 +4,5 @@ import 'package:dartz/dartz.dart';
 
 abstract class HomeRepo {
   Future<Either<Failure, PostsEntity>> getGlobalFeed({required int page});
+  Future<Either<Failure, PostsEntity>> getFollowingFeed({required int page});
 }

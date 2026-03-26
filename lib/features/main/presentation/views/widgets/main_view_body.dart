@@ -86,7 +86,7 @@ class _MainViewBodyState extends State<MainViewBody> {
       onItemSelected: (value) {
         if (value == 2) {
           BlocProvider.of<ProfileCubit>(context).getPersonlProfile();
-
+          BlocProvider.of<ProfileBloc>(context).add(LoadInitialProfilePosts());
         }
       },
       navBarStyle: NavBarStyle.style13,

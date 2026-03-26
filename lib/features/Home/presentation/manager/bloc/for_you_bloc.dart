@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Home/domain/entity/feed_item.dart';
+import 'package:archilink/features/Home/domain/entity/feed_type.dart';
 import 'package:archilink/features/Post/domain/entity/posts_entity.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Home/domain/repo/home_repo.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:bloc/bloc.dart';
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
 part 'for_you_event.dart';
@@ -14,8 +16,10 @@ part 'for_you_state.dart';
 
 class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
   final HomeRepo repo;
+  final FeedType feedType;
   late final StreamSubscription _likeSubscription;
-  ForYouBloc(this.repo, PostLikeCubit interactions) : super(ForYouState()) {
+  ForYouBloc(this.repo, PostLikeCubit interactions, this.feedType)
+    : super(ForYouState()) {
     _likeSubscription = interactions.stream.listen((event) {
       if (event == null) return;
       add(UpdatePostLike(event.postId, event.liked, event.likeCount));
@@ -32,7 +36,7 @@ class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
   ) async {
     emit(state.copyWith(isInitialLoading: true));
 
-    final result = await repo.getGlobalFeed(page: 1);
+    final result = await _fetchFeed(page: 1);
 
     result.fold(
       (failure) =>
@@ -56,7 +60,7 @@ class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
     if (state.isLoadingMore || state.hasReachedMax) return;
     emit(state.copyWith(isLoadingMore: true));
     final nextPage = state.currentPage + 1;
-    final result = await repo.getGlobalFeed(page: nextPage);
+    final result = await _fetchFeed(page: nextPage);
 
     result.fold((failure) => emit(state.copyWith(isLoadingMore: false)), (
       data,
@@ -78,6 +82,13 @@ class ForYouBloc extends Bloc<ForYouEvent, ForYouState> {
         );
       }
     });
+  }
+
+  Future<Either<Failure, PostsEntity>> _fetchFeed({required int page}) {
+    return switch (feedType) {
+      FeedType.forYou => repo.getGlobalFeed(page: page),
+      FeedType.following => repo.getFollowingFeed(page: page),
+    };
   }
 
   Future<void> _onRefresh(RefreshFeed event, Emitter<ForYouState> emit) async {

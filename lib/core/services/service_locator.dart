@@ -139,7 +139,4 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton(
     () => ProfileBloc(sl<ProfileRepo>(), sl<PostLikeCubit>()),
   );
-  sl.registerLazySingleton(
-    () => ForYouBloc(sl<HomeRepo>(), sl<PostLikeCubit>()),
-  );
 }

@@ -23,4 +23,18 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource{
       throw AppException.handelDioException(e);
     }
   }
+  
+  @override
+  Future<PostsModel> getFollowingFeed({required int page}) async{
+    try {
+      final reponse = await apiService.get('home/followed-feed');
+      final data = reponse.data?['data'];
+      if(data == null ){
+        throw ServerException(message: 'Invalid data response');
+      }
+      return PostsModel.fromJson(data);
+    }on DioException catch(e){
+      throw AppException.handelDioException(e);
+    }
+  }
 }

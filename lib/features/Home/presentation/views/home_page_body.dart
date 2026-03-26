@@ -1,5 +1,6 @@
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/widgets/main_appbar.dart';
+import 'package:archilink/features/Home/domain/entity/feed_type.dart';
 import 'package:archilink/features/Home/domain/repo/home_repo.dart';
 import 'package:archilink/features/Home/presentation/manager/bloc/for_you_bloc.dart';
 import 'package:archilink/features/Home/presentation/views/widgets/following_posts_page.dart';
@@ -26,11 +27,21 @@ class HomePageBody extends StatelessWidget {
             physics: BouncingScrollPhysics(),
             children: [
               BlocProvider(
-                create: (context) =>
-                    ForYouBloc(sl<HomeRepo>(), sl<PostLikeCubit>()),
+                create: (context) => ForYouBloc(
+                  sl<HomeRepo>(),
+                  sl<PostLikeCubit>(),
+                  FeedType.forYou,
+                ),
                 child: ForYouPage(),
               ),
-              FollowingPostsPage(),
+              BlocProvider(
+                create: (context) => ForYouBloc(
+                  sl<HomeRepo>(),
+                  sl<PostLikeCubit>(),
+                  FeedType.following,
+                ),
+                child: FollowingPostsPage(),
+              ),
               Center(child: Text('saved')),
             ],
           ),

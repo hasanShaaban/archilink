@@ -58,7 +58,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     if (state.isLoadingMore || state.hasReachedMax) return;
     emit(state.copyWith(isLoadingMore: true));
     final nextPage = state.currentPage + 1;
-    final result = await repo.getMyPosts(nextPage);
+    late final Either<Failure, PostsEntity> result;
+    if (event.username != null) {
+      result = await repo.getProfilePosts(
+        username: event.username!,
+        page: nextPage,
+      );
+    } else {
+      result = await repo.getMyPosts(nextPage);
+    }
 
     result.fold((failure) => emit(state.copyWith(isLoadingMore: false)), (
       data,

@@ -2,7 +2,6 @@ import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/main_appbar.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
-import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/personal_profile_buttons.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_details_page.dart';
@@ -35,7 +34,6 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
     return BlocBuilder<ProfileCubit, ProfileCubitState>(
       builder: (context, state) {
         if (state is ProfileSuccess) {
-          BlocProvider.of<ProfileBloc>(context).add(LoadInitialProfilePosts());
           ProfileEntity profileData = state.profileData;
           return DefaultTabController(
             length: 2,
