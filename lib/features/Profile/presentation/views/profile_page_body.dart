@@ -1,7 +1,10 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/main_appbar.dart';
+import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
+import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
+import 'package:archilink/features/Profile/presentation/manager/cubit/follow_cubit.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/personal_profile_buttons.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_details_page.dart';
@@ -109,7 +112,7 @@ class ProfielInfoHeader extends StatelessWidget {
           SizedBox(height: 16),
           ProfileInfoSection(profileData: profileData),
           SizedBox(height: 16),
-          _buildButtons(type, width, height),
+          _buildButtons(type, width, height, username: profileData.username),
           SizedBox(height: 8),
           ProfileStatisticsRow(
             followers: profileData.followersCount,
@@ -124,12 +127,20 @@ class ProfielInfoHeader extends StatelessWidget {
   }
 }
 
-Widget _buildButtons(ProfileType type, double width, double height) {
+Widget _buildButtons(
+  ProfileType type,
+  double width,
+  double height, {
+  required String username,
+}) {
   if (type == ProfileType.personalProfile) {
     return Skeleton.keep(child: PersonalProfileButtons(width: width));
   }
   if (type == ProfileType.userProfile) {
-    return UserProfileButtons(height: height, width: width);
+    return BlocProvider(
+      create: (context) => FollowCubit(sl<ProfileRepo>()),
+      child: UserProfileButtons(height: height, width: width, username: username),
+    );
   }
   return const SizedBox();
 }

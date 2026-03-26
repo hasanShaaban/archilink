@@ -9,5 +9,9 @@ abstract class ProfileRepo {
     required String username,
   });
   Future<Either<Failure, PostsEntity>> getMyPosts(int page);
-  Future<Either<Failure, PostsEntity>> getProfilePosts({required String username, required int page});
+  Future<Either<Failure, PostsEntity>> getProfilePosts({
+    required String username,
+    required int page,
+  });
+  Future<Either<Failure, bool>> follow(String username);
 }

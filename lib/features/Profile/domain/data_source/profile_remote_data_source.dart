@@ -1,4 +1,3 @@
-
 import 'package:archilink/features/Post/data/models/posts_model.dart';
 import 'package:archilink/features/Profile/data/model/profile_model.dart';
 
@@ -9,4 +8,5 @@ abstract class ProfileRemoteDataSource {
     required String username,
     required int page,
   });
+  Future<bool> follow(String username);
 }
