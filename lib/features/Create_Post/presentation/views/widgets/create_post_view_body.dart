@@ -64,15 +64,7 @@ class CreatePostViewBody extends StatelessWidget {
                 icon: Assets.assetsIconsAddImage,
                 text: 'Add Photos',
                 onPressed: () async {
-                  final List? result = await AssetPicker.pickAssets(
-                    context,
-                    pickerConfig: AssetPickerConfig(
-                      requestType: RequestType.image,
-                      maxAssets: 10,
-                      pageSize: 120,
-                      pickerTheme:AppTheme.darkMode
-                    ),
-                  );
+                  
                 },
               ),
               CreatePostActionButton(

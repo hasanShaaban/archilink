@@ -18,7 +18,6 @@ import 'package:archilink/features/Home/data/data_source/home_remote_data_source
 import 'package:archilink/features/Home/data/repo/home_repo_impl.dart';
 import 'package:archilink/features/Home/domain/data_source/home_remote_data_source.dart';
 import 'package:archilink/features/Home/domain/repo/home_repo.dart';
-import 'package:archilink/features/Home/presentation/manager/bloc/for_you_bloc.dart';
 import 'package:archilink/features/Post/data/data_source/post_remote_data_source_impl.dart';
 import 'package:archilink/features/Post/data/repo/post_repo_impl.dart';
 import 'package:archilink/features/Post/domain/data_soource/post_remote_data_source.dart';
