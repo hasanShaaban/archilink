@@ -1,6 +1,7 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Create_Post/presentation/views/create_post_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_custom_button.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,12 @@ class PersonalProfileButtons extends StatelessWidget {
         children: [
           Expanded(
             child: ProfileCustomButton(
-              onPress: () {},
+              onPress: () {
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pushNamed(CreatePostView.name);
+              },
               icon: Assets.assetsIconsAdd,
               iconSize: 16,
               title: 'Create Post',
@@ -33,7 +39,10 @@ class PersonalProfileButtons extends StatelessWidget {
           Expanded(
             child: ProfileCustomButton(
               onPress: () {
-                Navigator.of(context, rootNavigator: true).pushNamed(EditProfileView.name);
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pushNamed(EditProfileView.name);
               },
               icon: Assets.assetsIconsEditProfile,
               iconSize: 16,

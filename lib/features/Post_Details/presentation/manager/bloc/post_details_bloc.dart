@@ -127,7 +127,7 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     );
   }
 
-  /// Replaces the pending node identified by [tempId] with [realNode].
+  
   List<CommentNode> _replaceTempComment(
     int? parentId,
     int tempId,
@@ -145,7 +145,7 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     );
   }
 
-  /// Removes the pending node identified by [tempId].
+  
   List<CommentNode> _removeTempComment(int? parentId, int tempId) {
     bool isNotTemp(CommentNode n) => n.comment.id != tempId;
 
