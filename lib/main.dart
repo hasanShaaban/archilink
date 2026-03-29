@@ -1,7 +1,9 @@
 import 'package:archilink/core/functions/on_generate_route.dart';
+import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/theme/app_theme.dart';
 import 'package:archilink/core/utils/constants.dart';
+import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
@@ -33,7 +35,6 @@ class MyApp extends StatelessWidget {
       //Bloc Providers
       providers: [
         BlocProvider(create: (context) => ProfileCubit(sl<ProfileRepo>())),
-
         BlocProvider(create: (context) => sl<PostLikeCubit>()),
         BlocProvider(create: (context) => sl<ProfileBloc>()),
       ],

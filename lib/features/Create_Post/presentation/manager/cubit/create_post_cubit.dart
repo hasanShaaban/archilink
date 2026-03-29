@@ -16,6 +16,7 @@ class CreatePostCubit extends Cubit<CreatePostState> {
 
   Future<void> pickImages(BuildContext context) async {
     final picked = await _mediaPickerService.pickImage(
+      previouslySelected: state.selectedAssets,
       context: context,
       maxcount: 9,
     );

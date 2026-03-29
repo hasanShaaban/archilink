@@ -3,6 +3,8 @@ import 'package:archilink/core/network/dio_client.dart';
 import 'package:archilink/core/network/interceptors/auth_interceptor.dart';
 import 'package:archilink/core/network/interceptors/error_interceptor.dart';
 import 'package:archilink/core/network/interceptors/log_interceptor.dart';
+import 'package:archilink/core/services/media_picker_service.dart';
+import 'package:archilink/core/services/post_images_picker.dart';
 import 'package:archilink/core/storage/hive_storage.dart';
 import 'package:archilink/core/storage/local_storage.dart';
 import 'package:archilink/core/utils/constants.dart';
@@ -44,6 +46,11 @@ Future<void> initServiceLocator({
   required Box authBox,
   required Box profileBox,
 }) async {
+  ///----------
+  ///Services
+  ///----------
+  sl.registerLazySingleton<MediaPickerService>(() => PostImagesPicker());
+
   ///----------
   ///Storage
   ///----------

@@ -1,7 +1,4 @@
-
-
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
-
 
 class ProfileModel extends ProfileEntity {
   const ProfileModel({
@@ -27,7 +24,7 @@ class ProfileModel extends ProfileEntity {
       projectCount: data['project_count'] as int,
       role: data['role'] as String,
       details: ProfileDetailsModel.fromJson(
-        data['Details'] as Map<String, dynamic>,
+        data['details'] as Map<String, dynamic>,
       ),
     );
   }
@@ -43,7 +40,7 @@ class ProfileModel extends ProfileEntity {
         'posts_count': postsCount,
         'project_count': projectCount,
         'role': role,
-        'Details': (details as ProfileDetailsModel).toJson(),
+        'details': (details as ProfileDetailsModel).toJson(),
       },
     };
   }
@@ -55,7 +52,6 @@ class ProfileDetailsModel extends ProfileDetailsEntity {
     required super.academicExperiences,
     required super.contactInfo,
     required super.skills,
-    super.location,
     required super.joinedAt,
   });
 
@@ -73,7 +69,6 @@ class ProfileDetailsModel extends ProfileDetailsEntity {
       skills: (json['skills'] as List<dynamic>)
           .map((e) => SkillModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      location: json['location'] as String?,
       joinedAt: DateTime.parse(json['joined_at'] as String),
     );
   }
@@ -84,10 +79,10 @@ class ProfileDetailsModel extends ProfileDetailsEntity {
       'academic_experiences': academicExperiences
           .map((e) => (e as AcademicExperienceModel).toJson())
           .toList(),
-      'contact_info':
-          contactInfo.map((e) => (e as ContactInfoModel).toJson()).toList(),
+      'contact_info': contactInfo
+          .map((e) => (e as ContactInfoModel).toJson())
+          .toList(),
       'skills': skills.map((e) => (e as SkillModel).toJson()).toList(),
-      'location': location,
       'joined_at': joinedAt.toIso8601String().split('T').first,
     };
   }
@@ -139,11 +134,7 @@ class ContactInfoModel extends ContactInfoEntity {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'platform': platform,
-      'handle': username,
-      'url': url,
-    };
+    return {'platform': platform, 'handle': username, 'url': url};
   }
 }
 
@@ -151,16 +142,10 @@ class SkillModel extends SkillsEntity {
   const SkillModel({required super.id, required super.name});
 
   factory SkillModel.fromJson(Map<String, dynamic> json) {
-    return SkillModel(
-      id: json['id'] as int,
-      name: json['name'] as String,
-    );
+    return SkillModel(id: json['id'] as int, name: json['name'] as String);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name};
   }
 }

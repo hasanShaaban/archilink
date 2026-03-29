@@ -8,11 +8,13 @@ class PostImagesPicker extends MediaPickerService {
   Future<List<AssetEntity>?> pickImage({
     required BuildContext context,
     required int maxcount,
+    required List<AssetEntity>? previouslySelected,
   }) async {
     
     final List<AssetEntity>? result = await AssetPicker.pickAssets(
       context,
       pickerConfig: AssetPickerConfig(
+        selectedAssets: previouslySelected,
         requestType: RequestType.image,
         maxAssets: maxcount,
         pickerTheme: AppTheme.darkMode,

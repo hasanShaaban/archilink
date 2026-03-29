@@ -42,7 +42,6 @@ class ProfileDetailsEntity extends Equatable {
   final List<AcademicExperienceEntity> academicExperiences;
   final List<ContactInfoEntity> contactInfo;
   final List<SkillsEntity> skills;
-  final String? location;
   final DateTime joinedAt;
 
   const ProfileDetailsEntity({
@@ -50,7 +49,6 @@ class ProfileDetailsEntity extends Equatable {
     required this.academicExperiences,
     required this.contactInfo,
     required this.skills,
-    this.location,
     required this.joinedAt,
   });
 
@@ -60,7 +58,6 @@ class ProfileDetailsEntity extends Equatable {
     academicExperiences,
     contactInfo,
     skills,
-    location,
     joinedAt,
   ];
 }

@@ -20,10 +20,12 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
   ProfileModel? getCachedProfile() {
     final jsonString = storage.read(_profileDataKey);
     if (jsonString == null) return null;
-    log(jsonString);
+    log("jsonString: $jsonString");
     final decodedData = jsonDecode(jsonString) as Map<String, dynamic>;
-    log(decodedData['data'].toString());
+    log("decodedData: $decodedData");
 
     return ProfileModel.fromJson(decodedData['data']);
   }
 }
+
+

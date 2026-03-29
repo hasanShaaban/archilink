@@ -4,6 +4,7 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 abstract class MediaPickerService {
   Future<List<AssetEntity>?> pickImage({
     required BuildContext context,
+    required List<AssetEntity>? previouslySelected,
     required int maxcount,
   });
 }
