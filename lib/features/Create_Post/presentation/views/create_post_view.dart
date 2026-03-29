@@ -2,6 +2,7 @@ import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
+import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
 import 'package:archilink/features/Create_Post/presentation/views/widgets/create_post_view_body.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,10 @@ class CreatePostView extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     return BlocProvider(
-      create: (context) => CreatePostCubit(sl<MediaPickerService>()),
+      create: (context) => CreatePostCubit(
+        mediaPickerService: sl<MediaPickerService>(),
+        createPostRepo: sl<CreatePostRepo>(),
+      ),
       child: Scaffold(
         appBar: AppBar(
           title: Text(

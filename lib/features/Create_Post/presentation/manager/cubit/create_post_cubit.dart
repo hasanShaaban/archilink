@@ -1,4 +1,6 @@
 import 'package:archilink/core/services/media_picker_service.dart';
+import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
+import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -7,15 +9,27 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 part 'create_post_state.dart';
 
 class CreatePostCubit extends Cubit<CreatePostState> {
-  final MediaPickerService _mediaPickerService;
-  CreatePostCubit(this._mediaPickerService) : super(CreatePostState());
+  final MediaPickerService mediaPickerService;
+  final CreatePostRepo createPostRepo;
+  CreatePostCubit({
+    required this.mediaPickerService,
+    required this.createPostRepo,
+  }) : super(const CreatePostState()) {
+    loadPosterProfile();
+  }
+
+  void loadPosterProfile() {
+    final ProfileEntity? profile = createPostRepo.getPosterProfileData();
+    if (profile == null) return;
+    emit(state.copyWith(profileData: profile));
+  }
 
   void onTextChanged(String text) {
     emit(state.copyWith(postText: text));
   }
 
   Future<void> pickImages(BuildContext context) async {
-    final picked = await _mediaPickerService.pickImage(
+    final picked = await mediaPickerService.pickImage(
       previouslySelected: state.selectedAssets,
       context: context,
       maxcount: 9,

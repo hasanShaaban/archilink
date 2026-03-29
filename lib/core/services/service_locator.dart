@@ -16,6 +16,8 @@ import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_sour
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
+import 'package:archilink/features/Create_Post/data/repo/create_post_repo_impl.dart';
+import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Home/data/data_source/home_remote_data_source_impl.dart';
 import 'package:archilink/features/Home/data/repo/home_repo_impl.dart';
 import 'package:archilink/features/Home/domain/data_source/home_remote_data_source.dart';
@@ -132,9 +134,18 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<ProfileRepo>(
     () => ProfileRepoImpl(remoteDataSource: sl(), localDataSource: sl()),
   );
-  sl.registerLazySingleton<HomeRepo>(() => HomeRepoImpl(sl()));
-  sl.registerLazySingleton<PostRepo>(() => PostRepoImpl(sl()));
-  sl.registerLazySingleton<PostDetailsRepo>(() => PostDetailsRepoImpl(sl()));
+  sl.registerLazySingleton<HomeRepo>(
+    () => HomeRepoImpl(sl<HomeRemoteDataSource>()),
+  );
+  sl.registerLazySingleton<PostRepo>(
+    () => PostRepoImpl(sl<PostRemoteDataSource>()),
+  );
+  sl.registerLazySingleton<PostDetailsRepo>(
+    () => PostDetailsRepoImpl(sl<PostDetailsRemoteDataSource>()),
+  );
+  sl.registerLazySingleton<CreatePostRepo>(
+    () => CreatePostRepoImpl(sl<ProfileLocalDataSource>()),
+  );
 
   ///---------
   ///Bloc

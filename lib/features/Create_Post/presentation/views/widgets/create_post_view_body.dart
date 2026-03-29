@@ -3,6 +3,7 @@ import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
 import 'package:archilink/features/Create_Post/presentation/views/widgets/create_post_action_button.dart';
+import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_user_image.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_username_and_date.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,15 @@ class CreatePostViewBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<CreatePostCubit, CreatePostState>(
       builder: (context, state) {
+        final fallbackOwner = fakePostEntity(id: 0).owner;
+        final owner = state.profileData == null
+            ? fallbackOwner
+            : PostOwnerEntity(
+                id: 0,
+                name: state.profileData!.name,
+                username: state.profileData!.username,
+                profilePictureUrl: state.profileData!.profilePictureUrl,
+              );
         return SingleChildScrollView(
           child: Column(
             children: [
@@ -28,12 +38,15 @@ class CreatePostViewBody extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    PostUserImage(width: width),
+                    PostUserImage(
+                      width: width,
+                      imageURL: state.profileData?.profilePictureUrl,
+                    ),
                     SizedBox(width: 8),
                     PostUserNameAndDate(
                       withDetails: false,
                       date: DateTime.now().toIso8601String(),
-                      owner: fakePostEntity(id: 0).owner,
+                      owner: owner,
                     ),
                   ],
                 ),
