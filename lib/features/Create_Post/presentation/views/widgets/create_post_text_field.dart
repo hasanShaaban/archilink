@@ -3,22 +3,33 @@ import 'package:archilink/features/Create_Post/presentation/manager/cubit/create
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CreatePostTextFiled extends StatelessWidget {
+class CreatePostTextFiled extends StatefulWidget {
   const CreatePostTextFiled({
     super.key,
     required this.width,
   });
-
+  
   final double width;
 
   @override
+  State<CreatePostTextFiled> createState() => _CreatePostTextFiledState();
+}
+
+class _CreatePostTextFiledState extends State<CreatePostTextFiled> {
+  final FocusNode focusNode = FocusNode();
+  @override
   Widget build(BuildContext context) {
+    
     return Padding(
       padding: EdgeInsets.only(
-        left: 20 + width * 34 / 402 + 8,
+        left: 20 + widget.width * 34 / 402 + 8,
         right: 20,
       ),
       child: TextField(
+        focusNode: focusNode,
+        onTapOutside: (event) {
+          focusNode.unfocus();
+        },
         keyboardType: TextInputType.multiline,
         textInputAction: TextInputAction.newline,
         minLines: 1,

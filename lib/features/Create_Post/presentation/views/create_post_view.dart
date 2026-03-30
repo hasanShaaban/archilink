@@ -8,10 +8,16 @@ import 'package:archilink/features/Create_Post/presentation/views/widgets/create
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class CreatePostView extends StatelessWidget {
+class CreatePostView extends StatefulWidget {
   const CreatePostView({super.key});
   static const name = '/createPost';
 
+  @override
+  State<CreatePostView> createState() => _CreatePostViewState();
+}
+
+class _CreatePostViewState extends State<CreatePostView> {
+  FocusNode focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -70,7 +76,11 @@ class CreatePostView extends StatelessWidget {
         ),
 
         body: SafeArea(
-          child: CreatePostViewBody(width: width, height: height),
+          child: CreatePostViewBody(
+            width: width,
+            height: height,
+            focusNode: focusNode,
+          ),
         ),
       ),
     );

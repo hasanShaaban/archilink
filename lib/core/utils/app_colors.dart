@@ -15,6 +15,10 @@ abstract class AppColors {
 }
 
 abstract class AppColorsFromTheme {
+  static grayForText(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+      ? AppColors.gray
+      : AppColors.lightGrayDarkMode;
   static lightGray(BuildContext context) =>
       Theme.of(context).brightness == Brightness.light
       ? AppColors.lightGreyLightMode
