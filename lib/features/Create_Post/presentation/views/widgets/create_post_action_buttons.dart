@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CreatePostActionButtons extends StatelessWidget {
-  const CreatePostActionButtons({
-    super.key,
-  });
+  const CreatePostActionButtons({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +17,9 @@ class CreatePostActionButtons extends StatelessWidget {
           CreatePostActionButton(
             icon: Assets.assetsIconsAddTags,
             text: 'Add Tags',
-            onPressed: () {},
+            onPressed: () {
+              context.read<CreatePostCubit>().toggleAddingTag(true);
+            },
           ),
           CreatePostActionButton(
             icon: Assets.assetsIconsAddImage,

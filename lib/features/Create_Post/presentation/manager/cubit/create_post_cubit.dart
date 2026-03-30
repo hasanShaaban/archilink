@@ -60,6 +60,10 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     emit(state.copyWith(selectedAssets: updated));
   }
 
+  void toggleAddingTag(bool isAdding) {
+    emit(state.copyWith(isAddingTag: isAdding));
+  }
+
   Future<void> submitPost() async {
     if (!state.canPost) return;
     emit(state.copyWith(isSubmitting: true));
