@@ -5,9 +5,11 @@ class CreatePostState extends Equatable {
   final List<AssetEntity> selectedAssets;
   final bool isSubmitting;
   final ProfileEntity? profileData;
+  final List<String> tags;
   const CreatePostState({
     this.postText = '',
     this.selectedAssets = const [],
+    this.tags = const [],
     this.isSubmitting = false,
     this.profileData,
   });
@@ -19,15 +21,23 @@ class CreatePostState extends Equatable {
     List<AssetEntity>? selectedAssets,
     bool? isSubmitting,
     ProfileEntity? profileData,
+    List<String>? tags,
   }) {
     return CreatePostState(
       postText: postText ?? this.postText,
       selectedAssets: selectedAssets ?? this.selectedAssets,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       profileData: profileData ?? this.profileData,
+      tags: tags ?? this.tags
     );
   }
 
   @override
-  List<Object?> get props => [postText, selectedAssets, isSubmitting, profileData];
+  List<Object?> get props => [
+    postText,
+    selectedAssets,
+    isSubmitting,
+    profileData,
+    tags,
+  ];
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
@@ -36,6 +38,19 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     );
     if (picked == null) return;
     emit(state.copyWith(selectedAssets: picked));
+  }
+
+  void addTag(String tag) {
+    if (tag.trim().isEmpty) return;
+    final updated = List<String>.from(state.tags)..add(tag.trim());
+    emit(state.copyWith(tags: updated));
+    log('Tag added: $tag');
+    log('total Tags : ${state.tags}');
+  }
+
+  void removeTag(int index) {
+    final updated = List<String>.from(state.tags)..removeAt(index);
+    emit(state.copyWith(tags: updated));
   }
 
   void removeAsset(AssetEntity asset) {
