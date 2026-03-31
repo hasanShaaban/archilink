@@ -1,8 +1,12 @@
 import 'dart:developer';
 
 import 'package:archilink/core/services/media_picker_service.dart';
+import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
+import 'package:archilink/features/Post/domain/entity/post_entity.dart';
+import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
+import 'package:archilink/features/Post/domain/entity/tag_entity.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -41,11 +45,14 @@ class CreatePostCubit extends Cubit<CreatePostState> {
   }
 
   void addTag(String tag) {
-    if (tag.trim().isEmpty) return;
-    final updated = List<String>.from(state.tags)..add(tag.trim());
+    final cleaned = tag.trim();
+    if (cleaned.isEmpty) return;
+    final exists = state.tags.any(
+      (t) => t.trim().toLowerCase() == cleaned.toLowerCase(),
+    );
+    if (exists) return;
+    final updated = List<String>.from(state.tags)..add(cleaned);
     emit(state.copyWith(tags: updated));
-    log('Tag added: $tag');
-    log('total Tags : ${state.tags}');
   }
 
   void removeTag(int index) {
@@ -66,6 +73,40 @@ class CreatePostCubit extends Cubit<CreatePostState> {
 
   void setShowTagsInPost(bool show) {
     emit(state.copyWith(showTagsInPost: show, isAddingTag: false));
+  }
+
+  void togglePrivacy() {
+    final next = state.privacy == 'public' ? 'private' : 'public';
+    emit(state.copyWith(privacy: next));
+  }
+
+  PostEntity buildPreviewPost() {
+    final fallbackOwner = fakePostEntity(id: 0).owner;
+    final owner = state.profileData == null
+        ? fallbackOwner
+        : PostOwnerEntity(
+            id: 0,
+            name: state.profileData!.name,
+            username: state.profileData!.username,
+            profilePictureUrl: state.profileData!.profilePictureUrl,
+          );
+
+    final tags = List<TagEntity>.generate(
+      state.tags.length,
+      (index) => TagEntity(name: state.tags[index], id: index),
+    );
+
+    return PostEntity(
+      id: 0,
+      body: state.postText,
+      createdAt: DateTime.now(),
+      owner: owner,
+      tags: tags,
+      likesCount: 0,
+      commentsCount: 0,
+      likedByMe: false,
+      mediaItems: const [],
+    );
   }
 
   Future<void> submitPost() async {

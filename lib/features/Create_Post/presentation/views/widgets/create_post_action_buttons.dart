@@ -27,17 +27,24 @@ class CreatePostActionButtons extends StatelessWidget {
                 ? Theme.of(context).colorScheme.primary
                 : null,
           ),
+          SizedBox(width: 12),
           CreatePostActionButton(
             icon: Assets.assetsIconsAddImage,
             text: 'Add Photos',
             onPressed: () =>
                 context.read<CreatePostCubit>().pickImages(context),
           ),
+          SizedBox(width: 12),
           CreatePostActionButton(
-            icon: Assets.assetsIconsAddLocation,
-            text: 'Add Location',
-            onPressed: () {},
-            color: Colors.transparent,
+
+            icon: Assets.assetsIconsEyeFill,
+            text: state.privacy == 'private' ? 'Private' : 'Public',
+            onPressed: () {
+              context.read<CreatePostCubit>().togglePrivacy();
+            },
+            color: state.privacy == 'private'
+                ? Theme.of(context).colorScheme.primary
+                : null,
           ),
         ],
       ),

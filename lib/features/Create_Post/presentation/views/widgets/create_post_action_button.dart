@@ -17,34 +17,34 @@ class CreatePostActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      style: TextButton.styleFrom(
-        backgroundColor: color ?? AppColorsFromTheme.grayForTheme(context),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(8),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      ),
-      onPressed: onPressed,
-      child: Row(
-        children: [
-          SvgPicture.asset(
-            icon,
-            width: 16,
-            height: 16,
-            colorFilter: ColorFilter.mode(
-              Theme.of(context).colorScheme.onSurface,
-              BlendMode.srcIn,
-            ),
+    return Expanded(
+      child: TextButton(
+        style: TextButton.styleFrom(
+          backgroundColor: color ?? AppColorsFromTheme.grayForTheme(context),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(8),
           ),
-          SizedBox(width: 4),
-          Text(
-            text,
-            style: AppTextStyle.interMedium12.copyWith(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        ),
+        onPressed: onPressed,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              icon,
+              width: 16,
+              height: 16,
               color: Theme.of(context).colorScheme.onSurface,
             ),
-          ),
-        ],
+            SizedBox(width: 4),
+            Text(
+              text,
+              style: AppTextStyle.interMedium12.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

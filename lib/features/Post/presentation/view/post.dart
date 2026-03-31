@@ -12,6 +12,7 @@ import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class Post extends StatelessWidget {
   const Post({
@@ -22,12 +23,14 @@ class Post extends StatelessWidget {
     this.onPostTapped,
     required this.withDetails,
     required this.entity,
+    this.localAssets = const [],
   });
   final S lang;
   final double width, height;
   final VoidCallback? onPostTapped;
   final bool withDetails;
   final PostEntity entity;
+  final List<AssetEntity> localAssets;
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +93,7 @@ class Post extends StatelessWidget {
                       PostBody(
                         body: entity.body,
                         mediaItems: entity.mediaItems,
+                        localAssets: localAssets,
                         width: width,
                         height: height,
                         withDetails: withDetails,
