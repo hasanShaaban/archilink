@@ -7,6 +7,7 @@ import 'package:archilink/features/Create_Post/presentation/views/widgets/create
 import 'package:archilink/features/Create_Post/presentation/views/widgets/post_header_row.dart';
 import 'package:archilink/features/Create_Post/presentation/views/widgets/selected_images_list_view.dart';
 import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/exapndable_tags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -39,6 +40,11 @@ class CreatePostViewBody extends StatelessWidget {
               PostHeaderRow(width: width, owner: owner, state: state),
               SizedBox(height: 12),
               CreatePostTextFiled(width: width),
+              if (state.showTagsInPost && state.tags.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: ExpandableTags(tags: state.tags),
+                ),
               SizedBox(height: 12),
               if (state.selectedAssets.isNotEmpty)
                 Padding(
@@ -52,7 +58,7 @@ class CreatePostViewBody extends StatelessWidget {
 
               Divider(height: 0),
               SizedBox(height: 12),
-              CreatePostActionButtons(),
+              CreatePostActionButtons(state: state),
               SizedBox(height: 8),
               CreatePostTagsSection(
                 height: height,
@@ -66,5 +72,3 @@ class CreatePostViewBody extends StatelessWidget {
     );
   }
 }
-
-

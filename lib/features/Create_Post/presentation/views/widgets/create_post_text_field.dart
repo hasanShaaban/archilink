@@ -22,7 +22,7 @@ class _CreatePostTextFiledState extends State<CreatePostTextFiled> {
     
     return Padding(
       padding: EdgeInsets.only(
-        left: 20 + widget.width * 34 / 402 + 8,
+        left: 20,
         right: 20,
       ),
       child: TextField(

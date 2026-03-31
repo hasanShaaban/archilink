@@ -1,5 +1,7 @@
 import 'package:archilink/core/utils/app_text_style.dart';
+import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SaveTagsButton extends StatelessWidget {
   const SaveTagsButton({super.key});
@@ -9,7 +11,9 @@ class SaveTagsButton extends StatelessWidget {
     return Align(
       alignment: Alignment.center,
       child: TextButton(
-        onPressed: () {},
+        onPressed: () {
+          context.read<CreatePostCubit>().setShowTagsInPost(true);
+        },
 
         style: TextButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,

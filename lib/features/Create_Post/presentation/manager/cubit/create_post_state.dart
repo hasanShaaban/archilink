@@ -7,6 +7,7 @@ class CreatePostState extends Equatable {
   final ProfileEntity? profileData;
   final List<String> tags;
   final bool isAddingTag;
+  final bool showTagsInPost;
   const CreatePostState({
     this.postText = '',
     this.selectedAssets = const [],
@@ -14,6 +15,7 @@ class CreatePostState extends Equatable {
     this.isSubmitting = false,
     this.isAddingTag = false,
     this.profileData,
+    this.showTagsInPost = false,
   });
 
   bool get canPost => postText.trim().isNotEmpty || selectedAssets.isNotEmpty;
@@ -25,6 +27,7 @@ class CreatePostState extends Equatable {
     ProfileEntity? profileData,
     List<String>? tags,
     bool? isAddingTag,
+    bool? showTagsInPost,
   }) {
     return CreatePostState(
       postText: postText ?? this.postText,
@@ -33,6 +36,7 @@ class CreatePostState extends Equatable {
       profileData: profileData ?? this.profileData,
       tags: tags ?? this.tags,
       isAddingTag: isAddingTag ?? this.isAddingTag,
+      showTagsInPost: showTagsInPost ?? this.showTagsInPost,
     );
   }
 
@@ -44,5 +48,6 @@ class CreatePostState extends Equatable {
     isAddingTag,
     profileData,
     tags,
+    showTagsInPost,
   ];
 }

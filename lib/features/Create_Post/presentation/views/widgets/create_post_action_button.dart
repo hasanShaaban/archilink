@@ -6,17 +6,20 @@ import 'package:flutter_svg/svg.dart';
 class CreatePostActionButton extends StatelessWidget {
   final String icon, text;
   final VoidCallback onPressed;
+  final Color? color;
   const CreatePostActionButton({
     super.key,
     required this.icon,
-    required this.text, required this.onPressed,
+    required this.text,
+    required this.onPressed,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
       style: TextButton.styleFrom(
-        backgroundColor: AppColorsFromTheme.grayForTheme(context),
+        backgroundColor: color ?? AppColorsFromTheme.grayForTheme(context),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(8),
         ),
@@ -46,5 +49,3 @@ class CreatePostActionButton extends StatelessWidget {
     );
   }
 }
-
-

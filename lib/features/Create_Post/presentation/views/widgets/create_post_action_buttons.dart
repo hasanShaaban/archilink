@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CreatePostActionButtons extends StatelessWidget {
-  const CreatePostActionButtons({super.key});
+  const CreatePostActionButtons({super.key, required this.state});
+  final CreatePostState state;
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +19,13 @@ class CreatePostActionButtons extends StatelessWidget {
             icon: Assets.assetsIconsAddTags,
             text: 'Add Tags',
             onPressed: () {
-              context.read<CreatePostCubit>().toggleAddingTag(true);
+              state.isAddingTag
+                  ? context.read<CreatePostCubit>().toggleAddingTag(false)
+                  : context.read<CreatePostCubit>().toggleAddingTag(true);
             },
+            color: state.isAddingTag
+                ? Theme.of(context).colorScheme.primary
+                : null,
           ),
           CreatePostActionButton(
             icon: Assets.assetsIconsAddImage,
@@ -31,6 +37,7 @@ class CreatePostActionButtons extends StatelessWidget {
             icon: Assets.assetsIconsAddLocation,
             text: 'Add Location',
             onPressed: () {},
+            color: Colors.transparent,
           ),
         ],
       ),

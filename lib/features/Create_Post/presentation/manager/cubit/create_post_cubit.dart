@@ -64,6 +64,10 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     emit(state.copyWith(isAddingTag: isAdding));
   }
 
+  void setShowTagsInPost(bool show) {
+    emit(state.copyWith(showTagsInPost: show, isAddingTag: false));
+  }
+
   Future<void> submitPost() async {
     if (!state.canPost) return;
     emit(state.copyWith(isSubmitting: true));
