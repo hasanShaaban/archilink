@@ -1,6 +1,5 @@
 import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/services/service_locator.dart';
-import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
@@ -49,14 +48,33 @@ class _CreatePostViewState extends State<CreatePostView> {
         ),
 
         body: SafeArea(
-          child: CreatePostViewBody(
-            width: width,
-            height: height,
-            focusNode: focusNode,
+          child: Stack(
+            children: [
+              CreatePostViewBody(
+                width: width,
+                height: height,
+                focusNode: focusNode,
+              ),
+              Center(
+                child: BlocBuilder<CreatePostCubit, CreatePostState>(
+                  builder: (context, state) {
+                    if (!state.isSubmitting) return SizedBox();
+                    return Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withAlpha(150),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-

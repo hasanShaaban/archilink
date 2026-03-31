@@ -23,88 +23,7 @@ class PostButton extends StatelessWidget {
             height: height * 44 / 874,
             child: TextButton(
               onPressed: () {
-                showGeneralDialog(
-                  barrierDismissible: true,
-                  barrierLabel: 'Post Preview',
-                  barrierColor: Colors.black.withAlpha(450),
-                  transitionDuration: Duration(milliseconds: 300),
-                  context: context,
-                  pageBuilder: (_, __, ___) => Align(
-                    alignment: Alignment.center,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: Container(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Post(
-                              lang: S.of(context),
-                              width: width,
-                              height: height,
-                              withDetails: true,
-                              entity: context
-                                  .read<CreatePostCubit>()
-                                  .buildPreviewPost(),
-                              localAssets: context
-                                  .read<CreatePostCubit>()
-                                  .state
-                                  .selectedAssets,
-                            ),
-                            Text(
-                              'This is how your post will appear to others.\nReady to share it?',
-                              style: AppTextStyle.interRegular14.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    backgroundColor:
-                                        AppColorsFromTheme.grayForTheme(
-                                          context,
-                                        ),
-                                    foregroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text('Continue Editing'),
-                                ),
-                                SizedBox(width: 12),
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
-                                    foregroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                  onPressed: () {},
-                                  child: Text('submit'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  transitionBuilder: (_, anim, __, child) => FadeTransition(
-                    opacity: anim,
-                    child: SizeTransition(sizeFactor: anim, child: child),
-                  ),
-                );
+                postPreviewBuilder(context);
 
                 // context.read<CreatePostCubit>().submitPost();
               },
@@ -125,6 +44,92 @@ class PostButton extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Future<Object?> postPreviewBuilder(BuildContext context) {
+    return showGeneralDialog(
+      barrierDismissible: true,
+      barrierLabel: 'Post Preview',
+      barrierColor: Colors.black.withAlpha(450),
+      transitionDuration: Duration(milliseconds: 300),
+      context: context,
+      pageBuilder: (_, __, ___) => Align(
+        alignment: Alignment.center,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Post(
+                    lang: S.of(context),
+                    width: width,
+                    height: height,
+                    withDetails: true,
+                    entity: context.read<CreatePostCubit>().buildPreviewPost(),
+                    localAssets: context
+                        .read<CreatePostCubit>()
+                        .state
+                        .selectedAssets,
+                  ),
+                ),
+                Text(
+                  'This is how your post will appear to others.\nReady to share it?',
+                  style: AppTextStyle.interRegular14.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        backgroundColor: AppColorsFromTheme.grayForTheme(
+                          context,
+                        ),
+                        foregroundColor: Theme.of(
+                          context,
+                        ).colorScheme.onSurface,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Continue Editing'),
+                    ),
+                    SizedBox(width: 12),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(
+                          context,
+                        ).colorScheme.onSurface,
+                      ),
+                      onPressed: () {
+                        context.read<CreatePostCubit>().submitPost();
+                        Navigator.pop(context);
+                      },
+                      child: Text('submit'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      transitionBuilder: (_, anim, __, child) => FadeTransition(
+        opacity: anim,
+        child: SizeTransition(sizeFactor: anim, child: child),
+      ),
     );
   }
 }

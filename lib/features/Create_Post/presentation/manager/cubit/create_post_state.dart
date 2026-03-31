@@ -20,7 +20,7 @@ class CreatePostState extends Equatable {
     this.privacy = 'public',
   });
 
-  bool get canPost => postText.trim().isNotEmpty || selectedAssets.isNotEmpty;
+  bool get canPost => postText.trim().isNotEmpty;
 
   CreatePostState copyWith({
     String? postText,

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/utils/fakers.dart';
+import 'package:archilink/features/Create_Post/domain/entity/create_post_parms.dart';
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
@@ -112,7 +113,22 @@ class CreatePostCubit extends Cubit<CreatePostState> {
   Future<void> submitPost() async {
     if (!state.canPost) return;
     emit(state.copyWith(isSubmitting: true));
-    // TODO: create post logic
-    emit(state.copyWith(isSubmitting: false));
+    final parms = CreatePostParms(
+      text: state.postText,
+      tags: state.tags,
+      assetIds: state.selectedAssets,
+      privacy: state.privacy,
+    );
+    final result = await createPostRepo.createPost(parms);
+    result.fold(
+      (failure) {
+        log('Failed to create post: ${failure.message}');
+        emit(state.copyWith(isSubmitting: false));
+      },
+      (response) {
+        log('Post created successfully');
+        emit(state.copyWith(isSubmitting: false));
+      },
+    );
   }
 }
