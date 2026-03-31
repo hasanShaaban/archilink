@@ -23,7 +23,7 @@ class CreatePostRemoteDateSourceImpl extends CreatePostRemoteDataSource {
       if (data == null) {
         throw ServerException(message: 'Invalid create post response');
       }
-      return CreatePostResponseModel.fromJson(data);
+      return CreatePostResponseModel.fromJson(response.data);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }
