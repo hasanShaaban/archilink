@@ -4,6 +4,7 @@ class ProfileEntity extends Equatable {
   final String name;
   final String username;
   final String? profilePictureUrl;
+  final bool? isFollowing;
   final int followersCount;
   final int followingCount;
   final int postsCount;
@@ -16,6 +17,7 @@ class ProfileEntity extends Equatable {
     required this.username,
     required this.profilePictureUrl,
     required this.followersCount,
+    required this.isFollowing,
     required this.followingCount,
     required this.postsCount,
     required this.projectCount,
@@ -31,6 +33,7 @@ class ProfileEntity extends Equatable {
     followersCount,
     followingCount,
     postsCount,
+    isFollowing,
     projectCount,
     role,
     details,
@@ -42,6 +45,8 @@ class ProfileDetailsEntity extends Equatable {
   final List<AcademicExperienceEntity> academicExperiences;
   final List<ContactInfoEntity> contactInfo;
   final List<SkillsEntity> skills;
+  final String? country;
+  final String? city;
   final DateTime joinedAt;
 
   const ProfileDetailsEntity({
@@ -50,6 +55,8 @@ class ProfileDetailsEntity extends Equatable {
     required this.contactInfo,
     required this.skills,
     required this.joinedAt,
+    this.country,
+    this.city,
   });
 
   @override
@@ -59,6 +66,8 @@ class ProfileDetailsEntity extends Equatable {
     contactInfo,
     skills,
     joinedAt,
+    country,
+    city,
   ];
 }
 
@@ -101,7 +110,11 @@ class ContactInfoEntity extends Equatable {
   final String platform;
   final String? url;
   final String username;
-  const ContactInfoEntity({required this.platform, this.url,required this.username});
+  const ContactInfoEntity({
+    required this.platform,
+    this.url,
+    required this.username,
+  });
 
   @override
   List<Object?> get props => [platform, url, username];

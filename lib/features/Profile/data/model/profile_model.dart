@@ -11,6 +11,7 @@ class ProfileModel extends ProfileEntity {
     required super.projectCount,
     required super.role,
     required super.details,
+    required super.isFollowing,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> data) {
@@ -18,6 +19,7 @@ class ProfileModel extends ProfileEntity {
       name: data['name'] as String,
       username: data['username'] as String,
       profilePictureUrl: data['profile_picture_url'],
+      isFollowing: data['is_following'],
       followersCount: data['followers_count'] as int,
       followingCount: data['following_count'] as int,
       postsCount: data['posts_count'] as int,
@@ -41,6 +43,7 @@ class ProfileModel extends ProfileEntity {
         'project_count': projectCount,
         'role': role,
         'details': (details as ProfileDetailsModel).toJson(),
+        'is_following': isFollowing,
       },
     };
   }
@@ -53,11 +56,15 @@ class ProfileDetailsModel extends ProfileDetailsEntity {
     required super.contactInfo,
     required super.skills,
     required super.joinedAt,
+    super.country,
+    super.city,
   });
 
   factory ProfileDetailsModel.fromJson(Map<String, dynamic> json) {
     return ProfileDetailsModel(
       bio: json['bio'] as String?,
+      country: json['country'],
+      city: json['city'],
       academicExperiences: (json['academic_experiences'] as List<dynamic>)
           .map(
             (e) => AcademicExperienceModel.fromJson(e as Map<String, dynamic>),
@@ -84,6 +91,8 @@ class ProfileDetailsModel extends ProfileDetailsEntity {
           .toList(),
       'skills': skills.map((e) => (e as SkillModel).toJson()).toList(),
       'joined_at': joinedAt.toIso8601String().split('T').first,
+      'country': country,
+      'city': city,
     };
   }
 }

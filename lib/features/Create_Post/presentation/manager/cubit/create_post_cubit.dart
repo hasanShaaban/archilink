@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Create_Post/domain/entity/create_post_parms.dart';
@@ -123,11 +124,11 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     result.fold(
       (failure) {
         log('Failed to create post: ${failure.message}');
-        emit(state.copyWith(isSubmitting: false));
+        emit(state.copyWith(isSubmitting: false, failure: failure));
       },
       (response) {
         log('Post created successfully');
-        emit(state.copyWith(isSubmitting: false));
+        emit(state.copyWith(isSubmitting: false, failure: null));
         resetDraft();
       },
     );

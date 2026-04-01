@@ -20,6 +20,7 @@ class CommentLikeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('Building CommentLikeButton: isLiked=$isLiked, likeCount=$likeCount');
     return Row(
       children: [
         Text(
@@ -30,7 +31,6 @@ class CommentLikeButton extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            log('tapped');
             context.read<PostDetailsBloc>().add(ToggleCommentLike(commentId));
           },
           child: SvgPicture.asset(

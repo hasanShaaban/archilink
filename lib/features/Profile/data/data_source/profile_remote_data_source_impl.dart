@@ -49,7 +49,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       if (data == null) {
         throw ServerException(message: 'Invalid profile reponse');
       }
-      return PostsModel.fromJson(data['page']);
+      return PostsModel.fromJson(data);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }

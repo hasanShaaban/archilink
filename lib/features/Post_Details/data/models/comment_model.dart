@@ -20,7 +20,7 @@ class CommentModel extends CommentEntity {
       createdAt: json['created_at'],
       likesCount: json['likes_count'] ?? 0,
       repliesCount: json['replies_count'] ?? 0,
-      likedByMe: json['liked_by_me'] == 1 ? true : false,
+      likedByMe: json['liked_by_me'] ?? false,
       owner: CommentOwnerModel.fromJson(json['owner']),
       parentId: json['parent_id'],
     );

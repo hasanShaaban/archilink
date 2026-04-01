@@ -9,6 +9,7 @@ class CreatePostState extends Equatable {
   final bool isAddingTag;
   final bool showTagsInPost;
   final String privacy;
+  final Failure? failure;
   const CreatePostState({
     this.postText = '',
     this.selectedAssets = const [],
@@ -18,6 +19,7 @@ class CreatePostState extends Equatable {
     this.profileData,
     this.showTagsInPost = false,
     this.privacy = 'public',
+    this.failure,
   });
 
   bool get canPost => postText.trim().isNotEmpty;
@@ -31,6 +33,7 @@ class CreatePostState extends Equatable {
     bool? isAddingTag,
     bool? showTagsInPost,
     String? privacy,
+    Failure? failure,
   }) {
     return CreatePostState(
       postText: postText ?? this.postText,
@@ -41,6 +44,7 @@ class CreatePostState extends Equatable {
       isAddingTag: isAddingTag ?? this.isAddingTag,
       showTagsInPost: showTagsInPost ?? this.showTagsInPost,
       privacy: privacy ?? this.privacy,
+      failure: failure ?? this.failure,
     );
   }
 
@@ -54,5 +58,6 @@ class CreatePostState extends Equatable {
     tags,
     showTagsInPost,
     privacy,
+    failure,
   ];
 }
