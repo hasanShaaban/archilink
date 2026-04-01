@@ -116,6 +116,7 @@ class PostButton extends StatelessWidget {
                       onPressed: () {
                         context.read<CreatePostCubit>().submitPost();
                         Navigator.pop(context);
+                        Navigator.pop(context);
                       },
                       child: Text('submit'),
                     ),

@@ -3,6 +3,7 @@ import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/theme/app_theme.dart';
 import 'package:archilink/core/utils/constants.dart';
+import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
@@ -37,6 +38,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => ProfileCubit(sl<ProfileRepo>())),
         BlocProvider(create: (context) => sl<PostLikeCubit>()),
         BlocProvider(create: (context) => sl<ProfileBloc>()),
+        BlocProvider(
+          create: (context) => CreatePostCubit(
+            mediaPickerService: sl<MediaPickerService>(),
+            createPostRepo: sl<CreatePostRepo>(),
+          ),
+        ),
       ],
       child: MaterialApp(
         // Localization

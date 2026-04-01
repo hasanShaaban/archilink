@@ -1,6 +1,7 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/widgets/main_appbar.dart';
 import 'package:archilink/core/services/service_locator.dart';
+import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
@@ -28,8 +29,6 @@ class ProfilePageBody extends StatefulWidget {
 }
 
 class _ProfilePageBodyState extends State<ProfilePageBody> {
-  
-
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
@@ -42,7 +41,6 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
             length: 2,
             child: Scaffold(
               body: NestedScrollView(
-
                 headerSliverBuilder: (_, _) => [
                   widget.type == ProfileType.personalProfile
                       ? MainAppBar(withTabbar: false)
@@ -61,6 +59,57 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                     type: widget.type,
                     height: height,
                     profileData: profileData,
+                  ),
+                  SliverToBoxAdapter(
+                    child: BlocSelector<CreatePostCubit, CreatePostState, bool>(
+                      selector: (state) {
+                        return state.isSubmitting;
+                      },
+                      builder: (context, isSubmitting) {
+                        return isSubmitting
+                            ? Column(
+                                children: [
+                                  Divider(
+                                    thickness: 1,
+                                    color: Theme.of(context).dividerColor,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 6,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'loading new post...',
+                                          style: AppTextStyle.interRegular16
+                                              .copyWith(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                              ),
+                                        ),
+                                        SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 3,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Divider(
+                                    thickness: 1,
+                                    color: Theme.of(context).dividerColor,
+                                  ),
+                                ],
+                              )
+                            : SizedBox();
+                      },
+                    ),
                   ),
                   SliverPersistentHeader(
                     pinned: true,
@@ -139,7 +188,11 @@ Widget _buildButtons(
   if (type == ProfileType.userProfile) {
     return BlocProvider(
       create: (context) => FollowCubit(sl<ProfileRepo>()),
-      child: UserProfileButtons(height: height, width: width, username: username),
+      child: UserProfileButtons(
+        height: height,
+        width: width,
+        username: username,
+      ),
     );
   }
   return const SizedBox();

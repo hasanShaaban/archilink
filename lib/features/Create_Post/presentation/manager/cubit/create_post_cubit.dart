@@ -128,7 +128,21 @@ class CreatePostCubit extends Cubit<CreatePostState> {
       (response) {
         log('Post created successfully');
         emit(state.copyWith(isSubmitting: false));
+        resetDraft();
       },
+    );
+  }
+
+  void resetDraft() {
+    emit(
+      state.copyWith(
+        postText: '',
+        selectedAssets: const [],
+        tags: const [],
+        isAddingTag: false,
+        showTagsInPost: false,
+        privacy: 'public',
+      ),
     );
   }
 }
