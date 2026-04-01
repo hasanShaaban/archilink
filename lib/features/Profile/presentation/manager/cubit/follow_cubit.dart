@@ -8,10 +8,30 @@ class FollowCubit extends Cubit<FollowState> {
   final ProfileRepo profileRepo;
   FollowCubit(this.profileRepo) : super(const FollowState());
 
+  void setInitial({
+    required bool isFollowing,
+    bool force = false,
+  }) {
+    if (state.isInitialized && !force) return;
+    emit(
+      state.copyWith(
+        isFollowing: isFollowing,
+        isInitialized: true,
+        errorMessage: null,
+      ),
+    );
+  }
+
   Future<void> follow(String username) async {
     if (state.isSubmitting) return;
     // Optimistic UI: show followed state immediately.
-    emit(state.copyWith(isFollowing: true, isSubmitting: true, errorMessage: null));
+    emit(
+      state.copyWith(
+        isFollowing: true,
+        isSubmitting: true,
+        errorMessage: null,
+      ),
+    );
     final result = await profileRepo.follow(username);
     result.fold(
       (failure) => emit(

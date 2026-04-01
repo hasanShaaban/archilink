@@ -4,7 +4,7 @@ class ProfileEntity extends Equatable {
   final String name;
   final String username;
   final String? profilePictureUrl;
-  final bool? isFollowing;
+  final bool isFollowing;
   final int followersCount;
   final int followingCount;
   final int postsCount;

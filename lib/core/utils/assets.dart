@@ -118,6 +118,14 @@ class Assets {
   /// assets/icons/notification.svg
   static const String assetsIconsNotification = "assets/icons/notification.svg";
 
+  /// Assets for assetsIconsPrivate
+  /// assets/icons/private.svg
+  static const String assetsIconsPrivate = "assets/icons/private.svg";
+
+  /// Assets for assetsIconsPublic
+  /// assets/icons/public.svg
+  static const String assetsIconsPublic = "assets/icons/public.svg";
+
   /// Assets for assetsIconsSave
   /// assets/icons/Save.svg
   static const String assetsIconsSave = "assets/icons/Save.svg";

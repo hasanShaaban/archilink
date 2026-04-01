@@ -6,17 +6,43 @@ import 'package:archilink/features/Profile/presentation/views/widgets/profile_cu
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class UserProfileButtons extends StatelessWidget {
+class UserProfileButtons extends StatefulWidget {
   const UserProfileButtons({
     super.key,
     required this.height,
     required this.width,
     required this.username,
+    required this.isFollowing,
   });
 
   final double height;
   final double width;
   final String username;
+  final bool isFollowing;
+
+  @override
+  State<UserProfileButtons> createState() => _UserProfileButtonsState();
+}
+
+class _UserProfileButtonsState extends State<UserProfileButtons> {
+  @override
+  void initState() {
+    super.initState();
+    // Seed cubit with server value for the initial render.
+    context.read<FollowCubit>().setInitial(isFollowing: widget.isFollowing);
+  }
+
+  @override
+  void didUpdateWidget(covariant UserProfileButtons oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.username != widget.username ||
+        oldWidget.isFollowing != widget.isFollowing) {
+      context.read<FollowCubit>().setInitial(
+        isFollowing: widget.isFollowing,
+        force: true,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,19 +52,24 @@ class UserProfileButtons extends StatelessWidget {
         children: [
           BlocBuilder<FollowCubit, FollowState>(
             builder: (context, state) {
-              final Color followColor = state.isFollowing
+              final bool isFollowing = state.isFollowing;
+              final Color followColor = isFollowing
                   ? Theme.of(context).colorScheme.secondary
                   : Theme.of(context).colorScheme.primary;
+
               return SizedBox(
-                height: height * 44 / 874,
-                width: width * 150 / 402,
+                width: widget.width * 150 / 402,
                 child: ProfileCustomButton(
                   onPress: () {
                     if (state.isSubmitting) return;
-                    context.read<FollowCubit>().follow(username);
+                    if (isFollowing) {
+                      //TODO: implement unfollow functionality
+                    } else {
+                      context.read<FollowCubit>().follow(widget.username);
+                    }
                   },
-                  title: 'Follow',
-                  icon: Assets.assetsIconsEditProfile,
+                  title: isFollowing ? 'Followed' : 'Follow',
+                  icon: Assets.assetsIconsAdd,
                   iconSize: 24,
                   backgroundColor: followColor,
                   textStyle: AppTextStyle.interMedium16.copyWith(
