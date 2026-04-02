@@ -30,10 +30,21 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     LoadInitialProfilePosts event,
     Emitter<ProfileState> emit,
   ) async {
-    emit(state.copyWith(isInitialLoading: true));
+    emit(
+      state.copyWith(
+        profilePosts: const [],
+        isInitialLoading: true,
+        isLoadingMore: false,
+        hasReachedMax: false,
+        failure: null,
+        currentPage: 1,
+        activeUsername: event.username,
+      ),
+    );
     late final Either<Failure, PostsEntity> result;
-    if (event.username != null) {
-      result = await repo.getProfilePosts(username: event.username!, page: 1);
+    final username = event.username;
+    if (username != null) {
+      result = await repo.getProfilePosts(username: username, page: 1);
     } else {
       result = await repo.getMyPosts(1);
     }
@@ -59,9 +70,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     emit(state.copyWith(isLoadingMore: true));
     final nextPage = state.currentPage + 1;
     late final Either<Failure, PostsEntity> result;
-    if (event.username != null) {
+    final username = state.activeUsername;
+    if (username != null) {
       result = await repo.getProfilePosts(
-        username: event.username!,
+        username: username,
         page: nextPage,
       );
     } else {

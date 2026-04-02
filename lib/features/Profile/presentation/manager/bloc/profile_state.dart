@@ -7,6 +7,7 @@ class ProfileState extends Equatable {
   final bool hasReachedMax;
   final Failure? failure;
   final int currentPage;
+  final String? activeUsername;
 
   const ProfileState({
     this.profilePosts = const [],
@@ -15,6 +16,7 @@ class ProfileState extends Equatable {
     this.hasReachedMax = false,
     this.failure,
     this.currentPage = 1,
+    this.activeUsername,
   });
 
   ProfileState copyWith({
@@ -24,6 +26,7 @@ class ProfileState extends Equatable {
     bool? hasReachedMax,
     Failure? failure,
     int? currentPage,
+    String? activeUsername,
   }) {
     return ProfileState(
       profilePosts: profilePosts ?? this.profilePosts,
@@ -32,6 +35,7 @@ class ProfileState extends Equatable {
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       failure: failure,
       currentPage: currentPage ?? this.currentPage,
+      activeUsername: activeUsername ?? this.activeUsername,
     );
   }
 
@@ -42,7 +46,7 @@ class ProfileState extends Equatable {
     isLoadingMore,
     hasReachedMax,
     failure,
-    currentPage
+    currentPage,
+    activeUsername
   ];
 }
-
