@@ -1,6 +1,7 @@
 
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -8,7 +9,8 @@ part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
-  AuthCubit(this.authRepo) : super(AuthInitial());
+  final CurrentUserCubit currentUserCubit;
+  AuthCubit(this.authRepo, this.currentUserCubit) : super(AuthInitial());
 
   Future<void> login({required String email, required String password, required bool rememberMe}) async {
     emit(AuthLoading());
@@ -19,6 +21,7 @@ class AuthCubit extends Cubit<AuthState> {
       (failure) => emit(AuthError(failure.message, failure: failure)),
       (success){
         authRepo.setRememberMe(rememberMe);
+        currentUserCubit.setUsername(success.username);
          emit(AuthAuthenticated());
       },
     );
@@ -47,6 +50,7 @@ class AuthCubit extends Cubit<AuthState> {
       (failure) => emit(AuthError(failure.message, failure: failure)),
       (success) {
         authRepo.setRememberMe(true);
+        currentUserCubit.setUsername(success.user.username);
         emit(AuthAuthenticated());
       },
     );

@@ -16,6 +16,7 @@ import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_sour
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Create_Post/data/data_source/create_post_remote_date_source_impl.dart';
 import 'package:archilink/features/Create_Post/data/repo/create_post_repo_impl.dart';
 import 'package:archilink/features/Create_Post/domain/data_source/create_post_remote_data_source.dart';
@@ -158,7 +159,8 @@ Future<void> initServiceLocator({
   ///---------
   ///Bloc
   ///---------
-  sl.registerLazySingleton(() => AuthCubit(sl()));
+  sl.registerLazySingleton(() => CurrentUserCubit(sl()));
+  sl.registerLazySingleton(() => AuthCubit(sl(), sl<CurrentUserCubit>()));
   sl.registerLazySingleton(() => CheckUsernameCubit(sl()));
   sl.registerLazySingleton(() => PostLikeCubit(sl()));
   sl.registerLazySingleton(
