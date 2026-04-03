@@ -34,6 +34,10 @@ class Assets {
   /// assets/icons/Comment.svg
   static const String assetsIconsComment = "assets/icons/Comment.svg";
 
+  /// Assets for assetsIconsDeletePostComment
+  /// assets/icons/delete_post_comment.svg
+  static const String assetsIconsDeletePostComment = "assets/icons/delete_post_comment.svg";
+
   /// Assets for assetsIconsDot
   /// assets/icons/dot.svg
   static const String assetsIconsDot = "assets/icons/dot.svg";
@@ -45,6 +49,10 @@ class Assets {
   /// Assets for assetsIconsEdit
   /// assets/icons/edit.svg
   static const String assetsIconsEdit = "assets/icons/edit.svg";
+
+  /// Assets for assetsIconsEditPostComment
+  /// assets/icons/edit_post_comment.svg
+  static const String assetsIconsEditPostComment = "assets/icons/edit_post_comment.svg";
 
   /// Assets for assetsIconsEditProfile
   /// assets/icons/edit_profile.svg
@@ -73,6 +81,10 @@ class Assets {
   /// Assets for assetsIconsGoogle
   /// assets/icons/google.svg
   static const String assetsIconsGoogle = "assets/icons/google.svg";
+
+  /// Assets for assetsIconsHidePost
+  /// assets/icons/hide_post.svg
+  static const String assetsIconsHidePost = "assets/icons/hide_post.svg";
 
   /// Assets for assetsIconsHome
   /// assets/icons/home.svg
@@ -125,6 +137,10 @@ class Assets {
   /// Assets for assetsIconsPublic
   /// assets/icons/public.svg
   static const String assetsIconsPublic = "assets/icons/public.svg";
+
+  /// Assets for assetsIconsReport
+  /// assets/icons/report.svg
+  static const String assetsIconsReport = "assets/icons/report.svg";
 
   /// Assets for assetsIconsSave
   /// assets/icons/Save.svg
