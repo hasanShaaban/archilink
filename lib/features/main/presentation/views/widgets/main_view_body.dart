@@ -1,6 +1,8 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/features/Home/presentation/views/home_page_body.dart';
+import 'package:archilink/features/Main/presentation/manager/main_tab_controller.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
@@ -20,12 +22,12 @@ class MainViewBody extends StatefulWidget {
 
 // Section: State class for the main view
 class _MainViewBodyState extends State<MainViewBody> {
-  late PersistentTabController _controller;
+  late final MainTabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _controller = PersistentTabController(initialIndex: 0);
+    _tabController = sl<MainTabController>();
   }
 
   // Section: List of pages
@@ -77,7 +79,7 @@ class _MainViewBodyState extends State<MainViewBody> {
       ),
       context,
       screens: _pages,
-      controller: _controller,
+      controller: _tabController.controller,
       items: _navBarsItems(context, lang),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       handleAndroidBackButtonPress: true,

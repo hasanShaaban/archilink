@@ -22,11 +22,11 @@ class PostMenuButton extends StatelessWidget {
         minWidth: iconSize,
         minHeight: iconSize,
       ),
-      color: Theme.of(context).colorScheme.surface,
-      elevation: 0,
+      color: Theme.of(context).scaffoldBackgroundColor,
+      elevation: 2,
       offset: const Offset(0, 0),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         side: BorderSide(
           color: Theme.of(context).colorScheme.outline.withOpacity(0.16),
         ),
@@ -57,22 +57,28 @@ class PostMenuButton extends StatelessWidget {
       },
       itemBuilder: (context) {
         Widget item({required String label, required String icon}) {
-          return Row(
-            children: [
-              SvgPicture.asset(
-                icon,
-                width: 24,
-                height: 24,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: AppTextStyle.interMedium12.copyWith(
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.transparent,
+            ),
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  icon,
+                  width: 24,
+                  height: 24,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: AppTextStyle.interMedium12.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
           );
         }
 

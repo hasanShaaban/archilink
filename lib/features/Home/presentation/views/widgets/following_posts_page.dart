@@ -24,23 +24,28 @@ class _FollowingPostsPageState extends State<FollowingPostsPage> {
     var lang = S.of(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    return BlocBuilder<ForYouBloc, ForYouState>(
-      builder: (context, state) {
-        final posts = state.items
-            .whereType<PostItem>()
-            .map((item) => item.post)
-            .toList();
-        return PostListView(
-          lang: lang,
-          width: width,
-          height: height,
-          posts: posts,
-          isInitialLoading: state.isInitialLoading,
-          isLoadingMore: state.isLoadingMore,
-          failureMessage: state.failure?.message,
-          onLoadMore: () => context.read<ForYouBloc>().add(LoadMore()),
-        );
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<ForYouBloc>().add(RefreshFeed());
       },
+      child: BlocBuilder<ForYouBloc, ForYouState>(
+        builder: (context, state) {
+          final posts = state.items
+              .whereType<PostItem>()
+              .map((item) => item.post)
+              .toList();
+          return PostListView(
+            lang: lang,
+            width: width,
+            height: height,
+            posts: posts,
+            isInitialLoading: state.isInitialLoading,
+            isLoadingMore: state.isLoadingMore,
+            failureMessage: state.failure?.message,
+            onLoadMore: () => context.read<ForYouBloc>().add(LoadMore()),
+          );
+        },
+      ),
     );
   }
 }

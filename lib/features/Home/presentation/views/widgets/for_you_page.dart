@@ -57,7 +57,7 @@ class _ForYouPageState extends State<ForYouPage> {
           final String? errorMessage = state.failure?.message;
           return CustomScrollView(
             controller: _controller,
-            physics: const AlwaysScrollableScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(child: const AdsSection()),
               SliverToBoxAdapter(child: const FeaturedMemberSection()),

@@ -11,9 +11,12 @@ class PostLocationDateAndTags extends StatelessWidget {
     super.key,
     required this.date,
     required this.tags,
+    required this.city,
+    required this.country,
   });
   final String date;
   final List<TagEntity> tags;
+  final String? city, country;
 
   @override
   Widget build(BuildContext context) {
@@ -21,23 +24,24 @@ class PostLocationDateAndTags extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            SvgPicture.asset(
-              Assets.assetsIconsLocation,
-              color: Theme.of(context).colorScheme.tertiary,
-              width: 16,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Homs,Syria',
-              style: AppTextStyle.interMedium12.copyWith(
+        if (city != null && country != null)
+          Row(
+            children: [
+              SvgPicture.asset(
+                Assets.assetsIconsLocation,
                 color: Theme.of(context).colorScheme.tertiary,
+                width: 16,
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 13),
+              const SizedBox(width: 8),
+              Text(
+                '${city ?? ''}${(city != null && country != null) ? ', ' : ''}${country ?? ''}',
+                style: AppTextStyle.interMedium12.copyWith(
+                  color: Theme.of(context).colorScheme.tertiary,
+                ),
+              ),
+            ],
+          ),
+        SizedBox(height: 12),
         Row(
           children: [
             Text(

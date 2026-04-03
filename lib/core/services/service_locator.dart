@@ -18,6 +18,7 @@ import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_c
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Create_Post/data/data_source/create_post_remote_date_source_impl.dart';
+import 'package:archilink/features/Main/presentation/manager/main_tab_controller.dart';
 import 'package:archilink/features/Create_Post/data/repo/create_post_repo_impl.dart';
 import 'package:archilink/features/Create_Post/domain/data_source/create_post_remote_data_source.dart';
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
@@ -159,6 +160,7 @@ Future<void> initServiceLocator({
   ///---------
   ///Bloc
   ///---------
+  sl.registerLazySingleton(() => MainTabController());
   sl.registerLazySingleton(() => CurrentUserCubit(sl()));
   sl.registerLazySingleton(() => AuthCubit(sl(), sl<CurrentUserCubit>()));
   sl.registerLazySingleton(() => CheckUsernameCubit(sl()));

@@ -6,6 +6,9 @@ import 'package:archilink/features/Post/presentation/view/widgets/post_menu_butt
 import 'package:archilink/features/Post/presentation/view/widgets/post_user_image.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_username_and_date.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
+import 'package:archilink/core/services/service_locator.dart';
+import 'package:archilink/features/Main/presentation/manager/main_tab_controller.dart';
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
@@ -48,6 +51,18 @@ class Post extends StatelessWidget {
               //------------// User image section //-------------------------------------------------------------------------
               GestureDetector(
                 onTap: () {
+                  final myUsername =
+                      context.read<CurrentUserCubit>().state.username;
+                  final isMine =
+                      myUsername != null && myUsername == entity.owner.username;
+                  if (isMine) {
+                    context.read<ProfileCubit>().getPersonlProfile();
+                    BlocProvider.of<ProfileBloc>(context).add(
+                      LoadInitialProfilePosts(),
+                    );
+                    sl<MainTabController>().setIndex(2);
+                    return;
+                  }
                   Navigator.of(
                     context,
                     rootNavigator: true,
@@ -99,6 +114,8 @@ class Post extends StatelessWidget {
                           ? PostLocationDateAndTags(
                               date: entity.createdAt.toString(),
                               tags: entity.tags,
+                              city: entity.owner.city,
+                              country: entity.owner.country,
                             )
                           : SizedBox(),
                       //--------------------// Post actions section //------------------------------------------------------------
@@ -120,5 +137,3 @@ class Post extends StatelessWidget {
     );
   }
 }
-
-
