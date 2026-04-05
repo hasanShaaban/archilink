@@ -14,30 +14,33 @@ class ProfileImageSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageRadius = width * 35 / 402;
-    return CircleAvatar(
-      radius: imageRadius,
-      backgroundColor: AppColorsFromTheme.grayForTheme(context),
-      child: ClipOval(
-        child: image == null
-            ? SvgPicture.asset(
-                Assets.assetsIconsUser,
-                width: 35,
-                color: AppColorsFromTheme.reverseGrayForTheme(context),
-              )
-            : CachedNetworkImage(
-                imageUrl: image!,
-                fit: BoxFit.cover,
-                width: imageRadius * 2,
-                height: imageRadius * 2,
-                errorWidget: (context, url, error) => SvgPicture.asset(
+    return Skeleton.unite(
+      child: CircleAvatar(
+        radius: imageRadius,
+        backgroundColor: AppColorsFromTheme.grayForTheme(context),
+        child: ClipOval(
+          child: image == null
+              ? SvgPicture.asset(
                   Assets.assetsIconsUser,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  width: 24,
+                  width: 35,
+                  color: AppColorsFromTheme.reverseGrayForTheme(context),
+                )
+              : CachedNetworkImage(
+                  imageUrl: image!,
+                  fit: BoxFit.cover,
+                  width: imageRadius * 2,
+                  height: imageRadius * 2,
+                  errorWidget: (context, url, error) => SvgPicture.asset(
+                    Assets.assetsIconsUser,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    width: 24,
+                  ),
+                  placeholder: (context, url) => Skeletonizer(
+                    enabled: true,
+                    child: Container(width: imageRadius, height: imageRadius),
+                  ),
                 ),
-                placeholder: (context, url) => Skeletonizer(
-                  child: Container(width: imageRadius, height: imageRadius),
-                ),
-              ),
+        ),
       ),
     );
   }

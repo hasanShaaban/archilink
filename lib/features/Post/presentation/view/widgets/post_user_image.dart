@@ -13,30 +13,32 @@ class PostUserImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageRadius = width * 34 / 402;
-    return CircleAvatar(
-      radius: imageRadius / 2,
-      backgroundColor: Theme.of(context).colorScheme.secondary,
-      child: ClipOval(
-        child: imageURL == null
-            ? SvgPicture.asset(
-                Assets.assetsIconsUser, //---------------image
-                color: Theme.of(context).colorScheme.onSurface,
-                width: 24,
-              )
-            : CachedNetworkImage(
-                imageUrl: imageURL!,
-                fit: BoxFit.cover,
-                width: imageRadius,
-                height: imageRadius,
-                errorWidget: (context, url, error) => SvgPicture.asset(
-                  Assets.assetsIconsUser,
+    return Skeleton.shade(
+      child: CircleAvatar(
+        radius: imageRadius / 2,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        child: ClipOval(
+          child: imageURL == null
+              ? SvgPicture.asset(
+                  Assets.assetsIconsUser, //---------------image
                   color: Theme.of(context).colorScheme.onSurface,
                   width: 24,
+                )
+              : CachedNetworkImage(
+                  imageUrl: imageURL!,
+                  fit: BoxFit.cover,
+                  width: imageRadius,
+                  height: imageRadius,
+                  errorWidget: (context, url, error) => SvgPicture.asset(
+                    Assets.assetsIconsUser,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    width: 24,
+                  ),
+                  placeholder: (context, url) => Skeletonizer(
+                    child: Container(width: imageRadius, height: imageRadius),
+                  ),
                 ),
-                placeholder: (context, url) => Skeletonizer(
-                  child: Container(width: imageRadius, height: imageRadius),
-                ),
-              ),
+        ),
       ),
     );
   }

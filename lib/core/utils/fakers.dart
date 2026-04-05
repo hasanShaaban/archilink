@@ -6,6 +6,7 @@ import 'package:archilink/features/Post/domain/entity/tag_entity.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_node.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_owner_entity.dart';
+import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 
 PostEntity fakePostEntity({int id = 0}) {
   return PostEntity(
@@ -62,5 +63,48 @@ List<CommentNode> fakeCommentEntities({int count = 5}) {
       comment: fakeCommentEntity(id: index),
       replies: [],
     ),
+  );
+}
+
+ProfileEntity fakeProfileEntity({int id = 0}) {
+  return ProfileEntity(
+    name: 'Loading User $id',
+    username: 'loading_user_$id',
+    profilePictureUrl: 'url',
+    followersCount: 0,
+    isFollowing: false,
+    followingCount: 0,
+    postsCount: 0,
+    projectCount: 0,
+    role: 'Loading Role',
+    details: fakeProfileDetailsEntity(),
+  );
+}
+
+ProfileDetailsEntity fakeProfileDetailsEntity() {
+  return ProfileDetailsEntity(
+    bio: 'Loading bio...',
+    academicExperiences: const [
+      AcademicExperienceEntity(
+        university: 'Loading ',
+        degree: 'Loading ',
+        fieldOfStudy: 'Loading ',
+        startYear: 0,
+        endYear: null,
+      ),
+    ],
+    contactInfo: const [
+      ContactInfoEntity(
+        platform: 'Loading Platform',
+        url: null,
+        username: 'loading_user',
+      ),
+    ],
+    skills: const [
+      SkillsEntity(name: 'Loading Skill', id: 0),
+    ],
+    country: 'Loading Country',
+    city: 'Loading City',
+    joinedAt: DateTime(2000, 1, 1),
   );
 }

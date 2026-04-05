@@ -66,11 +66,13 @@ Widget _buildButtons(
   if (type == ProfileType.userProfile) {
     return BlocProvider(
       create: (context) => FollowCubit(sl<ProfileRepo>()),
-      child: UserProfileButtons(
-        height: height,
-        width: width,
-        username: username,
-        isFollowing: isFollowing,
+      child: Skeleton.keep(
+        child: UserProfileButtons(
+          height: height,
+          width: width,
+          username: username,
+          isFollowing: isFollowing,
+        ),
       ),
     );
   }

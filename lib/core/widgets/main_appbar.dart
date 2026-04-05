@@ -4,6 +4,7 @@ import 'package:archilink/core/widgets/app_bar_action_button.dart';
 import 'package:archilink/features/Home/presentation/views/widgets/home_page_tap_bar.dart';
 import 'package:archilink/features/Chat/presentation/view/chat_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class MainAppBar extends StatelessWidget {
   const MainAppBar({
@@ -21,11 +22,13 @@ class MainAppBar extends StatelessWidget {
       elevation: 0,
       actionsPadding: EdgeInsets.only(right: 20),
       titleSpacing: 20,
-      title: Text(
-        'Archi Link',
-        style: AppTextStyle.appTilte.copyWith(height: 1),
-        textHeightBehavior: TextHeightBehavior(
-          applyHeightToFirstAscent: false,
+      title: Skeleton.keep(
+        child: Text(
+          'Archi Link',
+          style: AppTextStyle.appTilte.copyWith(height: 1),
+          textHeightBehavior: TextHeightBehavior(
+            applyHeightToFirstAscent: false,
+          ),
         ),
       ),
       actions: [

@@ -1,3 +1,4 @@
+import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
@@ -64,8 +65,7 @@ class _PostListViewState extends State<PostListView> {
     if (widget.failureMessage != null) {
       return Center(child: Text(widget.failureMessage!));
     }
-    final bool isSkeleton =
-        widget.isInitialLoading && widget.posts.isEmpty;
+    final bool isSkeleton = widget.isInitialLoading && widget.posts.isEmpty;
     final List<PostEntity> posts = isSkeleton
         ? List<PostEntity>.generate(5, (index) => fakePostEntity(id: index))
         : widget.posts;
@@ -94,6 +94,14 @@ class _PostListViewState extends State<PostListView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Skeletonizer(
+                effect: ShimmerEffect(
+                  highlightColor: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.5),
+                  baseColor: AppColorsFromTheme.grayForTheme(
+                    context,
+                  ).withOpacity(0.5),
+                ),
                 enabled: isSkeleton,
                 child: Post(
                   entity: posts[index],
@@ -103,10 +111,7 @@ class _PostListViewState extends State<PostListView> {
                   onPostTapped: () {
                     isSkeleton
                         ? null
-                        : Navigator.of(
-                            context,
-                            rootNavigator: true,
-                          ).pushNamed(
+                        : Navigator.of(context, rootNavigator: true).pushNamed(
                             PostDetailsView.name,
                             arguments: {'post': posts[index]},
                           );
@@ -115,10 +120,7 @@ class _PostListViewState extends State<PostListView> {
                 ),
               ),
             ),
-            Divider(
-              height: 1,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
+            Divider(height: 1, color: Theme.of(context).colorScheme.secondary),
           ],
         );
       },

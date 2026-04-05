@@ -1,4 +1,5 @@
 import 'package:archilink/core/functions/snack_bar_builder.dart';
+import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Post_Details/domain/entity/comment_entity.dart';
@@ -90,6 +91,14 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 sliver: SliverToBoxAdapter(
                   child: Skeletonizer(
+                    effect: ShimmerEffect(
+                      highlightColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.5),
+                      baseColor: AppColorsFromTheme.grayForTheme(
+                        context,
+                      ).withOpacity(0.5),
+                    ),
                     enabled: state.isLoadingPost,
                     child: Post(
                       entity: state.post,
@@ -137,6 +146,14 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
                       : state.comments.length,
                   itemBuilder: (context, index) {
                     return Skeletonizer(
+                      effect: ShimmerEffect(
+                        highlightColor: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.5),
+                        baseColor: AppColorsFromTheme.grayForTheme(
+                          context,
+                        ).withOpacity(0.5),
+                      ),
                       enabled: state.isLoadingComments,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),

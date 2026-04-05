@@ -1,3 +1,4 @@
+import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
@@ -57,7 +58,7 @@ class _ForYouPageState extends State<ForYouPage> {
           final String? errorMessage = state.failure?.message;
           return CustomScrollView(
             controller: _controller,
-            physics: const BouncingScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(child: const AdsSection()),
               SliverToBoxAdapter(child: const FeaturedMemberSection()),
@@ -77,6 +78,14 @@ class _ForYouPageState extends State<ForYouPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Skeletonizer(
+                            effect: ShimmerEffect(
+                              highlightColor: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.5),
+                              baseColor: AppColorsFromTheme.grayForTheme(
+                                context,
+                              ).withOpacity(0.5),
+                            ),
                             enabled: isSkeleton,
                             child: Post(
                               entity: item.post,
