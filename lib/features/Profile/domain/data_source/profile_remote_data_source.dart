@@ -9,4 +9,5 @@ abstract class ProfileRemoteDataSource {
     required int page,
   });
   Future<bool> follow(String username);
+  Future<bool> unfollow(String username);
 }

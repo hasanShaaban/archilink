@@ -50,4 +50,32 @@ class FollowCubit extends Cubit<FollowState> {
       ),
     );
   }
+  Future<void> unfollow(String username) async {
+    if (state.isSubmitting) return;
+    // Optimistic UI: show followed state immediately.
+    emit(
+      state.copyWith(
+        isFollowing: false,
+        isSubmitting: true,
+        errorMessage: null,
+      ),
+    );
+    final result = await profileRepo.unfollow(username);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          isFollowing: true,
+          isSubmitting: false,
+          errorMessage: failure.message,
+        ),
+      ),
+      (success) => emit(
+        state.copyWith(
+          isFollowing: !success,
+          isSubmitting: false,
+          errorMessage: null,
+        ),
+      ),
+    );
+  }
 }

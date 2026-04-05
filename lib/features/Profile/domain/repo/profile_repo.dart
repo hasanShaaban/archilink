@@ -14,4 +14,5 @@ abstract class ProfileRepo {
     required int page,
   });
   Future<Either<Failure, bool>> follow(String username);
+  Future<Either<Failure, bool>> unfollow(String username);
 }

@@ -98,4 +98,16 @@ class ProfileRepoImpl implements ProfileRepo {
       return left(UnknownFailure());
     }
   }
+  
+  @override
+  Future<Either<Failure, bool>> unfollow(String username) async{
+    try {
+      final model = await remoteDataSource.unfollow(username);
+      return right(model);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

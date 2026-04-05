@@ -71,4 +71,24 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       throw AppException.handelDioException(e);
     }
   }
+
+  @override
+  Future<bool> unfollow(String username) async {
+    try {
+      final response = await apiService.delete(
+        'user-relations/unfollow/$username',
+      );
+
+      final status = response.data?['status'];
+      if (status == null) {
+        throw ServerException(message: 'Invalid profile reponse');
+      }
+      if (status == 'fail' && response.data?['error'] != null) {
+        throw ServerException(message: 'You are already following this user.');
+      }
+      return status == 'success' ? true : false;
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }
