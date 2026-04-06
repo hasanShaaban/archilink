@@ -11,6 +11,7 @@ abstract class AppColors {
   static const lightGrayDarkMode = Color(0xFF989898);
   static const gray = Color(0xFF636363);
   static const darkGray = Color(0xFF242527);
+  static const secondDarkGray = Color(0xFF121212);
   static const red = Color(0xFFFB344F);
 }
 
@@ -53,5 +54,10 @@ abstract class AppColorsFromTheme {
       Theme.of(context).brightness == Brightness.light
       ? AppColors.lightGreyLightMode
       : AppColors.gray;
+  
+  static editProfileContainer(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+      ? AppColors.lightGreyLightMode
+      : AppColors.secondDarkGray;
   
 }

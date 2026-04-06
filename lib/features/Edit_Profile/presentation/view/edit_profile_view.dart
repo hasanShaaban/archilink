@@ -1,6 +1,13 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/about_me_view.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/academic_experiance_view.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/contact_info_view.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/skills_view.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/widgets/edit_profile_account_type_button.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/widgets/edit_profile_app_bar.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/widgets/editable_text.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/widgets/routed_view_row.dart';
 import 'package:flutter/material.dart';
 
 class EditProfileView extends StatefulWidget {
@@ -24,9 +31,6 @@ class _EditProfileViewState extends State<EditProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    final double height = MediaQuery.of(context).size.height;
-    final double width = MediaQuery.of(context).size.width;
-
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -38,134 +42,46 @@ class _EditProfileViewState extends State<EditProfileView> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
-                  color: AppColorsFromTheme.grayForTheme(context),
+                  color: AppColorsFromTheme.editProfileContainer(context),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
                   children: [
-                    EditableText(
+                    EditProfileTextField(
                       title: 'Full Name',
-                      isOneRow: true,
                       initialValue: 'Hasan Shaaban',
                       controller: controller.fullName,
                     ),
                     Divider(height: 1),
-                    EditableText(
-                      title: 'UserName',
-                      isOneRow: true,
+                    EditProfileTextField(
+                      title: 'bio',
                       initialValue: 'hsa_hasan',
-                      controller: controller.username,
+                      controller: controller.bio,
                     ),
+
+                    Divider(height: 1),
+                    EditProfileAccountTypeButton(),
+
+                    Divider(height: 1),
+                    RoutedViewRow(title: 'About Me', route: AboutMeView.name),
+
+                    Divider(height: 1),
+                    RoutedViewRow(
+                      title: 'Academic Experience',
+                      route: AcademicExperianceView.name,
+                    ),
+                    Divider(height: 1),
+                    RoutedViewRow(
+                      title: 'Contact Information',
+                      route: ContactInfoView.name,
+                    ),
+                    Divider(height: 1),
+                    RoutedViewRow(title: 'Skills', route: SkillsView.name),
                   ],
                 ),
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class EditableText extends StatefulWidget {
-  const EditableText({
-    super.key,
-    required this.title,
-    required this.isOneRow,
-    required this.initialValue,
-    required this.controller,
-  });
-  final String title, initialValue;
-  final bool isOneRow;
-  final TextEditingController controller;
-
-  @override
-  State<EditableText> createState() => _EditableTextState();
-}
-
-class _EditableTextState extends State<EditableText> {
-  bool isEditing = false;
-  bool enabled = true;
-
-  @override
-  void initState() {
-    widget.controller.text = widget.initialValue;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: AnimatedSize(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    widget.title,
-                    style: AppTextStyle.interSemiBold12.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-
-                  if (!isEditing && widget.isOneRow)
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => setState(() => isEditing = true),
-                        child: Text(
-                          widget.controller.text,
-                          style: AppTextStyle.interRegular12.copyWith(
-                            color: AppColors.gray,
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (isEditing)
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 150,
-                          child: TextField(
-                            style: AppTextStyle.interRegular10,
-                            enabled: enabled,
-                            onTapUpOutside: (event) {
-                              setState(() {
-                                isEditing = false;
-                              });
-                            },
-                            controller: widget.controller,
-                            maxLines: null,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              filled: true,
-                              fillColor: AppColorsFromTheme.containerColor(
-                                context,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                      ],
-                    ),
-                ],
-              ),
-            ],
-          ),
         ),
       ),
     );

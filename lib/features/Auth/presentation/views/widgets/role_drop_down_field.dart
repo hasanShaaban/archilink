@@ -16,24 +16,24 @@ class RoleDropDownField extends FormField<String> {
     FormFieldValidator<String>? validator,
     AutovalidateMode? autovalidateMode,
   }) : super(
-          initialValue: value,
-          validator: validator,
-          autovalidateMode: autovalidateMode,
-          builder: (state) {
-            return _RoleDropDownBody(
-              height: height,
-              label: label,
-              hint: hint,
-              options: options,
-              value: state.value,
-              errorText: state.errorText,
-              onSelected: (v) {
-                state.didChange(v);
-                onSelected(v);
-              },
-            );
-          },
-        );
+         initialValue: value,
+         validator: validator,
+         autovalidateMode: autovalidateMode,
+         builder: (state) {
+           return _RoleDropDownBody(
+             height: height,
+             label: label,
+             hint: hint,
+             options: options,
+             value: state.value,
+             errorText: state.errorText,
+             onSelected: (v) {
+               state.didChange(v);
+               onSelected(v);
+             },
+           );
+         },
+       );
 }
 
 class _RoleDropDownBody extends StatefulWidget {
@@ -58,8 +58,8 @@ class _RoleDropDownBody extends StatefulWidget {
   @override
   State<_RoleDropDownBody> createState() => _RoleDropDownBodyState();
 }
-class _RoleDropDownBodyState extends State<_RoleDropDownBody> {
 
+class _RoleDropDownBodyState extends State<_RoleDropDownBody> {
   final GlobalKey _key = GlobalKey();
 
   void _openMenu() async {
@@ -69,23 +69,22 @@ class _RoleDropDownBodyState extends State<_RoleDropDownBody> {
       context: context,
       position: RelativeRect.fromLTRB(
         position.dx,
-        position.dy +box.size.height,
+        position.dy + box.size.height,
         position.dy + box.size.width,
         0,
       ),
       popUpAnimationStyle: AnimationStyle(
         curve: Curves.easeInExpo,
-        duration: const Duration(milliseconds: 400)
+        duration: const Duration(milliseconds: 400),
       ),
       items: [
-      
         PopupMenuItem(
           height: 0,
           enabled: false,
           padding: EdgeInsets.zero,
           child: _buildRolesMenu(context),
-        )
-      ]
+        ),
+      ],
     );
 
     if (select != null) {
@@ -110,9 +109,11 @@ class _RoleDropDownBodyState extends State<_RoleDropDownBody> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: hasError ? AppColors.red :  AppColorsFromTheme.secondaryColor(
-                  context,
-                ).withOpacity(0.5),
+                color: hasError
+                    ? AppColors.red
+                    : AppColorsFromTheme.secondaryColor(
+                        context,
+                      ).withOpacity(0.5),
               ),
               color: AppColorsFromTheme.secondaryColor(
                 context,
@@ -150,7 +151,7 @@ class _RoleDropDownBodyState extends State<_RoleDropDownBody> {
     );
   }
 
-  Widget _buildRolesMenu(BuildContext context){
+  Widget _buildRolesMenu(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -159,11 +160,10 @@ class _RoleDropDownBodyState extends State<_RoleDropDownBody> {
           color: AppColorsFromTheme.secondaryColor(context),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.lightGrayDarkMode),
-          
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: List.generate(2, (i){
+          children: List.generate(2, (i) {
             return Column(
               children: [
                 InkWell(
@@ -171,21 +171,25 @@ class _RoleDropDownBodyState extends State<_RoleDropDownBody> {
                   borderRadius: i == 0
                       ? const BorderRadius.vertical(top: Radius.circular(14))
                       : i == widget.options.length - 1
-                          ? const BorderRadius.vertical(bottom: Radius.circular(14))
-                          : BorderRadius.zero,
+                      ? const BorderRadius.vertical(bottom: Radius.circular(14))
+                      : BorderRadius.zero,
                   child: Container(
-                    padding: EdgeInsets.only(left: 24, top: 16, bottom: 16,),
+                    padding: EdgeInsets.only(left: 24, top: 16, bottom: 16),
                     width: double.infinity,
                     child: Text(
                       widget.options[i],
-                      style: AppTextStyle.interMedium12.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                      style: AppTextStyle.interMedium12.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ),
                 ),
-                i != 2 ? Divider(color: AppColors.lightGrayDarkMode,height: 1,):SizedBox()
+                i != 2
+                    ? Divider(color: AppColors.lightGrayDarkMode, height: 1)
+                    : SizedBox(),
               ],
             );
-          })
+          }),
         ),
       ),
     );
