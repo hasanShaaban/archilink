@@ -3,14 +3,21 @@ import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Create_Post/presentation/views/create_post_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
+import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PersonalProfileButtons extends StatelessWidget {
-  const PersonalProfileButtons({super.key, required this.width});
+  const PersonalProfileButtons({
+    super.key,
+    required this.width,
+    required this.profileData,
+  });
 
   final double width;
+
+  final ProfileEntity profileData;
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +46,10 @@ class PersonalProfileButtons extends StatelessWidget {
           Expanded(
             child: ProfileCustomButton(
               onPress: () {
-                Navigator.of(
-                  context,
-                  rootNavigator: true,
-                ).pushNamed(EditProfileView.name);
+                Navigator.of(context, rootNavigator: true).pushNamed(
+                  EditProfileView.name,
+                  arguments: {'profileData': profileData},
+                );
               },
               icon: Assets.assetsIconsEditProfile,
               iconSize: 16,

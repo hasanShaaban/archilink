@@ -33,11 +33,16 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case UserProfileView.name:
       return MaterialPageRoute(builder: (context) => const UserProfileView());
     case EditProfileView.name:
-      return MaterialPageRoute(builder: (context) => const EditProfileView());
+      final args = settings.arguments as Map<String, dynamic>;
+      return MaterialPageRoute(
+        builder: (context) => EditProfileView(profileData: args['profileData']),
+      );
     case AboutMeView.name:
       return MaterialPageRoute(builder: (context) => const AboutMeView());
     case AcademicExperianceView.name:
-      return MaterialPageRoute(builder: (context) => const AcademicExperianceView());
+      return MaterialPageRoute(
+        builder: (context) => const AcademicExperianceView(),
+      );
     case ContactInfoView.name:
       return MaterialPageRoute(builder: (context) => const ContactInfoView());
     case SkillsView.name:

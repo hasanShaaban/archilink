@@ -38,7 +38,14 @@ class ProfielInfoHeader extends StatelessWidget {
           SizedBox(height: 16),
           ProfileInfoSection(profileData: profileData),
           SizedBox(height: 16),
-          _buildButtons(type, width, height, username: profileData.username, isFollowing: profileData.isFollowing),
+          _buildButtons(
+            type,
+            width,
+            height,
+            username: profileData.username,
+            isFollowing: profileData.isFollowing,
+            profileData: profileData,
+          ),
           SizedBox(height: 8),
           ProfileStatisticsRow(
             followers: profileData.followersCount,
@@ -59,9 +66,12 @@ Widget _buildButtons(
   double height, {
   required String username,
   required bool isFollowing,
+  required ProfileEntity profileData,
 }) {
   if (type == ProfileType.personalProfile) {
-    return Skeleton.keep(child: PersonalProfileButtons(width: width));
+    return Skeleton.keep(
+      child: PersonalProfileButtons(width: width, profileData: profileData),
+    );
   }
   if (type == ProfileType.userProfile) {
     return BlocProvider(

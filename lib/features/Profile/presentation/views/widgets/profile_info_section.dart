@@ -35,7 +35,7 @@ class ProfileInfoSection extends StatelessWidget {
         SizedBox(height: 8),
         Text(
           profileData != null
-              ? profileData!.details.bio ?? 'No bio yet'
+              ? profileData!.bio ?? 'No bio yet'
               : 'No bio yet',
           style: AppTextStyle.interRegular12.copyWith(
             color: Theme.of(context).colorScheme.onSurface,

@@ -70,6 +70,7 @@ ProfileEntity fakeProfileEntity({int id = 0}) {
   return ProfileEntity(
     name: 'Loading User $id',
     username: 'loading_user_$id',
+    bio: 'loading bio',
     profilePictureUrl: 'url',
     followersCount: 0,
     isFollowing: false,
@@ -83,7 +84,7 @@ ProfileEntity fakeProfileEntity({int id = 0}) {
 
 ProfileDetailsEntity fakeProfileDetailsEntity() {
   return ProfileDetailsEntity(
-    bio: 'Loading bio...',
+    aboutMe: 'Loading bio...',
     academicExperiences: const [
       AcademicExperienceEntity(
         university: 'Loading ',

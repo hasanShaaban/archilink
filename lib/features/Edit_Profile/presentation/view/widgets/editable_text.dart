@@ -8,20 +8,29 @@ class EditProfileTextField extends StatefulWidget {
     required this.title,
     required this.initialValue,
     required this.controller,
+    this.onChanged,
   });
   final String title, initialValue;
   final TextEditingController controller;
+  final ValueChanged<String>? onChanged;
 
   @override
   State<EditProfileTextField> createState() => _EditProfileTextFieldState();
 }
 
 class _EditProfileTextFieldState extends State<EditProfileTextField> {
-  bool focused = false;
+  FocusNode focusNode = FocusNode();
   @override
   void initState() {
+    focusNode.addListener(() => setState(() {}));
     widget.controller.text = widget.initialValue;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -39,22 +48,19 @@ class _EditProfileTextFieldState extends State<EditProfileTextField> {
           ),
           Expanded(
             child: TextField(
+              focusNode: focusNode,
               onTapOutside: (event) {
-                focused = false;
-                setState(() {});
-              },
-              onTap: () {
-
-                focused = true;
-                setState(() {});
+                focusNode.unfocus();
               },
               style: AppTextStyle.interRegular12.copyWith(
-                color: focused ? Theme.of(context).colorScheme.onSurface :
-                AppColorsFromTheme.grayForText(context)
+                color: focusNode.hasFocus
+                    ? Theme.of(context).colorScheme.onSurface
+                    : AppColorsFromTheme.grayForText(context),
               ),
               textInputAction: TextInputAction.done,
               textAlign: TextAlign.end,
               controller: widget.controller,
+              onChanged: widget.onChanged,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 isCollapsed: true,

@@ -4,6 +4,7 @@ class ProfileModel extends ProfileEntity {
   const ProfileModel({
     required super.name,
     required super.username,
+    required super.bio,
     required super.profilePictureUrl,
     required super.followersCount,
     required super.followingCount,
@@ -18,6 +19,7 @@ class ProfileModel extends ProfileEntity {
     return ProfileModel(
       name: data['name'] as String,
       username: data['username'] as String,
+      bio: data['bio'],
       profilePictureUrl: data['profile_picture_url'],
       isFollowing: data['is_following'],
       followersCount: data['followers_count'] as int,
@@ -36,6 +38,7 @@ class ProfileModel extends ProfileEntity {
       'data': {
         'name': name,
         'username': username,
+        'bio': bio,
         'profile_picture_url': profilePictureUrl,
         'followers_count': followersCount,
         'following_count': followingCount,
@@ -51,7 +54,7 @@ class ProfileModel extends ProfileEntity {
 
 class ProfileDetailsModel extends ProfileDetailsEntity {
   const ProfileDetailsModel({
-    super.bio,
+    super.aboutMe,
     required super.academicExperiences,
     required super.contactInfo,
     required super.skills,
@@ -62,7 +65,7 @@ class ProfileDetailsModel extends ProfileDetailsEntity {
 
   factory ProfileDetailsModel.fromJson(Map<String, dynamic> json) {
     return ProfileDetailsModel(
-      bio: json['bio'] as String?,
+      aboutMe: json['about_me'] as String?,
       country: json['country'],
       city: json['city'],
       academicExperiences: (json['academic_experiences'] as List<dynamic>)
@@ -82,7 +85,7 @@ class ProfileDetailsModel extends ProfileDetailsEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'bio': bio,
+      'about_me': aboutMe,
       'academic_experiences': academicExperiences
           .map((e) => (e as AcademicExperienceModel).toJson())
           .toList(),
