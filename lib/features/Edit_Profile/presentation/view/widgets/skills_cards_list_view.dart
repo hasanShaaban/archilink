@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SkillsCardsListView extends StatelessWidget {
-  const SkillsCardsListView({
-    super.key,
-  });
+  const SkillsCardsListView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,17 +17,14 @@ class SkillsCardsListView extends StatelessWidget {
             return Center(
               child: Text(
                 'No skills yet',
-                style: AppTextStyle.interRegular12.copyWith(
+                style: AppTextStyle.interSemiBold12.copyWith(
                   color: AppColorsFromTheme.grayForText(context),
                 ),
               ),
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 10,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             itemCount: state.skills.length,
             separatorBuilder: (_, __) => SizedBox(height: 10),
             itemBuilder: (context, index) {
@@ -40,9 +35,7 @@ class SkillsCardsListView extends StatelessWidget {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColorsFromTheme.editProfileContainer(
-                    context,
-                  ),
+                  color: AppColorsFromTheme.editProfileContainer(context),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -54,10 +47,15 @@ class SkillsCardsListView extends StatelessWidget {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
-                    Icon(
-                      Icons.close_rounded,
-                      size: 24,
-                      color: AppColors.red,
+                    InkWell(
+                      onTap: () {
+                        context.read<EditProfileCubit>().removeSkill(index);
+                      },
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 24,
+                        color: AppColors.red,
+                      ),
                     ),
                   ],
                 ),

@@ -1,7 +1,7 @@
 
 import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/edit_profile_cubit.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/widgets/add_skill_text_field.dart';
-import 'package:archilink/features/Edit_Profile/presentation/view/widgets/edit_profile_add_post.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/widgets/edit_profile_add_button.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/widgets/edit_profile_app_bar.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/widgets/skills_cards_list_view.dart';
 import 'package:flutter/material.dart';
