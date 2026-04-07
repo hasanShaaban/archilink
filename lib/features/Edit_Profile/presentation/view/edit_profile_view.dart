@@ -62,7 +62,7 @@ class _EditProfileViewState extends State<EditProfileView> {
           },
           child: Column(
             children: [
-              EditProfileAppBar(titel: 'Edit Profile'),
+              EditProfileAppBar(titel: 'Edit Profile', withDoneButton: true,),
               SizedBox(height: 16),
               Padding(
                 padding: EdgeInsetsGeometry.symmetric(horizontal: 20),

@@ -48,6 +48,7 @@ class _AboutMeViewState extends State<AboutMeView> {
           child: Column(
             children: [
               EditProfileAppBar(
+                withDoneButton: true,
                 titel: 'About me',
                 onDone: () {
                   cubit.updateAboutMe(aboutController.text);

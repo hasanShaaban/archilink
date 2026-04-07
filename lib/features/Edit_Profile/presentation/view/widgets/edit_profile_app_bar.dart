@@ -9,9 +9,13 @@ class EditProfileAppBar extends StatelessWidget {
     super.key,
     required this.titel,
     this.onDone,
+    required this.withDoneButton,
+    this.backButtonIcon = Icons.close_outlined,
   });
   final String titel;
   final VoidCallback? onDone;
+  final bool withDoneButton;
+  final IconData backButtonIcon;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<EditProfileCubit, EditProfileState>(
@@ -29,7 +33,9 @@ class EditProfileAppBar extends StatelessWidget {
                     Navigator.pop(context);
                   },
                   child: Icon(
-                    Icons.close_outlined,
+                    
+                    backButtonIcon,
+                    size: 20,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -42,25 +48,26 @@ class EditProfileAppBar extends StatelessWidget {
                 ),
               ),
               Spacer(),
-              TextButton(
-                style: TextButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              if (withDoneButton)
+                TextButton(
+                  style: TextButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: canSubmit
+                        ? Theme.of(context).colorScheme.primary
+                        : AppColorsFromTheme.grayForTheme(context),
                   ),
-                  backgroundColor: canSubmit
-                      ? Theme.of(context).colorScheme.primary
-                      : AppColorsFromTheme.grayForTheme(context),
-                ),
-                onPressed: canSubmit ? (onDone ?? () {}) : null,
-                child: Text(
-                  'Done',
-                  style: AppTextStyle.interMedium16.copyWith(
-                    color: canSubmit
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(context).colorScheme.onSurface,
+                  onPressed: canSubmit ? (onDone ?? () {}) : null,
+                  child: Text(
+                    'Done',
+                    style: AppTextStyle.interMedium16.copyWith(
+                      color: canSubmit
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         );

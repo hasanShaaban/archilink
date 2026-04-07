@@ -1,3 +1,4 @@
+import 'package:archilink/features/Edit_Profile/presentation/view/widgets/edit_profile_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class AcademicExperianceView extends StatelessWidget {
@@ -6,6 +7,18 @@ class AcademicExperianceView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            EditProfileAppBar(
+              titel: 'Academic Experiance',
+              withDoneButton: false,
+              backButtonIcon: Icons.arrow_back_ios_new_rounded,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
