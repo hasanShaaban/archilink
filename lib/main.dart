@@ -7,6 +7,7 @@ import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/curren
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
 import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/edit_profile_cubit.dart';
+import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/universities_cubit.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
@@ -50,6 +51,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         BlocProvider(create: (context) => EditProfileCubit()),
+        BlocProvider(create: (context) => sl<UniversitiesCubit>()),
       ],
       child: MaterialApp(
         // Localization

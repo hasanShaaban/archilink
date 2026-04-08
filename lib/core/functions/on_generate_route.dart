@@ -2,6 +2,7 @@ import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
 import 'package:archilink/features/Create_Post/presentation/views/create_post_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/about_me_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/academic_experiance_view.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/add_academic_experiance_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/contact_info_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/skills_view.dart';
@@ -42,6 +43,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case AcademicExperianceView.name:
       return MaterialPageRoute(
         builder: (context) => const AcademicExperianceView(),
+      );
+    case AddAcademicExperianceView.name:
+      return MaterialPageRoute(
+        builder: (context) => const AddAcademicExperianceView(),
       );
     case ContactInfoView.name:
       return MaterialPageRoute(builder: (context) => const ContactInfoView());

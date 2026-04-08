@@ -18,6 +18,11 @@ import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_c
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Create_Post/data/data_source/create_post_remote_date_source_impl.dart';
+import 'package:archilink/features/Edit_Profile/data/data_source/edit_profile_remote_data_source_impl.dart';
+import 'package:archilink/features/Edit_Profile/data/repo/edit_profile_repo_impl.dart';
+import 'package:archilink/features/Edit_Profile/domain/data_source/edit_profile_remote_data_source.dart';
+import 'package:archilink/features/Edit_Profile/domain/repo/edit_profile_repo.dart';
+import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/universities_cubit.dart';
 import 'package:archilink/features/Main/presentation/manager/main_tab_controller.dart';
 import 'package:archilink/features/Create_Post/data/repo/create_post_repo_impl.dart';
 import 'package:archilink/features/Create_Post/domain/data_source/create_post_remote_data_source.dart';
@@ -103,6 +108,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<CreatePostRemoteDataSource>(
     () => CreatePostRemoteDateSourceImpl(sl()),
   );
+  sl.registerLazySingleton<EditProfileRemoteDataSource>(
+    () => EditProfileRemoteDataSourceImpl(sl()),
+  );
 
   ///----------
   ///Interceptor
@@ -156,6 +164,9 @@ Future<void> initServiceLocator({
       remoteDataSource: sl<CreatePostRemoteDataSource>(),
     ),
   );
+  sl.registerLazySingleton<EditProfileRepo>(
+    () => EditProfileRepoImpl(sl<EditProfileRemoteDataSource>()),
+  );
 
   ///---------
   ///Bloc
@@ -168,4 +179,5 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton(
     () => ProfileBloc(sl<ProfileRepo>(), sl<PostLikeCubit>()),
   );
+  sl.registerLazySingleton(() => UniversitiesCubit(sl<EditProfileRepo>()));
 }
