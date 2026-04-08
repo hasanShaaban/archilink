@@ -45,8 +45,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         builder: (context) => const AcademicExperianceView(),
       );
     case AddAcademicExperianceView.name:
+      final args = settings.arguments as Map<String, dynamic>?;
       return MaterialPageRoute(
-        builder: (context) => const AddAcademicExperianceView(),
+        builder: (context) => AddAcademicExperianceView(
+          initialExperience: args?['experience'],
+          editIndex: args?['index'],
+        ),
       );
     case ContactInfoView.name:
       return MaterialPageRoute(builder: (context) => const ContactInfoView());

@@ -61,9 +61,7 @@ class EditProfilePopupField extends StatelessWidget {
                 Text(
                   displayValue,
                   style: AppTextStyle.interRegular12.copyWith(
-                    color: isPlaceholder
-                        ? AppColorsFromTheme.grayForText(context)
-                        : Theme.of(context).colorScheme.onSurface,
+                    color: AppColorsFromTheme.grayForText(context),
                   ),
                 ),
               ],

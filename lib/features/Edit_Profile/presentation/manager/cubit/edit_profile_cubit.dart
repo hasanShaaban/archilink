@@ -75,6 +75,11 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     emit(state.copyWith(location: value, hasChanges: true));
   }
 
+  void markHasChanges() {
+    if (state.hasChanges) return;
+    emit(state.copyWith(hasChanges: true));
+  }
+
   void addSkill(String skill) {
     final cleaned = skill.trim();
     if (cleaned.isEmpty) return;
@@ -102,6 +107,13 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     if (index < 0 || index >= state.academicExperiences.length) return;
     final updated = List<AcademicExperience>.from(state.academicExperiences)
       ..removeAt(index);
+    emit(state.copyWith(academicExperiences: updated, hasChanges: true));
+  }
+
+  void updateAcademicExperience(int index, AcademicExperience experience) {
+    if (index < 0 || index >= state.academicExperiences.length) return;
+    final updated = List<AcademicExperience>.from(state.academicExperiences)
+      ..[index] = experience;
     emit(state.copyWith(academicExperiences: updated, hasChanges: true));
   }
 }
