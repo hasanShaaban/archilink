@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "704887122823",
+    "project_id": "archi-link-7c8da",
+    "storage_bucket": "archi-link-7c8da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704887122823:android:869d1053b917c2aa0e4122",
+        "android_client_info": {
+          "package_name": "com.example.archilink"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi6LVQ8N1xicKcHbJTkl2-EC8mv4f1Mcw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
