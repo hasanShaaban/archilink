@@ -3,6 +3,7 @@ import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/theme/app_theme.dart';
 import 'package:archilink/core/utils/constants.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
@@ -23,9 +24,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Hive.initFlutter();
   final authBox = await Hive.openBox(kAuthBox);
   final profileBox = await Hive.openBox(kProfileBox);
@@ -42,6 +41,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       //Bloc Providers
       providers: [
+        BlocProvider(create: (context) => sl<AuthCubit>()),
         BlocProvider(
           create: (context) => sl<CurrentUserCubit>()..loadFromCache(),
         ),

@@ -65,17 +65,36 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw AppException.handelDioException(e);
     }
   }
-  
+
   @override
-  Future<bool> checkUsername({required String username}) async{
-    try{
-      final response = await apiService.get('account-center/check-availability/$username');
+  Future<bool> checkUsername({required String username}) async {
+    try {
+      final response = await apiService.get(
+        'account-center/check-availability/$username',
+      );
       final data = response.data;
-      if(data == null){
+      if (data == null) {
         throw ServerException(message: 'Invalid check username response');
       }
       return data['data']['available'] as bool;
-    }on DioException catch(e){
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<bool> registerFCM(String token) async {
+    try {
+      final response = await apiService.patch(
+        'account-center/fcm-token',
+        body: {'fcm_token': token},
+      );
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'Invalid fcm register response');
+      }
+      return data['status'] == 'success';
+    } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }
   }

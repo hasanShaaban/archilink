@@ -16,4 +16,5 @@ abstract class AuthRemoteDataSource {
     String? phone,
   });
   Future<bool> checkUsername({required String username});
+  Future<bool> registerFCM(String token);
 }

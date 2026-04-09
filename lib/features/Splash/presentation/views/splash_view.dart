@@ -3,9 +3,11 @@ import 'dart:ui';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
 import 'package:archilink/features/Main/presentation/views/main_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class SplashView extends StatelessWidget {
@@ -31,6 +33,7 @@ class _SplashViewBodyState extends State<SplashViewBody> {
 
   @override
   void initState() {
+    context.read<AuthCubit>().initApp();
     Future.delayed(const Duration(microseconds: 300), () {
       setState(() {
         opacity = 1;

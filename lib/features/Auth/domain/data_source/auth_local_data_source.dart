@@ -7,4 +7,6 @@ abstract class AuthLocalDataSource {
   Future<void> clearUsername();
   Future<void> setRememberMe(bool rememberMe);
   bool? getRemeberMe();
+  Future<void> setTokenRegistered(bool value);
+  bool isTokenRegistered();
 }

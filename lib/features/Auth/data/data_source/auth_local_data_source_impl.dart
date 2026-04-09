@@ -6,6 +6,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource{
   static const _tokenKey = 'ACCESS_TOKEN';
   static const _usernameKey = 'USERNAME';
   static const _rememberMeKey = 'REMEMBERME';
+  static const _tokenRegisteredKey = 'IS_FCM_TOKEN_REGISTERED';
 
   AuthLocalDataSourceImpl(this.storage);
   @override
@@ -48,6 +49,14 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource{
   bool? getRemeberMe() {
     return storage.read<bool>(_rememberMeKey);
   }
-
   
+  @override
+  bool isTokenRegistered() {
+    return storage.read<bool>(_tokenRegisteredKey) ?? false;
+  }
+  
+  @override
+  Future<void> setTokenRegistered(bool value) async{
+    await storage.write(_tokenRegisteredKey, value);
+  }
 }

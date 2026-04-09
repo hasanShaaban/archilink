@@ -4,6 +4,8 @@ import 'package:archilink/core/network/interceptors/auth_interceptor.dart';
 import 'package:archilink/core/network/interceptors/error_interceptor.dart';
 import 'package:archilink/core/network/interceptors/log_interceptor.dart';
 import 'package:archilink/core/services/media_picker_service.dart';
+import 'package:archilink/core/services/notification/data_source/fcm_data_source.dart';
+import 'package:archilink/core/services/notification/data_source/fcm_data_source_impl.dart';
 import 'package:archilink/core/services/post_images_picker.dart';
 import 'package:archilink/core/storage/hive_storage.dart';
 import 'package:archilink/core/storage/local_storage.dart';
@@ -11,9 +13,11 @@ import 'package:archilink/core/utils/constants.dart';
 import 'package:archilink/features/Auth/data/data_source/auth_local_data_source_impl.dart';
 import 'package:archilink/features/Auth/data/data_source/auth_remote_data_source_impl.dart';
 import 'package:archilink/features/Auth/data/repo/auth_repo_impl.dart';
+import 'package:archilink/features/Auth/data/repo/notification_repo_impl.dart';
 import 'package:archilink/features/Auth/domain/data_source/auth_local_data_source.dart';
 import 'package:archilink/features/Auth/domain/data_source/auth_remote_data_source.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
+import 'package:archilink/features/Auth/domain/repo/notification_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
@@ -111,6 +115,7 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<EditProfileRemoteDataSource>(
     () => EditProfileRemoteDataSourceImpl(sl()),
   );
+  sl.registerLazySingleton<FCMDataSource>(() => FCMDataSourceImpl());
 
   ///----------
   ///Interceptor
@@ -167,17 +172,30 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<EditProfileRepo>(
     () => EditProfileRepoImpl(sl<EditProfileRemoteDataSource>()),
   );
+  sl.registerLazySingleton<NotificationRepo>(
+    () => NotificationRepoImpl(
+      sl<FCMDataSource>(),
+      sl<AuthRemoteDataSource>(),
+      sl<AuthLocalDataSource>(),
+    ),
+  );
 
   ///---------
   ///Bloc
   ///---------
   sl.registerLazySingleton(() => MainTabController());
   sl.registerLazySingleton(() => CurrentUserCubit(sl()));
-  sl.registerLazySingleton(() => AuthCubit(sl(), sl<CurrentUserCubit>()));
   sl.registerLazySingleton(() => CheckUsernameCubit(sl()));
   sl.registerLazySingleton(() => PostLikeCubit(sl()));
   sl.registerLazySingleton(
     () => ProfileBloc(sl<ProfileRepo>(), sl<PostLikeCubit>()),
+  );
+  sl.registerLazySingleton(
+    () => AuthCubit(
+      sl<AuthRepo>(),
+      sl<CurrentUserCubit>(),
+      sl<NotificationRepo>(),
+    ),
   );
   sl.registerLazySingleton(() => UniversitiesCubit(sl<EditProfileRepo>()));
 }

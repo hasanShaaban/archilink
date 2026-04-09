@@ -12,6 +12,9 @@ class ApiService {
   Future<Response<T>> post<T>(String path, {dynamic body}) {
     return dio.post<T>(path, data: body);
   }
+  Future<Response<T>> patch<T>(String path, {dynamic body}) {
+    return dio.patch<T>(path, data: body);
+  }
   
   Future<Response<T>> postForm<T>(String path, {required FormData formData}) {
     return dio.post<T>(
