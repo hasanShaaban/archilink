@@ -9,24 +9,25 @@ class DioClient {
   late final Dio dio;
 
   DioClient({
+    required String baseUrl,  
     required AuthInterceptor authInterceptor,
     required ErrorInterceptor errorInterceptor,
     required LogInterseptor logInterceptor,
-  }){
+  }) {
     dio = Dio(
       BaseOptions(
-        baseUrl: NetworkConfig.baseURL,
+        baseUrl: baseUrl,
         connectTimeout: NetworkConfig.connectTimeout,
         receiveTimeout: NetworkConfig.receiveTimeout,
         headers: NetworkConfig.defaultHeaders,
         responseType: ResponseType.json,
-      )
+      ),
     );
 
     dio.interceptors.addAll([
       authInterceptor,
       errorInterceptor,
-      logInterceptor
+      logInterceptor,
     ]);
   }
 }
