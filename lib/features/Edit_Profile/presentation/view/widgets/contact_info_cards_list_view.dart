@@ -2,6 +2,7 @@ import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/edit_profile_cubit.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/add_contact_info_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -29,7 +30,12 @@ class ContactInfoCardsListView extends StatelessWidget {
             itemBuilder: (context, index) {
               final contactInfo = state.contactInfos[index];
               return GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context, rootNavigator: true).pushNamed(
+                    AddContactInfoView.name,
+                    arguments: {'contactInfo': contactInfo, 'index': index},
+                  );
+                },
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   padding: const EdgeInsets.symmetric(

@@ -6,6 +6,7 @@ import 'package:archilink/features/Edit_Profile/presentation/view/add_academic_e
 import 'package:archilink/features/Edit_Profile/presentation/view/add_contact_info_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/contact_info_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
+import 'package:archilink/features/Edit_Profile/presentation/view/location_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/skills_view.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/features/Splash/presentation/views/splash_view.dart';
@@ -41,6 +42,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       );
     case AboutMeView.name:
       return MaterialPageRoute(builder: (context) => const AboutMeView());
+    case LocationView.name:
+      return MaterialPageRoute(builder: (context) => const LocationView());
     case AcademicExperianceView.name:
       return MaterialPageRoute(
         builder: (context) => const AcademicExperianceView(),
@@ -56,8 +59,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case ContactInfoView.name:
       return MaterialPageRoute(builder: (context) => const ContactInfoView());
     case AddContactInfoView.name:
+      final args = settings.arguments as Map<String, dynamic>?;
       return MaterialPageRoute(
-        builder: (context) => const AddContactInfoView(),
+        builder: (context) => AddContactInfoView(
+          initialContactInfo: args?['contactInfo'],
+          editIndex: args?['index'],
+        ),
       );
     case SkillsView.name:
       return MaterialPageRoute(builder: (context) => const SkillsView());

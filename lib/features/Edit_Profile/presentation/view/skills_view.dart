@@ -39,7 +39,18 @@ class _SkillsViewState extends State<SkillsView> with TickerProviderStateMixin {
       body: SafeArea(
         child: Column(
           children: [
-            EditProfileAppBar(titel: 'Skills', withDoneButton: true),
+            EditProfileAppBar(
+              titel: 'Skills',
+              withDoneButton: true,
+              onDone: () {
+                final pending = skillController.text.trim();
+                if (pending.isNotEmpty) {
+                  cubit.addSkill(pending);
+                  skillController.clear();
+                }
+                Navigator.pop(context);
+              },
+            ),
             EditProfileAddButton(
               showInput: showInput,
               title: 'Add skill',

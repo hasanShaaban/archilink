@@ -9,12 +9,14 @@ class EditProfileAppBar extends StatelessWidget {
     super.key,
     required this.titel,
     this.onDone,
+    this.onBack,
     required this.withDoneButton,
     this.backButtonIcon = Icons.close_outlined,
     this.canSubmitOverride,
   });
   final String titel;
   final VoidCallback? onDone;
+  final VoidCallback? onBack;
   final bool withDoneButton;
   final IconData backButtonIcon;
   final bool? canSubmitOverride;
@@ -32,7 +34,11 @@ class EditProfileAppBar extends StatelessWidget {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    Navigator.pop(context);
+                    if (onBack != null) {
+                      onBack!();
+                    } else {
+                      Navigator.pop(context);
+                    }
                   },
                   child: Icon(
                     backButtonIcon,
