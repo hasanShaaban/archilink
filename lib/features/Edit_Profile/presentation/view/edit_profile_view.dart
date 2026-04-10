@@ -75,6 +75,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                   child: Column(
                     children: [
                       EditProfileTextField(
+                        hintText: 'Enter your full name',
                         title: 'Full Name',
                         initialValue: fullNameController.text,
                         controller: fullNameController,
@@ -82,6 +83,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                       ),
                       Divider(height: 1),
                       EditProfileTextField(
+                        hintText: 'Enter a bio',
                         title: 'bio',
                         initialValue: bioController.text,
                         controller: bioController,

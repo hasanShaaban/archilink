@@ -121,7 +121,6 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
 
     if (picked != null) {
       setState(() => onPicked(picked));
-      context.read<EditProfileCubit>().markHasChanges();
     }
   }
 
@@ -154,7 +153,6 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
                       onSelected: (value) {
                         setState(() {
                           selectedUniversity = value;
-                          context.read<EditProfileCubit>().markHasChanges();
                         });
                       },
                     ),
@@ -166,19 +164,18 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
                       onSelected: (value) {
                         setState(() {
                           selectedDegree = value;
-                          context.read<EditProfileCubit>().markHasChanges();
                         });
                       },
                       placeholder: 'Select Degree',
                     ),
                     Divider(height: 1),
                     EditProfileTextField(
+                      hintText: 'Enter your field of study',
                       title: 'Field of Study',
                       initialValue: fieldOfStudyController.text,
                       controller: fieldOfStudyController,
                       onChanged: (_) {
                         setState(() {});
-                        context.read<EditProfileCubit>().markHasChanges();
                       },
                     ),
                     Divider(height: 1),

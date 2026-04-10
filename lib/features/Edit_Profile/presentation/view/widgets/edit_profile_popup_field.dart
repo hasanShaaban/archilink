@@ -23,7 +23,6 @@ class EditProfilePopupField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final displayValue = value.isEmpty ? placeholder : value;
-    final isPlaceholder = value.isEmpty;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
       child: Row(

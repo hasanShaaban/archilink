@@ -17,12 +17,24 @@ class AcademicExperience extends Equatable {
 
   @override
   List<Object?> get props => [
-        university,
-        degree,
-        fieldOfStudy,
-        startYear,
-        endYear,
-      ];
+    university,
+    degree,
+    fieldOfStudy,
+    startYear,
+    endYear,
+  ];
+}
+
+class ContactInfo extends Equatable {
+  final String handle, platform, url;
+
+  const ContactInfo({
+    required this.handle,
+    required this.platform,
+    required this.url,
+  });
+  @override
+  List<Object?> get props => [handle, platform, url];
 }
 
 class EditProfileState extends Equatable {
@@ -35,6 +47,13 @@ class EditProfileState extends Equatable {
     this.skills = const [],
     this.academicExperiences = const [],
     this.hasChanges = false,
+    this.contactInfos = const [],
+    this.hasBasicInfoChanges = false,
+    this.hasAccountTypeChanges = false,
+    this.hasAboutMeChanges = false,
+    this.hasSkillsChanges = false,
+    this.hasAcademicChanges = false,
+    this.hasContactInfoChanges = false,
   });
 
   final String fullName;
@@ -43,8 +62,15 @@ class EditProfileState extends Equatable {
   final String accountType;
   final String location;
   final List<String> skills;
+  final List<ContactInfo> contactInfos;
   final List<AcademicExperience> academicExperiences;
   final bool hasChanges;
+  final bool hasBasicInfoChanges;
+  final bool hasAccountTypeChanges;
+  final bool hasAboutMeChanges;
+  final bool hasSkillsChanges;
+  final bool hasAcademicChanges;
+  final bool hasContactInfoChanges;
 
   EditProfileState copyWith({
     String? fullName,
@@ -55,6 +81,13 @@ class EditProfileState extends Equatable {
     List<String>? skills,
     List<AcademicExperience>? academicExperiences,
     bool? hasChanges,
+    List<ContactInfo>? contactInfos,
+    bool? hasBasicInfoChanges,
+    bool? hasAccountTypeChanges,
+    bool? hasAboutMeChanges,
+    bool? hasSkillsChanges,
+    bool? hasAcademicChanges,
+    bool? hasContactInfoChanges,
   }) {
     return EditProfileState(
       fullName: fullName ?? this.fullName,
@@ -65,18 +98,34 @@ class EditProfileState extends Equatable {
       skills: skills ?? this.skills,
       academicExperiences: academicExperiences ?? this.academicExperiences,
       hasChanges: hasChanges ?? this.hasChanges,
+      contactInfos: contactInfos ?? this.contactInfos,
+      hasBasicInfoChanges: hasBasicInfoChanges ?? this.hasBasicInfoChanges,
+      hasAccountTypeChanges:
+          hasAccountTypeChanges ?? this.hasAccountTypeChanges,
+      hasAboutMeChanges: hasAboutMeChanges ?? this.hasAboutMeChanges,
+      hasSkillsChanges: hasSkillsChanges ?? this.hasSkillsChanges,
+      hasAcademicChanges: hasAcademicChanges ?? this.hasAcademicChanges,
+      hasContactInfoChanges:
+          hasContactInfoChanges ?? this.hasContactInfoChanges,
     );
   }
 
   @override
   List<Object?> get props => [
-        fullName,
-        bio,
-        aboutMe,
-        accountType,
-        location,
-        skills,
-        academicExperiences,
-        hasChanges,
-      ];
+    fullName,
+    bio,
+    aboutMe,
+    accountType,
+    location,
+    skills,
+    academicExperiences,
+    hasChanges,
+    contactInfos,
+    hasBasicInfoChanges,
+    hasAccountTypeChanges,
+    hasAboutMeChanges,
+    hasSkillsChanges,
+    hasAcademicChanges,
+    hasContactInfoChanges,
+  ];
 }

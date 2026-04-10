@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:archilink/core/services/notification/display/notificatio_display_service.dart';
-import 'package:firebase_messaging_platform_interface/src/remote_message.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationDisplayServiceImpl implements NotificationDisplayService {

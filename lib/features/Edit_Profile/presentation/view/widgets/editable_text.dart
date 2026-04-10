@@ -9,8 +9,9 @@ class EditProfileTextField extends StatefulWidget {
     required this.initialValue,
     required this.controller,
     this.onChanged,
+    required this.hintText,
   });
-  final String title, initialValue;
+  final String title, initialValue, hintText;
   final TextEditingController controller;
   final ValueChanged<String>? onChanged;
 
@@ -62,6 +63,10 @@ class _EditProfileTextFieldState extends State<EditProfileTextField> {
               controller: widget.controller,
               onChanged: widget.onChanged,
               decoration: InputDecoration(
+                hintText: widget.hintText,
+                hintStyle: AppTextStyle.interMedium12.copyWith(
+                  color: AppColorsFromTheme.grayForText(context),
+                ),
                 border: InputBorder.none,
                 isCollapsed: true,
                 isDense: true,

@@ -16,13 +16,11 @@ class AboutMeView extends StatefulWidget {
 class _AboutMeViewState extends State<AboutMeView> {
   FocusNode focusNode = FocusNode();
   late final TextEditingController aboutController;
-  late final String? initialValue;
 
   @override
   void initState() {
     final state = context.read<EditProfileCubit>().state;
     aboutController = TextEditingController(text: state.aboutMe);
-    initialValue = state.aboutMe;
     focusNode.addListener(() => setState(() {}));
     super.initState();
   }
@@ -69,16 +67,16 @@ class _AboutMeViewState extends State<AboutMeView> {
                   ),
                   maxLines: null,
                   onChanged: (value) {
-                    final trimmedValue = value.trim();
-                    final baseline = (initialValue ?? '').trim();
-                    if (trimmedValue != baseline) {
-                      cubit.markHasChanges();
-                    }
+                    cubit.updateAboutMe(value);
                   },
                   minLines: 1,
                   textInputAction: TextInputAction.newline,
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
+                    hintText: 'Enter a small overview',
+                    hintStyle: AppTextStyle.interRegular14.copyWith(
+                      color: AppColorsFromTheme.grayForText(context),
+                    ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 16,
