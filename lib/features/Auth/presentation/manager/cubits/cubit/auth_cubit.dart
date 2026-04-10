@@ -74,6 +74,8 @@ class AuthCubit extends Cubit<AuthState> {
     log(isLoggedIn.toString());
     if (isLoggedIn) return;
 
+    notificationRepo.listenToTokenRefresh();
+
     if (!notificationRepo.isTokenRegistered) {
       await notificationRepo.registerFCM();
     }

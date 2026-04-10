@@ -15,4 +15,10 @@ class FCMDataSourceImpl extends FCMDataSource {
 
   @override
   Stream<String> get tokenRefresh => _messageing.onTokenRefresh;
+
+  @override
+  Future<RemoteMessage?> getInitialMessage() => _messageing.getInitialMessage();
+
+  @override
+  Stream<RemoteMessage> get onForegroundMessage => FirebaseMessaging.onMessage;
 }

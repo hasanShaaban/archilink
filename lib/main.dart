@@ -1,3 +1,4 @@
+import 'package:archilink/core/functions/firebase_background_handler.dart';
 import 'package:archilink/core/functions/on_generate_route.dart';
 import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/services/service_locator.dart';
@@ -17,6 +18,7 @@ import 'package:archilink/features/Splash/presentation/views/splash_view.dart';
 import 'package:archilink/firebase_options.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,6 +27,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
   await Hive.initFlutter();
   final authBox = await Hive.openBox(kAuthBox);
   final profileBox = await Hive.openBox(kProfileBox);
