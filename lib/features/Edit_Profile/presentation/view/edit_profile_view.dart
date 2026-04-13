@@ -1,5 +1,4 @@
 import 'package:archilink/core/utils/app_colors.dart';
-import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/edit_profile_cubit.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/about_me_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/academic_experiance_view.dart';
@@ -106,8 +105,13 @@ class _EditProfileViewState extends State<EditProfileView> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<EditProfileCubit>();
-    return WillPopScope(
-      onWillPop: () => _confirmExit(cubit),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldPop = await _confirmExit(cubit);
+        if (shouldPop && context.mounted) Navigator.pop(context);
+      },
       child: Scaffold(
         body: SafeArea(
           child: BlocListener<EditProfileCubit, EditProfileState>(
@@ -121,82 +125,88 @@ class _EditProfileViewState extends State<EditProfileView> {
                 bioController.text = state.bio;
               }
             },
-            child: Column(
-              children: [
-                EditProfileAppBar(
-                  titel: 'Edit Profile',
-                  withDoneButton: true,
-                  onDone: () {
-                    _applyChanges(cubit);
-                    Navigator.pop(context);
-                  },
-                  onBack: () => _handleBack(cubit),
-                ),
-                SizedBox(height: 16),
-                Padding(
-                  padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: AppColorsFromTheme.editProfileContainer(context),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      children: [
-                        EditProfileTextField(
-                          hintText: 'Enter your full name',
-                          title: 'Full Name',
-                          initialValue: fullNameController.text,
-                          controller: fullNameController,
-                          onChanged: cubit.updateFullName,
-                        ),
-                        Divider(height: 1),
-                        EditProfileTextField(
-                          hintText: 'Enter a bio',
-                          title: 'Bio',
-                          initialValue: bioController.text,
-                          controller: bioController,
-                          onChanged: cubit.updateBio,
-                        ),
-                        Divider(height: 1),
-                        BlocBuilder<EditProfileCubit, EditProfileState>(
-                          buildWhen: (prev, next) =>
-                              prev.location != next.location,
-                          builder: (context, state) {
-                            return LocationRoutedRow(
-                              title: 'Location',
-                              value: state.location,
-                              route: LocationView.name,
-                            );
-                          },
-                        ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  EditProfileAppBar(
+                    titel: 'Edit Profile',
+                    withDoneButton: true,
+                    onDone: () {
+                      _applyChanges(cubit);
+                      Navigator.pop(context);
+                      context.read<EditProfileCubit>().submit();
+                    },
+                    onBack: () => _handleBack(cubit),
+                  ),
+                  SizedBox(height: 16),
+                  Padding(
+                    padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: AppColorsFromTheme.editProfileContainer(context),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        children: [
+                          EditProfileTextField(
+                            hintText: 'Enter your full name',
+                            title: 'Full Name',
+                            initialValue: fullNameController.text,
+                            controller: fullNameController,
+                            onChanged: cubit.updateFullName,
+                          ),
+                          Divider(height: 1),
+                          EditProfileTextField(
+                            hintText: 'Enter a bio',
+                            title: 'Bio',
+                            initialValue: bioController.text,
+                            controller: bioController,
+                            onChanged: cubit.updateBio,
+                          ),
+                          Divider(height: 1),
+                          BlocBuilder<EditProfileCubit, EditProfileState>(
+                            buildWhen: (prev, next) =>
+                                prev.location != next.location,
+                            builder: (context, state) {
+                              return LocationRoutedRow(
+                                title: 'Location',
+                                value: state.location,
+                                route: LocationView.name,
+                              );
+                            },
+                          ),
 
-                        Divider(height: 1),
-                        EditProfileAccountTypeButton(),
+                          Divider(height: 1),
+                          EditProfileAccountTypeButton(),
 
-                        Divider(height: 1),
-                        RoutedViewRow(
-                          title: 'About Me',
-                          route: AboutMeView.name,
-                        ),
+                          Divider(height: 1),
+                          RoutedViewRow(
+                            title: 'About Me',
+                            route: AboutMeView.name,
+                          ),
 
-                        Divider(height: 1),
-                        RoutedViewRow(
-                          title: 'Academic Experience',
-                          route: AcademicExperianceView.name,
-                        ),
-                        Divider(height: 1),
-                        RoutedViewRow(
-                          title: 'Contact Information',
-                          route: ContactInfoView.name,
-                        ),
-                        Divider(height: 1),
-                        RoutedViewRow(title: 'Skills', route: SkillsView.name),
-                      ],
+                          Divider(height: 1),
+                          RoutedViewRow(
+                            title: 'Academic Experience',
+                            route: AcademicExperianceView.name,
+                          ),
+                          Divider(height: 1),
+                          RoutedViewRow(
+                            title: 'Contact Information',
+                            route: ContactInfoView.name,
+                          ),
+                          Divider(height: 1),
+                          RoutedViewRow(
+                            title: 'Skills',
+                            route: SkillsView.name,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -206,4 +216,3 @@ class _EditProfileViewState extends State<EditProfileView> {
 }
 
 enum _ExitAction { save, discard, cancel }
-

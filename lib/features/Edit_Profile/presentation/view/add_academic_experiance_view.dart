@@ -32,6 +32,7 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
   late final TextEditingController fieldOfStudyController;
   int? selectedStartYear;
   int? selectedEndYear;
+  int? selectedUniversityId;
 
   final List<String> degrees = const ['Associate', 'Bachelor', 'Master', 'PhD'];
   static const String _fieldOfStudyPlaceholder = 'Enter your Major';
@@ -42,6 +43,7 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
     context.read<UniversitiesCubit>().loadUniversities();
     final initial = widget.initialExperience;
     selectedUniversity = initial?.university ?? '';
+    selectedUniversityId = initial?.universityId;
     selectedDegree = initial?.degree ?? '';
     selectedStartYear = initial?.startYear;
     selectedEndYear = initial?.endYear;
@@ -59,10 +61,12 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
   void _handleDone() {
     final cubit = context.read<EditProfileCubit>();
     final experience = AcademicExperience(
+      universityId: selectedUniversityId!,
       university: selectedUniversity,
       degree: selectedDegree,
       fieldOfStudy: fieldOfStudyController.text.trim(),
-      startYear: selectedStartYear ??
+      startYear:
+          selectedStartYear ??
           widget.initialExperience?.startYear ??
           DateTime.now().year,
       endYear: selectedEndYear ?? widget.initialExperience?.endYear,
@@ -78,9 +82,9 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
 
   bool _isFormValid() {
     final field = fieldOfStudyController.text.trim();
-    final isFieldValid =
-        field.isNotEmpty && field != _fieldOfStudyPlaceholder;
-    return selectedUniversity.isNotEmpty &&
+    final isFieldValid = field.isNotEmpty && field != _fieldOfStudyPlaceholder;
+    return selectedUniversityId != null &&
+        selectedUniversity.isNotEmpty &&
         selectedDegree.isNotEmpty &&
         isFieldValid &&
         selectedStartYear != null;
@@ -150,9 +154,10 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
                   children: [
                     UniversityPopupField(
                       value: selectedUniversity,
-                      onSelected: (value) {
+                      onSelected: ({required int id, required String name}) {
                         setState(() {
-                          selectedUniversity = value;
+                          selectedUniversityId = id;
+                          selectedUniversity = name;
                         });
                       },
                     ),
@@ -181,8 +186,7 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
                     Divider(height: 1),
                     YearPickerRow(
                       title: 'Start year',
-                      valueText:
-                          selectedStartYear?.toString() ?? 'Select Year',
+                      valueText: selectedStartYear?.toString() ?? 'Select Year',
                       onTap: () => _showYearPicker(
                         currentYear: selectedStartYear,
                         onPicked: (value) => selectedStartYear = value,

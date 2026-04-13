@@ -3,6 +3,9 @@ import 'package:archilink/features/Edit_Profile/presentation/view/widgets/edit_p
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+typedef UniversitySelected =
+    void Function({required int id, required String name});
+
 class UniversityPopupField extends StatelessWidget {
   const UniversityPopupField({
     super.key,
@@ -12,7 +15,7 @@ class UniversityPopupField extends StatelessWidget {
   });
 
   final String value;
-  final ValueChanged<String> onSelected;
+  final UniversitySelected onSelected;
   final String placeholder;
 
   @override
@@ -46,18 +49,13 @@ class UniversityPopupField extends StatelessWidget {
             PopupMenuItem(
               enabled: false,
               value: '',
-              child: Text(
-                state.failure?.message ?? 'No universities found',
-              ),
+              child: Text(state.failure?.message ?? 'No universities found'),
             ),
           );
         } else {
           menuItems.addAll(
             state.universities.map(
-              (uni) => PopupMenuItem(
-                value: uni.name,
-                child: Text(uni.name),
-              ),
+              (uni) => PopupMenuItem(value: uni.name, child: Text(uni.name)),
             ),
           );
         }
@@ -67,11 +65,15 @@ class UniversityPopupField extends StatelessWidget {
           value: value,
           items: const [],
           menuItems: menuItems,
-          onSelected: (selected) {
-            if (selected.isEmpty) return;
-            onSelected(selected);
+          onSelected: (selectedName) {
+            if (selectedName.isEmpty) return;
+            final uni = state.universities.firstWhere(
+              (u) => u.name == selectedName,
+              orElse: () =>
+                  throw StateError('University not found: $selectedName'),
+            );
+            onSelected(id: uni.id, name: uni.name);
           },
-          placeholder: placeholder,
         );
       },
     );

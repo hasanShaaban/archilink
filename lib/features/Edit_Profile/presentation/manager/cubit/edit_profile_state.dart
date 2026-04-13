@@ -3,13 +3,16 @@ part of 'edit_profile_cubit.dart';
 class AcademicExperience extends Equatable {
   const AcademicExperience({
     required this.university,
+
     required this.degree,
     required this.fieldOfStudy,
     required this.startYear,
     required this.endYear,
+    required this.universityId,
   });
 
   final String university;
+  final int universityId;
   final String degree;
   final String fieldOfStudy;
   final int? startYear;
@@ -22,6 +25,7 @@ class AcademicExperience extends Equatable {
     fieldOfStudy,
     startYear,
     endYear,
+    universityId
   ];
 }
 

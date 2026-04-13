@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 part 'edit_profile_state.dart';
 
@@ -24,6 +27,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     final academicExperiences = details.academicExperiences
         .map(
           (e) => AcademicExperience(
+            universityId: -1,
             university: e.university,
             degree: e.degree,
             fieldOfStudy: e.fieldOfStudy,
@@ -48,8 +52,9 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     _initialAccountType = accountType;
     _initialLocation = location;
     _initialSkills = List<String>.from(skills);
-    _initialAcademicExperiences =
-        List<AcademicExperience>.from(academicExperiences);
+    _initialAcademicExperiences = List<AcademicExperience>.from(
+      academicExperiences,
+    );
     _initialContactInfos = List<ContactInfo>.from(contactInfos);
 
     emit(
@@ -155,7 +160,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     final updated = List<String>.from(state.skills)..add(cleaned);
     final next = state.copyWith(
       skills: updated,
-      hasSkillsChanges: !_listEquals(updated, _initialSkills),
+      hasSkillsChanges: !listEquals(updated, _initialSkills),
     );
     emit(_withOverallHasChanges(next));
   }
@@ -165,7 +170,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     final updated = List<String>.from(state.skills)..removeAt(index);
     final next = state.copyWith(
       skills: updated,
-      hasSkillsChanges: !_listEquals(updated, _initialSkills),
+      hasSkillsChanges: !listEquals(updated, _initialSkills),
     );
     emit(_withOverallHasChanges(next));
   }
@@ -175,10 +180,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       ..add(experience);
     final next = state.copyWith(
       academicExperiences: updated,
-      hasAcademicChanges: !_listEquals(
-        updated,
-        _initialAcademicExperiences,
-      ),
+      hasAcademicChanges: !listEquals(updated, _initialAcademicExperiences),
     );
     emit(_withOverallHasChanges(next));
   }
@@ -189,10 +191,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       ..removeAt(index);
     final next = state.copyWith(
       academicExperiences: updated,
-      hasAcademicChanges: !_listEquals(
-        updated,
-        _initialAcademicExperiences,
-      ),
+      hasAcademicChanges: !listEquals(updated, _initialAcademicExperiences),
     );
     emit(_withOverallHasChanges(next));
   }
@@ -203,10 +202,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       ..[index] = experience;
     final next = state.copyWith(
       academicExperiences: updated,
-      hasAcademicChanges: !_listEquals(
-        updated,
-        _initialAcademicExperiences,
-      ),
+      hasAcademicChanges: !listEquals(updated, _initialAcademicExperiences),
     );
     emit(_withOverallHasChanges(next));
   }
@@ -215,29 +211,27 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     final updated = List<ContactInfo>.from(state.contactInfos)..add(info);
     final next = state.copyWith(
       contactInfos: updated,
-      hasContactInfoChanges: !_listEquals(updated, _initialContactInfos),
+      hasContactInfoChanges: !listEquals(updated, _initialContactInfos),
     );
     emit(_withOverallHasChanges(next));
   }
 
   void removeContactInfo(int index) {
     if (index < 0 || index >= state.contactInfos.length) return;
-    final updated = List<ContactInfo>.from(state.contactInfos)
-      ..removeAt(index);
+    final updated = List<ContactInfo>.from(state.contactInfos)..removeAt(index);
     final next = state.copyWith(
       contactInfos: updated,
-      hasContactInfoChanges: !_listEquals(updated, _initialContactInfos),
+      hasContactInfoChanges: !listEquals(updated, _initialContactInfos),
     );
     emit(_withOverallHasChanges(next));
   }
 
   void updateContactInfo(int index, ContactInfo info) {
     if (index < 0 || index >= state.contactInfos.length) return;
-    final updated = List<ContactInfo>.from(state.contactInfos)
-      ..[index] = info;
+    final updated = List<ContactInfo>.from(state.contactInfos)..[index] = info;
     final next = state.copyWith(
       contactInfos: updated,
-      hasContactInfoChanges: !_listEquals(updated, _initialContactInfos),
+      hasContactInfoChanges: !listEquals(updated, _initialContactInfos),
     );
     emit(_withOverallHasChanges(next));
   }
@@ -255,21 +249,18 @@ class EditProfileCubit extends Cubit<EditProfileState> {
         _isTextChanged(location, _initialLocation);
   }
 
-  bool _listEquals<T>(List<T> a, List<T> b) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
-  }
-
   EditProfileState _withOverallHasChanges(EditProfileState next) {
-    final hasChanges = next.hasBasicInfoChanges ||
+    final hasChanges =
+        next.hasBasicInfoChanges ||
         next.hasAccountTypeChanges ||
         next.hasAboutMeChanges ||
         next.hasSkillsChanges ||
         next.hasAcademicChanges ||
         next.hasContactInfoChanges;
     return next.copyWith(hasChanges: hasChanges);
+  }
+
+  void submit() {
+    log(state.academicExperiences.first.universityId.toString());
   }
 }
