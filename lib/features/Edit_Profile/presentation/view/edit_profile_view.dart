@@ -133,8 +133,9 @@ class _EditProfileViewState extends State<EditProfileView> {
                     withDoneButton: true,
                     onDone: () {
                       _applyChanges(cubit);
+
+                      context.read<EditProfileCubit>().saveProfile();
                       Navigator.pop(context);
-                      context.read<EditProfileCubit>().submit();
                     },
                     onBack: () => _handleBack(cubit),
                   ),

@@ -8,6 +8,7 @@ import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_c
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
+import 'package:archilink/features/Edit_Profile/domain/repo/edit_profile_repo.dart';
 import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/edit_profile_cubit.dart';
 import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/universities_cubit.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
             createPostRepo: sl<CreatePostRepo>(),
           ),
         ),
-        BlocProvider(create: (context) => EditProfileCubit()),
+        BlocProvider(create: (context) => EditProfileCubit(sl<EditProfileRepo>())),
         BlocProvider(create: (context) => sl<UniversitiesCubit>()),
       ],
       child: MaterialApp(

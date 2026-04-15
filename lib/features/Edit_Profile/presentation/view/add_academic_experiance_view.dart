@@ -35,7 +35,6 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
   int? selectedUniversityId;
 
   final List<String> degrees = const ['Associate', 'Bachelor', 'Master', 'PhD'];
-  static const String _fieldOfStudyPlaceholder = 'Enter your Major';
 
   @override
   void initState() {
@@ -48,7 +47,7 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
     selectedStartYear = initial?.startYear;
     selectedEndYear = initial?.endYear;
     fieldOfStudyController = TextEditingController(
-      text: initial?.fieldOfStudy ?? _fieldOfStudyPlaceholder,
+      text: initial?.fieldOfStudy ?? '',
     );
   }
 
@@ -82,7 +81,7 @@ class _AddAcademicExperianceViewState extends State<AddAcademicExperianceView> {
 
   bool _isFormValid() {
     final field = fieldOfStudyController.text.trim();
-    final isFieldValid = field.isNotEmpty && field != _fieldOfStudyPlaceholder;
+    final isFieldValid = field.isNotEmpty && field.isNotEmpty;
     return selectedUniversityId != null &&
         selectedUniversity.isNotEmpty &&
         selectedDegree.isNotEmpty &&

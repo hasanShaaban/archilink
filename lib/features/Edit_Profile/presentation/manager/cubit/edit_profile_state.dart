@@ -1,5 +1,7 @@
 part of 'edit_profile_cubit.dart';
 
+enum EditProfileStatus { initial, loading, success, failure }
+
 class AcademicExperience extends Equatable {
   const AcademicExperience({
     required this.university,
@@ -25,7 +27,7 @@ class AcademicExperience extends Equatable {
     fieldOfStudy,
     startYear,
     endYear,
-    universityId
+    universityId,
   ];
 }
 
@@ -58,8 +60,11 @@ class EditProfileState extends Equatable {
     this.hasSkillsChanges = false,
     this.hasAcademicChanges = false,
     this.hasContactInfoChanges = false,
+    this.status = EditProfileStatus.initial,
+     this.errorMessage,
   });
-
+  final EditProfileStatus status;
+  final String? errorMessage;
   final String fullName;
   final String bio;
   final String aboutMe;
@@ -92,8 +97,12 @@ class EditProfileState extends Equatable {
     bool? hasSkillsChanges,
     bool? hasAcademicChanges,
     bool? hasContactInfoChanges,
+    EditProfileStatus? status,
+    String? errorMessage,
   }) {
     return EditProfileState(
+      status: status ?? this.status,
+      errorMessage: errorMessage ?? this.errorMessage,
       fullName: fullName ?? this.fullName,
       bio: bio ?? this.bio,
       aboutMe: aboutMe ?? this.aboutMe,
@@ -131,5 +140,7 @@ class EditProfileState extends Equatable {
     hasSkillsChanges,
     hasAcademicChanges,
     hasContactInfoChanges,
+    status,
+    errorMessage,
   ];
 }

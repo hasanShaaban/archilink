@@ -1,5 +1,6 @@
-import 'dart:developer';
 
+import 'package:archilink/features/Edit_Profile/domain/entity/edit_profile_request_body.dart';
+import 'package:archilink/features/Edit_Profile/domain/repo/edit_profile_repo.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -8,7 +9,8 @@ import 'package:flutter/foundation.dart';
 part 'edit_profile_state.dart';
 
 class EditProfileCubit extends Cubit<EditProfileState> {
-  EditProfileCubit() : super(const EditProfileState());
+  final EditProfileRepo repo;
+  EditProfileCubit(this.repo) : super(const EditProfileState());
 
   String _initialFullName = '';
   String _initialBio = '';
@@ -260,7 +262,127 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     return next.copyWith(hasChanges: hasChanges);
   }
 
-  void submit() {
-    log(state.academicExperiences.first.universityId.toString());
+  Future<void> saveProfile() async {
+    if (!state.hasChanges) return;
+
+    emit(state.copyWith(status: EditProfileStatus.loading));
+
+    final requestBody = _buildRequestBody();
+
+    final result = await repo.updateProfile(requestBody);
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: EditProfileStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
+      (_) {
+        // Re-baseline the initial values so hasChanges resets cleanly
+        _rebaseInitialValues();
+        emit(
+          state.copyWith(
+            status: EditProfileStatus.success,
+            hasChanges: false,
+            hasBasicInfoChanges: false,
+            hasAccountTypeChanges: false,
+            hasAboutMeChanges: false,
+            hasSkillsChanges: false,
+            hasAcademicChanges: false,
+            hasContactInfoChanges: false,
+          ),
+        );
+      },
+    );
+  }
+
+  EditProfileRequestBody _buildRequestBody() {
+    // Basic info — send all three together or all null,
+    // since they share the same change flag
+    final String? fullName = state.hasBasicInfoChanges
+        ? state.fullName.trim()
+        : null;
+    final String? bio = state.hasBasicInfoChanges ? state.bio.trim() : null;
+    final (String? city, String? country) = state.hasBasicInfoChanges
+        ? _parseLocation(state.location)
+        : (null, null);
+
+    // Skills — send full list or null
+    final List<String>? skills = state.hasSkillsChanges
+        ? List.from(state.skills)
+        : null;
+
+    // Academic experiences
+    final List<AcademicExperianceRequestBody>? academicExperiences =
+        state.hasAcademicChanges
+        ? state.academicExperiences.map(_mapAcademicExperience).toList()
+        : null;
+
+    // Contact info
+    final List<ContactInfoRequestBody>? contactInfo =
+        state.hasContactInfoChanges
+        ? state.contactInfos.map(_mapContactInfo).toList()
+        : null;
+
+    return EditProfileRequestBody(
+      fullName: fullName,
+      bio: bio,
+      city: city,
+      country: country,
+      skills: skills,
+      academicExperiences: academicExperiences,
+      contactInfo: contactInfo,
+    );
+  }
+
+  /// Splits "city, country" back into parts
+  (String?, String?) _parseLocation(String location) {
+    final cleaned = location.trim();
+    if (cleaned.isEmpty) return (null, null);
+    final parts = cleaned.split(',');
+    if (parts.length >= 2) {
+      return (
+        parts[0].trim().nullIfEmpty(),
+        parts.sublist(1).join(',').trim().nullIfEmpty(),
+      );
+    }
+    return (cleaned.nullIfEmpty(), null);
+  }
+
+  AcademicExperianceRequestBody _mapAcademicExperience(AcademicExperience e) {
+
+    return AcademicExperianceRequestBody(
+      university: e.universityId, 
+      degree: e.degree,
+      fieldOfStudy: e.fieldOfStudy,
+      startDate: e.startYear!,
+      endDate: e.endYear,
+    );
+  }
+
+  ContactInfoRequestBody _mapContactInfo(ContactInfo c) {
+    return ContactInfoRequestBody(
+      handel: c.handle,
+      platform: c.platform,
+      url: c.url,
+    );
+  }
+
+  void _rebaseInitialValues() {
+    _initialFullName = state.fullName;
+    _initialBio = state.bio;
+    _initialLocation = state.location;
+    _initialAboutMe = state.aboutMe;
+    _initialAccountType = state.accountType;
+    _initialSkills = List.from(state.skills);
+    _initialAcademicExperiences = List.from(state.academicExperiences);
+    _initialContactInfos = List.from(state.contactInfos);
   }
 }
+
+extension on String {
+  String? nullIfEmpty() => trim().isEmpty ? null : trim();
+}
+
+
