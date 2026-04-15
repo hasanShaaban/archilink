@@ -307,7 +307,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     final (String? city, String? country) = state.hasBasicInfoChanges
         ? _parseLocation(state.location)
         : (null, null);
-
+    final String? aboutMe = state.hasAboutMeChanges ? state.aboutMe.trim() : null;
     // Skills — send full list or null
     final List<String>? skills = state.hasSkillsChanges
         ? List.from(state.skills)

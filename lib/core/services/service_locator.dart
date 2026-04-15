@@ -10,6 +10,7 @@ import 'package:archilink/core/services/notification/data_source/fcm_data_source
 import 'package:archilink/core/services/notification/display/notificatio_display_service.dart';
 import 'package:archilink/core/services/notification/display/notification_display_service_impl.dart';
 import 'package:archilink/core/services/post_images_picker.dart';
+import 'package:archilink/core/services/profile_image_picker.dart';
 import 'package:archilink/core/storage/hive_storage.dart';
 import 'package:archilink/core/storage/local_storage.dart';
 import 'package:archilink/core/utils/constants.dart';
@@ -68,7 +69,14 @@ Future<void> initServiceLocator({
   ///----------
   ///Services
   ///----------
-  sl.registerLazySingleton<MediaPickerService>(() => PostImagesPicker());
+  sl.registerLazySingleton<MediaPickerService>(
+    () => PostImagesPicker(),
+    instanceName: kPostImagePicker,
+  );
+  sl.registerLazySingleton<MediaPickerService>(
+    () => ProfileImagePicker(),
+    instanceName: kProfileImagePicker,
+  );
   sl.registerLazySingleton<NotificationDisplayService>(
     () => NotificationDisplayServiceImpl(),
   );

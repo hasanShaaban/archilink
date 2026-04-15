@@ -1,8 +1,12 @@
+import 'package:archilink/core/services/media_picker_service.dart';
+import 'package:archilink/core/services/profile_image_picker.dart';
 import 'package:archilink/core/services/service_locator.dart';
+import 'package:archilink/core/utils/constants.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/follow_cubit.dart';
+import 'package:archilink/features/Profile/presentation/manager/cubit/update_profile_image_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/personal_profile_buttons.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_image_section.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_info_section.dart';
@@ -31,9 +35,14 @@ class ProfielInfoHeader extends StatelessWidget {
     return SliverToBoxAdapter(
       child: Column(
         children: [
-          ProfileImageSection(
-            width: width,
-            image: profileData.profilePictureUrl,
+          BlocProvider(
+            create: (context) =>
+                UpdateProfileImageCubit(sl<MediaPickerService>(instanceName: kProfileImagePicker)),
+            child: ProfileImageSection(
+              type: type,
+              width: width,
+              image: profileData.profilePictureUrl,
+            ),
           ),
           SizedBox(height: 16),
           ProfileInfoSection(profileData: profileData),

@@ -54,11 +54,15 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<ProfileBloc>()),
         BlocProvider(
           create: (context) => CreatePostCubit(
-            mediaPickerService: sl<MediaPickerService>(),
+            mediaPickerService: sl<MediaPickerService>(
+              instanceName: kPostImagePicker,
+            ),
             createPostRepo: sl<CreatePostRepo>(),
           ),
         ),
-        BlocProvider(create: (context) => EditProfileCubit(sl<EditProfileRepo>())),
+        BlocProvider(
+          create: (context) => EditProfileCubit(sl<EditProfileRepo>()),
+        ),
         BlocProvider(create: (context) => sl<UniversitiesCubit>()),
       ],
       child: MaterialApp(
