@@ -54,6 +54,7 @@ dependencies:
   mime: ^2.0.0
   persistent_bottom_nav_bar: ^6.2.1
   provider: ^6.1.5+1
+  pusher_channels_flutter: ^2.6.0
   skeletonizer: ^2.1.2
   wechat_assets_picker: ^10.1.1
 

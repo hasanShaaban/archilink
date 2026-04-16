@@ -5,17 +5,25 @@ import 'package:equatable/equatable.dart';
 part 'current_user_state.dart';
 
 class CurrentUserCubit extends Cubit<CurrentUserState> {
-  CurrentUserCubit(this._authLocalDataSource)
-    : super(const CurrentUserState());
+  CurrentUserCubit(this._authLocalDataSource) : super(const CurrentUserState());
 
   final AuthLocalDataSource _authLocalDataSource;
 
   void loadFromCache() {
-    emit(CurrentUserState(username: _authLocalDataSource.getUsername()));
+    emit(
+      CurrentUserState(
+        username: _authLocalDataSource.getUsername(),
+        token: _authLocalDataSource.getToken(),
+      ),
+    );
   }
 
   void setUsername(String username) {
     emit(CurrentUserState(username: username));
+  }
+
+  void setToken(String token) {
+    emit(CurrentUserState(token: token));
   }
 
   void clear() {

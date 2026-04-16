@@ -4,6 +4,7 @@ import 'package:archilink/core/network/interceptors/auth_interceptor.dart';
 import 'package:archilink/core/network/interceptors/error_interceptor.dart';
 import 'package:archilink/core/network/interceptors/log_interceptor.dart';
 import 'package:archilink/core/network/network_config.dart';
+import 'package:archilink/core/network/websocket/pusher_client.dart';
 import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/services/notification/data_source/fcm_data_source.dart';
 import 'package:archilink/core/services/notification/data_source/fcm_data_source_impl.dart';
@@ -26,6 +27,12 @@ import 'package:archilink/features/Auth/domain/repo/notification_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
+import 'package:archilink/features/Chat/data/data_source/chat_remote_data_source_impl.dart';
+import 'package:archilink/features/Chat/data/repo/chat_repo_impl.dart';
+import 'package:archilink/features/Chat/domain/data_source/chat_remote_data_source.dart';
+import 'package:archilink/features/Chat/domain/repo/chat_repo.dart';
+import 'package:archilink/features/Chat/domain/usecase/listen_to_chat_usecase.dart';
+import 'package:archilink/features/Chat/presentation/manager/bloc/chat_bloc.dart';
 import 'package:archilink/features/Create_Post/data/data_source/create_post_remote_date_source_impl.dart';
 import 'package:archilink/features/Edit_Profile/data/data_source/edit_profile_remote_data_source_impl.dart';
 import 'package:archilink/features/Edit_Profile/data/repo/edit_profile_repo_impl.dart';
@@ -69,6 +76,8 @@ Future<void> initServiceLocator({
   ///----------
   ///Services
   ///----------
+  ///
+  sl.registerLazySingleton(() => PusherClient.instance);
   sl.registerLazySingleton<MediaPickerService>(
     () => PostImagesPicker(),
     instanceName: kPostImagePicker,
@@ -130,6 +139,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<EditProfileRemoteDataSource>(
     () => EditProfileRemoteDataSourceImpl(sl()),
   );
+  sl.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(sl()),
+  );
   sl.registerLazySingleton<FCMDataSource>(() => FCMDataSourceImpl());
 
   ///----------
@@ -169,6 +181,7 @@ Future<void> initServiceLocator({
   ///---------
   ///Repositories
   ///---------
+  sl.registerLazySingleton<ChatRepo>(() => ChatRepoImpl(sl()));
   sl.registerLazySingleton<AuthRepo>(
     () => AuthRepoImpl(localDataSource: sl(), remoteDataSource: sl()),
   );
@@ -203,6 +216,11 @@ Future<void> initServiceLocator({
   );
 
   ///---------
+  ///Usecases
+  ///---------
+  sl.registerLazySingleton(() => ListenToChatUsecase(sl()));
+
+  ///---------
   ///Bloc
   ///---------
   sl.registerLazySingleton(() => MainTabController());
@@ -217,7 +235,9 @@ Future<void> initServiceLocator({
       sl<AuthRepo>(),
       sl<CurrentUserCubit>(),
       sl<NotificationRepo>(),
+      sl<PusherClient>(),
     ),
   );
   sl.registerLazySingleton(() => UniversitiesCubit(sl<EditProfileRepo>()));
+  sl.registerLazySingleton(() => ChatBloc(sl()));
 }

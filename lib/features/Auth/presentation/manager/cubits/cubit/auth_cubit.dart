@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/core/network/websocket/pusher_client.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/domain/repo/notification_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
@@ -13,9 +14,14 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
   final NotificationRepo notificationRepo;
   final CurrentUserCubit currentUserCubit;
+  final PusherClient pusherClient;
 
-  AuthCubit(this.authRepo, this.currentUserCubit, this.notificationRepo)
-    : super(AuthInitial());
+  AuthCubit(
+    this.authRepo,
+    this.currentUserCubit,
+    this.notificationRepo,
+    this.pusherClient,
+  ) : super(AuthInitial());
 
   Future<void> login({
     required String email,
@@ -31,6 +37,9 @@ class AuthCubit extends Cubit<AuthState> {
       (success) async {
         authRepo.setRememberMe(rememberMe);
         currentUserCubit.setUsername(success.username);
+        currentUserCubit.setToken(success.accessToken);
+
+        await pusherClient.init(token: success.accessToken);
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());
@@ -62,6 +71,9 @@ class AuthCubit extends Cubit<AuthState> {
       (success) async {
         authRepo.setRememberMe(true);
         currentUserCubit.setUsername(success.user.username);
+        currentUserCubit.setToken(success.token);
+
+        await pusherClient.init(token: success.token);
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());

@@ -1,9 +1,11 @@
 import 'dart:ui';
 
+import 'package:archilink/core/network/websocket/pusher_client.dart';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
 import 'package:archilink/features/Main/presentation/views/main_page.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +52,13 @@ class _SplashViewBodyState extends State<SplashViewBody> {
   void _navigation() {
     final AuthRepo repo = sl<AuthRepo>();
     final bool? rememberMe = repo.getRemeberMe();
+    final token = context.read<CurrentUserCubit>().state.token;
+
+    if (token != null) {
+      // Fire and forget — PusherClient._initialized guard prevents double init
+      sl<PusherClient>().init(token: token);
+    }
+
     if (rememberMe != null && rememberMe) {
       Navigator.pushReplacementNamed(context, MainView.name);
     } else {

@@ -1,3 +1,4 @@
 TODO: translate the whole texts in the application 
 TODO: fix the theme and refactor AppColor class 
 TODO: take action from ketboard in create post text field, add tags text field 
+TODO: diconnect the pusher client when the user logout

@@ -22,6 +22,10 @@ class Assets {
   /// assets/icons/app_logo.svg
   static const String assetsIconsAppLogo = "assets/icons/app_logo.svg";
 
+  /// Assets for assetsIconsAttachment
+  /// assets/icons/attachment.svg
+  static const String assetsIconsAttachment = "assets/icons/attachment.svg";
+
   /// Assets for assetsIconsBack
   /// assets/icons/back.svg
   static const String assetsIconsBack = "assets/icons/back.svg";
@@ -125,6 +129,10 @@ class Assets {
   /// Assets for assetsIconsMenu
   /// assets/icons/menu.svg
   static const String assetsIconsMenu = "assets/icons/menu.svg";
+
+  /// Assets for assetsIconsMic
+  /// assets/icons/mic.svg
+  static const String assetsIconsMic = "assets/icons/mic.svg";
 
   /// Assets for assetsIconsMoreVertical
   /// assets/icons/more-vertical.svg
