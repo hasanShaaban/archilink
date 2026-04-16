@@ -6,6 +6,7 @@ import 'package:archilink/core/theme/app_theme.dart';
 import 'package:archilink/core/utils/constants.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
+import 'package:archilink/features/Chat/presentation/manager/bloc/chat_bloc.dart';
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
 import 'package:archilink/features/Edit_Profile/domain/repo/edit_profile_repo.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => ProfileCubit(sl<ProfileRepo>())),
         BlocProvider(create: (context) => sl<PostLikeCubit>()),
         BlocProvider(create: (context) => sl<ProfileBloc>()),
+        BlocProvider(create: (context) => sl<ChatBloc>()),
         BlocProvider(
           create: (context) => CreatePostCubit(
             mediaPickerService: sl<MediaPickerService>(

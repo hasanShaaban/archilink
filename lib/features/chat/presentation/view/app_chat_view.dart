@@ -1,8 +1,10 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Chat/presentation/manager/bloc/chat_bloc.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class AppChatView extends StatelessWidget {
@@ -86,182 +88,192 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    
 
-    return ChatView(
-      // onSendTap: _onSendTap,
-      chatController: _chatController,
-      chatViewState: ChatViewState.hasMessages,
+    return BlocBuilder<ChatBloc, ChatState>(
+      builder: (context, state) {
+        
+        return ChatView(
+          // onSendTap: _onSendTap,
+          chatController: _chatController,
+          chatViewState: ChatViewState.hasMessages,
 
-      // ─── Features ──────────────────────────────────────────────────────────
-      featureActiveConfig: const FeatureActiveConfig(
-        enableOtherUserName: false,
-        enablePagination: true,
-        enableSwipeToReply: true,
-        enableReactionPopup: true,
-        enableScrollToBottomButton: true,
-        enableDoubleTapToLike: true,
-      ),
+          // ─── Features ──────────────────────────────────────────────────────────
+          featureActiveConfig: const FeatureActiveConfig(
+            enableOtherUserName: false,
+            enablePagination: true,
+            enableSwipeToReply: true,
+            enableReactionPopup: true,
+            enableScrollToBottomButton: true,
+            enableDoubleTapToLike: true,
+          ),
 
-      // ─── AppBar ────────────────────────────────────────────────────────────
-      appBar: ChatViewAppBar(
-        imageType: ImageType.asset, //TODO: change to network for real images
+          // ─── AppBar ────────────────────────────────────────────────────────────
+          appBar: ChatViewAppBar(
+            imageType:
+                ImageType.asset, //TODO: change to network for real images
 
-        backGroundColor: scaffoldBg,
-        profilePicture: Assets.assetsImagesBackgroundDark,
-        chatTitle: 'Simform',
-        chatTitleTextStyle: AppTextStyle.interSemiBold16.copyWith(
-          color: colorScheme.onSurface,
-        ),
-        userStatus: 'Online',
-        userStatusTextStyle: AppTextStyle.interRegular10.copyWith(
-          color: Colors.green,
-        ),
-        actions: [
-          PopupMenuButton<_ChatAction>(
-            icon: Icon(Icons.menu, color: colorScheme.onSurface),
-            color: scaffoldBg,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(color: colorScheme.outlineVariant),
+            backGroundColor: scaffoldBg,
+            profilePicture: Assets.assetsImagesBackgroundDark,
+            chatTitle: 'Simform',
+            chatTitleTextStyle: AppTextStyle.interSemiBold16.copyWith(
+              color: colorScheme.onSurface,
             ),
-            onSelected: _onMenuAction,
-            itemBuilder: (_) => const [
-              PopupMenuItem(
-                value: _ChatAction.viewMembers,
-                child: Text('View Members'),
-              ),
-              PopupMenuItem(
-                value: _ChatAction.muteNotifications,
-                child: Text('Mute Notifications'),
-              ),
-              PopupMenuItem(
-                value: _ChatAction.exportChat,
-                child: Text('Export Chat'),
-              ),
-              PopupMenuItem(
-                value: _ChatAction.starMessage,
-                child: Text('Star Message'),
+            userStatus: 'Online',
+            userStatusTextStyle: AppTextStyle.interRegular10.copyWith(
+              color: Colors.green,
+            ),
+            actions: [
+              PopupMenuButton<_ChatAction>(
+                icon: Icon(Icons.menu, color: colorScheme.onSurface),
+                color: scaffoldBg,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: colorScheme.outlineVariant),
+                ),
+                onSelected: _onMenuAction,
+                itemBuilder: (_) => const [
+                  PopupMenuItem(
+                    value: _ChatAction.viewMembers,
+                    child: Text('View Members'),
+                  ),
+                  PopupMenuItem(
+                    value: _ChatAction.muteNotifications,
+                    child: Text('Mute Notifications'),
+                  ),
+                  PopupMenuItem(
+                    value: _ChatAction.exportChat,
+                    child: Text('Export Chat'),
+                  ),
+                  PopupMenuItem(
+                    value: _ChatAction.starMessage,
+                    child: Text('Star Message'),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
 
-      // ─── Background ────────────────────────────────────────────────────────
-      chatBackgroundConfig: ChatBackgroundConfiguration(
-        backgroundColor: scaffoldBg,
-      ),
+          // ─── Background ────────────────────────────────────────────────────────
+          chatBackgroundConfig: ChatBackgroundConfiguration(
+            backgroundColor: scaffoldBg,
+          ),
 
-      // ─── Profile circle ────────────────────────────────────────────────────
-      profileCircleConfig: const ProfileCircleConfiguration(
-        profileImageUrl: '',
-        circleRadius: 16,
-      ),
+          // ─── Profile circle ────────────────────────────────────────────────────
+          profileCircleConfig: const ProfileCircleConfiguration(
+            profileImageUrl: '',
+            circleRadius: 16,
+          ),
 
-      // ─── Bubbles ───────────────────────────────────────────────────────────
-      chatBubbleConfig: ChatBubbleConfiguration(
-        inComingChatBubbleConfig: ChatBubble(
-          textStyle: AppTextStyle.interRegular16.copyWith(
-            color: colorScheme.onSurface,
+          // ─── Bubbles ───────────────────────────────────────────────────────────
+          chatBubbleConfig: ChatBubbleConfiguration(
+            inComingChatBubbleConfig: ChatBubble(
+              textStyle: AppTextStyle.interRegular16.copyWith(
+                color: colorScheme.onSurface,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              color: AppColorsFromTheme.grayForTheme(context),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            outgoingChatBubbleConfig: ChatBubble(
+              border: Border.all(
+                color: AppColorsFromTheme.grayForTheme(context),
+                width: 1.5,
+              ),
+              textStyle: AppTextStyle.interRegular16.copyWith(
+                color: colorScheme.onSurface,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              color: scaffoldBg,
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          color: AppColorsFromTheme.grayForTheme(context),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        outgoingChatBubbleConfig: ChatBubble(
-          border: Border.all(
-            color: AppColorsFromTheme.grayForTheme(context),
-            width: 1.5,
-          ),
-          textStyle: AppTextStyle.interRegular16.copyWith(
-            color: colorScheme.onSurface,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          color: scaffoldBg,
-          borderRadius: BorderRadius.circular(16),
-        ),
-      ),
 
-      // ─── Reply message ─────────────────────────────────────────────────────
-      // repliedMessageConfig: RepliedMessageConfiguration(
-      //   backgroundColor: AppColorsFromTheme.grayForTheme(context),
-      //   textStyle: AppTextStyle.interRegular14.copyWith(
-      //     color: colorScheme.onSurface.withOpacity(0.7),
-      //   ),
-      //   replyTitleTextStyle: AppTextStyle.interSemiBold16.copyWith(
-      //     color: colorScheme.primary,
-      //   ),
-      //   closeIconColor: colorScheme.onSurface,
-      // ),
+          // ─── Reply message ─────────────────────────────────────────────────────
+          // repliedMessageConfig: RepliedMessageConfiguration(
+          //   backgroundColor: AppColorsFromTheme.grayForTheme(context),
+          //   textStyle: AppTextStyle.interRegular14.copyWith(
+          //     color: colorScheme.onSurface.withOpacity(0.7),
+          //   ),
+          //   replyTitleTextStyle: AppTextStyle.interSemiBold16.copyWith(
+          //     color: colorScheme.primary,
+          //   ),
+          //   closeIconColor: colorScheme.onSurface,
+          // ),
 
-      // ─── Reaction popup (long-press) ───────────────────────────────────────
-      reactionPopupConfig: ReactionPopupConfiguration(
-        showGlassMorphismEffect: true,
-        backgroundColor: colorScheme.surface,
-        shadow: BoxShadow(
-          color: Colors.black.withOpacity(0.08),
-          blurRadius: 12,
-          offset: const Offset(0, 4),
-        ),
-        userReactionCallback: (message, emoji) {
-          // chatview handles it internally via chatController
-        },
-      ),
+          // ─── Reaction popup (long-press) ───────────────────────────────────────
+          reactionPopupConfig: ReactionPopupConfiguration(
+            showGlassMorphismEffect: true,
+            backgroundColor: colorScheme.surface,
+            shadow: BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+            userReactionCallback: (message, emoji) {
+              // chatview handles it internally via chatController
+            },
+          ),
 
-      // ─── Reaction chip below bubbles ───────────────────────────────────────
+          // ─── Reaction chip below bubbles ───────────────────────────────────────
 
-      // ─── Image messages ────────────────────────────────────────────────────
-      messageConfig: MessageConfiguration(
-        imageMessageConfig: ImageMessageConfiguration(
-          padding: const EdgeInsets.all(4),
-        ),
-      ),
+          // ─── Image messages ────────────────────────────────────────────────────
+          messageConfig: MessageConfiguration(
+            imageMessageConfig: ImageMessageConfiguration(
+              padding: const EdgeInsets.all(4),
+            ),
+          ),
 
-      // ─── Input bar ─────────────────────────────────────────────────────────
-      sendMessageConfig: SendMessageConfiguration(
-        voiceRecordingConfiguration: VoiceRecordingConfiguration(
-          waveStyle: WaveStyle(
-            waveColor: colorScheme.primary,
-            middleLineColor: colorScheme.primary,
-          ),
-          micIcon: SvgPicture.asset(
-            Assets.assetsIconsMic,
-            color: colorScheme.primary,
-          ),
-        ),
-        textFieldBackgroundColor: AppColorsFromTheme.grayForTheme(context),
-        textFieldConfig: TextFieldConfiguration(
-          margin: EdgeInsetsDirectional.all(15),
-          hintText: 'Message',
-          hintStyle: AppTextStyle.interRegular16.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.4),
-          ),
-          textStyle: AppTextStyle.interRegular16.copyWith(
-            color: colorScheme.onSurface,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 10,
-          ),
-        ),
-        sendButtonIcon: Icon(Icons.send_outlined, color: colorScheme.primary),
+          // ─── Input bar ─────────────────────────────────────────────────────────
+          sendMessageConfig: SendMessageConfiguration(
+            voiceRecordingConfiguration: VoiceRecordingConfiguration(
+              waveStyle: WaveStyle(
+                waveColor: colorScheme.primary,
+                middleLineColor: colorScheme.primary,
+              ),
+              micIcon: SvgPicture.asset(
+                Assets.assetsIconsMic,
+                color: colorScheme.primary,
+              ),
+            ),
+            textFieldBackgroundColor: AppColorsFromTheme.grayForTheme(context),
+            textFieldConfig: TextFieldConfiguration(
+              margin: EdgeInsetsDirectional.all(15),
+              hintText: 'Message',
+              hintStyle: AppTextStyle.interRegular16.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.4),
+              ),
+              textStyle: AppTextStyle.interRegular16.copyWith(
+                color: colorScheme.onSurface,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 10,
+              ),
+            ),
+            sendButtonIcon: Icon(
+              Icons.send_outlined,
+              color: colorScheme.primary,
+            ),
 
-        imagePickerIconsConfig: ImagePickerIconsConfiguration(
-          galleryImagePickerIcon: SvgPicture.asset(
-            Assets.assetsIconsAttachment,
-            color: colorScheme.primary,
+            imagePickerIconsConfig: ImagePickerIconsConfiguration(
+              galleryImagePickerIcon: SvgPicture.asset(
+                Assets.assetsIconsAttachment,
+                color: colorScheme.primary,
+              ),
+              cameraImagePickerIcon: Icon(
+                Icons.camera_alt_outlined,
+                color: colorScheme.primary,
+              ),
+            ),
+            replyMessageColor: colorScheme.onSurface,
+            replyDialogColor: AppColorsFromTheme.grayForTheme(context),
+            replyTitleColor: colorScheme.primary,
+            closeIconColor: colorScheme.onSurface,
           ),
-          cameraImagePickerIcon: Icon(
-            Icons.camera_alt_outlined,
-            color: colorScheme.primary,
-          ),
-        ),
-        replyMessageColor: colorScheme.onSurface,
-        replyDialogColor: AppColorsFromTheme.grayForTheme(context),
-        replyTitleColor: colorScheme.primary,
-        closeIconColor: colorScheme.onSurface,
-      ),
+        );
+      },
     );
   }
 }

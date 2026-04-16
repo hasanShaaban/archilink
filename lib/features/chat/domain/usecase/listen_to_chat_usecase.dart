@@ -1,7 +1,7 @@
-import 'package:archilink/features/Chat/domain/repo/chat_repo.dart';
+import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
 
 class ListenToChatUsecase {
-  final ChatRepo _repo;
+  final ChatWebsocketRepo _repo;
 
   ListenToChatUsecase(this._repo);
 

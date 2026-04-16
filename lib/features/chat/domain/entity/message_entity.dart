@@ -1,15 +1,24 @@
+import 'package:archilink/features/Chat/domain/entity/reaction_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/sender_entity.dart';
+
 class MessageEntity {
   final int id;
-  final int conversationId;
-  final int senderId;
+  final int chatId;
   final String content;
-  final DateTime createdAt;
+  final DateTime? sentAt;
+  final DateTime? editedAt;
+  final SenderEntity sender;
+  final List<int> receiptUserIds;   // flattened from receipts[{user_id}]
+  final List<ReactionEntity> reactions;
 
   const MessageEntity({
     required this.id,
-    required this.conversationId,
-    required this.senderId,
+    required this.chatId,
     required this.content,
-    required this.createdAt,
+    this.sentAt,
+    this.editedAt,
+    required this.sender,
+    required this.receiptUserIds,
+    required this.reactions,
   });
 }

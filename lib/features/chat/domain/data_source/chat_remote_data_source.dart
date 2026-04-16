@@ -1,6 +1,8 @@
-import 'package:archilink/features/Chat/domain/repo/chat_repo.dart';
+import 'package:archilink/features/Chat/domain/entity/messages_reponse_entity.dart';
 
 abstract class ChatRemoteDataSource {
-  Stream<ChatSocketEvent> subscribeToChannel(int conversationId);
-  Future<void> unsubscribeFromChannel(int conversationId);
+  Future<MessagesResponseEntity> fetchMessages({
+    required int conversationId,
+    required int page,
+  });
 }

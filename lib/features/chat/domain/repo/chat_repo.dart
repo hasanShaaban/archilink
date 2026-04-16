@@ -1,28 +1,10 @@
-import 'package:archilink/features/Chat/domain/entity/message_entity.dart';
+import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/features/Chat/domain/entity/messages_reponse_entity.dart';
+import 'package:dartz/dartz.dart';
 
 abstract class ChatRepo {
-  Stream<ChatSocketEvent> subscribeToChannle(int conversationId);
-  Future<void> unsubscribeFromChannle(int conversationId);
-}
-
-sealed class ChatSocketEvent {}
-
-class MessageSentEvent extends ChatSocketEvent {
-  final MessageEntity message;
-  MessageSentEvent(this.message);
-}
-
-class MessageDeletedEvent extends ChatSocketEvent {
-  final int messageId;
-  MessageDeletedEvent(this.messageId);
-}
-
-class MessagesDeliveredEvent extends ChatSocketEvent {
-  final int conversationId;
-  MessagesDeliveredEvent(this.conversationId);
-}
-
-class MessagesSeenEvent extends ChatSocketEvent {
-  final int conversationId;
-  MessagesSeenEvent(this.conversationId);
+  Future<Either<Failure, MessagesResponseEntity>> fetchMessages({
+    required int conversationId,
+    required int page,
+  });
 }

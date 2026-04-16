@@ -11,3 +11,12 @@ class UnsubscribeFromChat extends ChatBlocEvent {
   final int conversationId;
   UnsubscribeFromChat(this.conversationId);
 }
+class FetchInitialMessages extends ChatBlocEvent {
+  final int conversationId;
+  FetchInitialMessages(this.conversationId);
+}
+
+class FetchMoreMessages extends ChatBlocEvent {
+  final int conversationId;
+  FetchMoreMessages(this.conversationId);
+}

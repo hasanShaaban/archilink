@@ -28,9 +28,13 @@ import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/auth_c
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/check_username_cubit.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Chat/data/data_source/chat_remote_data_source_impl.dart';
+import 'package:archilink/features/Chat/data/data_source/chat_websocket_remote_data_source_impl.dart';
 import 'package:archilink/features/Chat/data/repo/chat_repo_impl.dart';
+import 'package:archilink/features/Chat/data/repo/chat_websocket_repo_impl.dart';
 import 'package:archilink/features/Chat/domain/data_source/chat_remote_data_source.dart';
+import 'package:archilink/features/Chat/domain/data_source/chat_websocket_remote_data_source.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_repo.dart';
+import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
 import 'package:archilink/features/Chat/domain/usecase/listen_to_chat_usecase.dart';
 import 'package:archilink/features/Chat/presentation/manager/bloc/chat_bloc.dart';
 import 'package:archilink/features/Create_Post/data/data_source/create_post_remote_date_source_impl.dart';
@@ -139,6 +143,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<EditProfileRemoteDataSource>(
     () => EditProfileRemoteDataSourceImpl(sl()),
   );
+  sl.registerLazySingleton<ChatWebsocketRemoteDataSource>(
+    () => ChatWebsocketRemoteDataSourceImpl(sl()),
+  );
   sl.registerLazySingleton<ChatRemoteDataSource>(
     () => ChatRemoteDataSourceImpl(sl()),
   );
@@ -181,7 +188,12 @@ Future<void> initServiceLocator({
   ///---------
   ///Repositories
   ///---------
-  sl.registerLazySingleton<ChatRepo>(() => ChatRepoImpl(sl()));
+  sl.registerLazySingleton<ChatWebsocketRepo>(
+    () => ChatWebsocketRepoImpl(sl()),
+  );
+  sl.registerLazySingleton<ChatRepo>(
+    () => ChatRepoImpl(sl<ChatRemoteDataSource>()),
+  );
   sl.registerLazySingleton<AuthRepo>(
     () => AuthRepoImpl(localDataSource: sl(), remoteDataSource: sl()),
   );
@@ -239,5 +251,5 @@ Future<void> initServiceLocator({
     ),
   );
   sl.registerLazySingleton(() => UniversitiesCubit(sl<EditProfileRepo>()));
-  sl.registerLazySingleton(() => ChatBloc(sl()));
+  sl.registerLazySingleton(() => ChatBloc(sl(), sl<ChatRepo>()));
 }

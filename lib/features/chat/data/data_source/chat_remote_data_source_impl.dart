@@ -1,63 +1,31 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:archilink/core/network/websocket/pusher_client.dart';
-import 'package:archilink/features/Chat/data/model/message_model.dart';
+import 'package:archilink/core/error/exceptions.dart';
+import 'package:archilink/core/network/api_service.dart';
+import 'package:archilink/features/Chat/data/model/messages_response_model.dart';
 import 'package:archilink/features/Chat/domain/data_source/chat_remote_data_source.dart';
-import 'package:archilink/features/Chat/domain/repo/chat_repo.dart';
-import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
+import 'package:archilink/features/Chat/domain/entity/messages_reponse_entity.dart';
+import 'package:dio/dio.dart';
 
-class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
-  final PusherClient _pusherClient;
-  final Map<int, StreamController<ChatSocketEvent>> _controllers = {};
+class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
+  final ApiService apiService;
 
-  ChatRemoteDataSourceImpl(this._pusherClient);
-
-  @override
-  Stream<ChatSocketEvent> subscribeToChannel(int conversationId) {
-    if (_controllers.containsKey(conversationId)) {
-      return _controllers[conversationId]!.stream;
-    }
-    final controller = StreamController<ChatSocketEvent>.broadcast();
-    _controllers[conversationId] = controller;
-    _pusherClient.pusher.subscribe(
-      channelName: 'private-chat.$conversationId',
-      onEvent: (PusherEvent event) {
-        _handleEvent(event, controller);
-      },
-    );
-    return controller.stream;
-  }
-
-  void _handleEvent(
-    PusherEvent event,
-    StreamController<ChatSocketEvent> controller,
-  ) {
-    if (controller.isClosed) return;
-
-    final data = jsonDecode(event.data ?? '{}') as Map<String, dynamic>;
-
-    switch (event.eventName) {
-      case 'message.sent':
-        controller.add(MessageSentEvent(MessageModel.fromJson(data)));
-
-      case 'message.deleted':
-        controller.add(MessageDeletedEvent(data['message_id'] as int));
-
-      case 'messages.delivered':
-        controller.add(MessagesDeliveredEvent(data['conversation_id'] as int));
-
-      case 'messages.seen':
-        controller.add(MessagesSeenEvent(data['conversation_id'] as int));
-    }
-  }
+  ChatRemoteDataSourceImpl(this.apiService);
 
   @override
-  Future<void> unsubscribeFromChannel(int conversationId) async {
-    await _pusherClient.pusher.unsubscribe(
-      channelName: 'private-chat.$conversationId',
-    );
-    await _controllers[conversationId]?.close();
-    _controllers.remove(conversationId);
+  Future<MessagesResponseEntity> fetchMessages({
+    required int conversationId,
+    required int page,
+  }) async {
+    try {
+      final response = await apiService.get(
+        'chats/$conversationId/messages?page=$page',
+      );
+      final data = response.data;
+      if (data == null) {
+        throw Exception('Invalid data response');
+      }
+      return MessagesResponseModel.fromJson(data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
   }
 }
