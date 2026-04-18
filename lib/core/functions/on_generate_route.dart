@@ -1,4 +1,5 @@
 import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_args.dart';
 import 'package:archilink/features/Create_Post/presentation/views/create_post_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/about_me_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/academic_experiance_view.dart';
@@ -25,7 +26,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case ChatListView.name:
       return MaterialPageRoute(builder: (context) => const ChatListView());
     case AppChatView.name:
-      return MaterialPageRoute(builder: (context) => const AppChatView());
+      final args = settings.arguments as ChatArgs;
+      return MaterialPageRoute(builder: (context) => AppChatView(args: args));
     case PostDetailsView.name:
       final args = settings.arguments as Map<String, dynamic>;
       return MaterialPageRoute(

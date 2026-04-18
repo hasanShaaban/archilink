@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:archilink/features/Chat/domain/entity/message_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/sender_entity.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_repo.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
 import 'package:archilink/features/Chat/domain/usecase/listen_to_chat_usecase.dart';
@@ -13,8 +14,8 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
   final ChatRepo _chatRepo;
   final ListenToChatUsecase _listenToChat;
   StreamSubscription<ChatSocketEvent>? _subscription;
-  final List<MessageEntity> _messages = [];
-  ChatBloc(this._listenToChat, this._chatRepo) : super(ChatInitial()) {
+
+  ChatBloc(this._listenToChat, this._chatRepo) : super(ChatState()) {
     on<SubscribeToChat>(_onSubscribe);
     on<UnsubscribeFromChat>(_onUnsubscribe);
     on<FetchInitialMessages>(_onFetchInitial);
@@ -25,27 +26,31 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
     SubscribeToChat event,
     Emitter<ChatState> emit,
   ) async {
-    emit(ChatConnecting());
+    emit(state.copyWith(status: ChatStatus.connecting));
 
-    _subscription = _listenToChat(event.conversationId).listen((socketEvent) {
-      switch (socketEvent) {
-        case MessageSentEvent():
-          final updated = List<MessageEntity>.from(state.messages)
-            ..add(socketEvent.message);
+    _subscription = _listenToChat(event.conversationId).listen(
+      (socketEvent) {
+        switch (socketEvent) {
+          case MessageSentEvent():
+            final updated = [socketEvent.message, ...state.messages];
+            emit(state.copyWith(messages: updated, status: ChatStatus.ready));
 
-          emit(state.copyWith(messages: updated));
+          case MessageDeletedEvent():
+            final updated = state.messages
+                .where((m) => m.id != socketEvent.messageId)
+                .toList();
+            emit(state.copyWith(messages: updated));
 
-        case MessageDeletedEvent():
-          _messages.removeWhere((m) => m.id == socketEvent.messageId);
-          emit(MessageRemovedState(socketEvent.messageId));
-
-        case MessagesDeliveredEvent():
-          emit(MessagesStatusUpdated('delivered'));
-
-        case MessagesSeenEvent():
-          emit(MessagesStatusUpdated('seen'));
-      }
-    }, onError: (e) => emit(ChatError(e.toString())));
+          case MessagesDeliveredEvent():
+          case MessagesSeenEvent():
+            // handle status updates later
+            break;
+        }
+      },
+      onError: (e) => emit(
+        state.copyWith(status: ChatStatus.error, errorMessage: e.toString()),
+      ),
+    );
   }
 
   Future<void> _onUnsubscribe(
@@ -53,8 +58,7 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     await _subscription?.cancel();
-    _messages.clear();
-    emit(ChatInitial());
+    emit(ChatState());
   }
 
   @override
@@ -67,23 +71,38 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
     FetchInitialMessages event,
     Emitter<ChatState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true, page: 1));
+    emit(state.copyWith(isLoading: true, status: ChatStatus.loading));
 
     final result = await _chatRepo.fetchMessages(
       conversationId: event.conversationId,
       page: 1,
     );
 
-    result.fold((failure) => emit(ChatError(failure.message)), (response) {
-      emit(
+    result.fold(
+      (failure) => emit(
         state.copyWith(
-          messages: response.messages,
+          status: ChatStatus.error,
+          errorMessage: failure.message,
           isLoading: false,
-          hasReachedMax: response.messages.isEmpty,
-          page: 1,
         ),
-      );
-    });
+      ),
+      (response) {
+        final participants = response.messages
+            .map((m) => m.sender)
+            .toSet()
+            .toList();
+        emit(
+          state.copyWith(
+            messages: response.messages,
+            participants: participants,
+            isLoading: false,
+            hasReachedMax: !response.pagination.hasMore,
+            page: 1,
+            status: ChatStatus.ready,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _onFetchMore(
@@ -94,24 +113,28 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
 
     emit(state.copyWith(isLoading: true));
 
-    final nextPage = state.page + 1;
-
     final result = await _chatRepo.fetchMessages(
       conversationId: event.conversationId,
-      page: nextPage,
+      page: state.page + 1,
     );
 
-    result.fold((failure) => emit(ChatError(failure.message)), (response) {
-      final newMessages = [...response.messages, ...state.messages];
-
-      emit(
+    result.fold(
+      (failure) => emit(
         state.copyWith(
-          messages: newMessages,
+          status: ChatStatus.error,
+          errorMessage: failure.message,
           isLoading: false,
-          hasReachedMax: response.messages.isEmpty,
-          page: nextPage,
         ),
-      );
-    });
+      ),
+      (response) => emit(
+        state.copyWith(
+          // older messages go at the end (chat is newest-first)
+          messages: [...state.messages, ...response.messages],
+          isLoading: false,
+          hasReachedMax: !response.pagination.hasMore,
+          page: state.page + 1,
+        ),
+      ),
+    );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:archilink/core/utils/device_helper.dart';
+
 
 class NetworkConfig {
   static const String emulatorBaseUrl = 'http://10.0.2.2:8000/api/v1/';

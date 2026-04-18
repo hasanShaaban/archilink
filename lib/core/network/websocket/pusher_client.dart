@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 
@@ -8,24 +9,31 @@ class PusherClient {
   final PusherChannelsFlutter _pusher = PusherChannelsFlutter.getInstance();
 
   bool _initailized = false;
+  String? _socketId;
+  String? get socketId => _socketId;
 
   Future<void> init({required String token}) async {
     if (_initailized) return;
     await _pusher.init(
       useTLS: false,
       apiKey: 'jxwpfroqsx4mu4lyl0ke',
-      cluster: 'mt1',
-      authEndpoint: 'http://localhost:8000/broadcasting/auth',
+      cluster: '',
+      authEndpoint: 'http://127.0.0.1:8000/broadcasting/auth',
       authParams: {
         'headers': {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
         },
       },
-      proxy: 'ws://localhost:8080',
       enabledTransports: ['ws'],
       logToConsole: true,
-      onConnectionStateChange: (currentState, previousState) {
+      onConnectionStateChange: (currentState, previousState) async {
+        if (currentState == 'CONNECTED') {
+          _socketId = await _pusher.getSocketId();
+        }
+        if (currentState == 'DISCONNECTED') {
+          _socketId = null;
+        }
         debugPrint('Pusher: $previousState → $currentState');
       },
       onError: (message, code, error) {
@@ -39,6 +47,7 @@ class PusherClient {
     await _pusher.connect();
     _initailized = true;
   }
+
   Future<void> disconnect() async {
     await _pusher.disconnect();
     _initailized = false;

@@ -154,7 +154,9 @@ Future<void> initServiceLocator({
   ///----------
   ///Interceptor
   ///----------
-  sl.registerLazySingleton<AuthInterceptor>(() => AuthInterceptor(sl()));
+  sl.registerLazySingleton<AuthInterceptor>(
+    () => AuthInterceptor(sl(), sl<PusherClient>()),
+  );
   sl.registerLazySingleton<ErrorInterceptor>(() => ErrorInterceptor());
   sl.registerLazySingleton<LogInterseptor>(() => LogInterseptor());
 

@@ -1,6 +1,7 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_args.dart';
 import 'package:archilink/features/Chat/presentation/view/app_chat_view.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/follow_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_custom_button.dart';
@@ -90,10 +91,13 @@ class _UserProfileButtonsState extends State<UserProfileButtons> {
               child: ProfileCustomButton(
                 iconSize: 24,
                 onPress: () {
-                  Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).pushNamed(AppChatView.name);
+                  Navigator.of(context, rootNavigator: true).pushNamed(
+                    AppChatView.name,
+                    arguments: ChatArgs(
+                      conversationId: 1,
+                      chatTitle: widget.username,
+                    ),
+                  );
                 },
                 icon: Assets.assetsIconsShareProfile,
                 title: 'Send a message',

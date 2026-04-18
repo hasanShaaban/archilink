@@ -8,7 +8,7 @@ class MessageEntity {
   final DateTime? sentAt;
   final DateTime? editedAt;
   final SenderEntity sender;
-  final List<int> receiptUserIds;   // flattened from receipts[{user_id}]
+  final List<int> receiptUserIds;
   final List<ReactionEntity> reactions;
 
   const MessageEntity({

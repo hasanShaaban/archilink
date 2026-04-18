@@ -1,16 +1,24 @@
 part of 'chat_bloc.dart';
 
+enum ChatStatus { initial, connecting, loading, ready, error }
+
 class ChatState {
   final List<MessageEntity> messages;
   final bool isLoading;
   final bool hasReachedMax;
   final int page;
+  final ChatStatus status;
+  final String? errorMessage;
+  final List<SenderEntity> participants;
 
   ChatState({
     this.messages = const [],
     this.isLoading = false,
     this.hasReachedMax = false,
     this.page = 1,
+    this.status = ChatStatus.initial,
+    this.errorMessage,
+    this.participants = const [],
   });
 
   ChatState copyWith({
@@ -18,36 +26,18 @@ class ChatState {
     bool? isLoading,
     bool? hasReachedMax,
     int? page,
+    ChatStatus? status,
+    String? errorMessage,
+    List<SenderEntity>? participants,
   }) {
     return ChatState(
       messages: messages ?? this.messages,
       isLoading: isLoading ?? this.isLoading,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       page: page ?? this.page,
+      status: status ?? this.status,
+      errorMessage: errorMessage ?? this.errorMessage,
+      participants: participants ?? this.participants,
     );
   }
-}
-
-final class ChatInitial extends ChatState {}
-
-class ChatConnecting extends ChatState {}
-
-class ChatUpdated extends ChatState {
-  final List<MessageEntity> messages;
-  ChatUpdated(this.messages);
-}
-
-class MessageRemovedState extends ChatState {
-  final int messageId;
-  MessageRemovedState(this.messageId);
-}
-
-class MessagesStatusUpdated extends ChatState {
-  final String status; // 'delivered' | 'seen'
-  MessagesStatusUpdated(this.status);
-}
-
-class ChatError extends ChatState {
-  final String message;
-  ChatError(this.message);
 }

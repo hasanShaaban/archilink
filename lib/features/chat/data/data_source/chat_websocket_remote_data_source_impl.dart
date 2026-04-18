@@ -8,7 +8,8 @@ import 'package:archilink/features/Chat/domain/entity/messages_reponse_entity.da
 import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 
-class ChatWebsocketRemoteDataSourceImpl implements ChatWebsocketRemoteDataSource {
+class ChatWebsocketRemoteDataSourceImpl
+    implements ChatWebsocketRemoteDataSource {
   final PusherClient _pusherClient;
   final Map<int, StreamController<ChatSocketEvent>> _controllers = {};
 
@@ -23,8 +24,10 @@ class ChatWebsocketRemoteDataSourceImpl implements ChatWebsocketRemoteDataSource
     _controllers[conversationId] = controller;
     _pusherClient.pusher.subscribe(
       channelName: 'private-chat.$conversationId',
-      onEvent: (PusherEvent event) {
-        _handleEvent(event, controller);
+      onEvent: (event) {
+        if (event is PusherEvent) {
+          _handleEvent(event, controller);
+        }
       },
     );
     return controller.stream;
@@ -61,5 +64,4 @@ class ChatWebsocketRemoteDataSourceImpl implements ChatWebsocketRemoteDataSource
     await _controllers[conversationId]?.close();
     _controllers.remove(conversationId);
   }
-
 }

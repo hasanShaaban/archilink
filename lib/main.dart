@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => ProfileCubit(sl<ProfileRepo>())),
         BlocProvider(create: (context) => sl<PostLikeCubit>()),
         BlocProvider(create: (context) => sl<ProfileBloc>()),
-        BlocProvider(create: (context) => sl<ChatBloc>()),
+        
         BlocProvider(
           create: (context) => CreatePostCubit(
             mediaPickerService: sl<MediaPickerService>(

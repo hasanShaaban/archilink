@@ -1,6 +1,11 @@
+import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/core/utils/message_mapper.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_args.dart';
+import 'package:archilink/features/Chat/domain/entity/message_entity.dart';
 import 'package:archilink/features/Chat/presentation/manager/bloc/chat_bloc.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +13,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class AppChatView extends StatelessWidget {
-  const AppChatView({super.key});
+  const AppChatView({super.key, required this.args});
   static const String name = '/chat';
+  final ChatArgs args;
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: SafeArea(child: _ChatViewBody()));
+    return Scaffold(
+      body: SafeArea(
+        child: BlocProvider(
+          create: (context) => sl<ChatBloc>()
+            ..add(FetchInitialMessages(args.conversationId))
+            ..add(SubscribeToChat(args.conversationId)),
+          child: _ChatViewBody(args: args),
+        ),
+      ),
+    );
   }
 }
 
@@ -22,49 +37,67 @@ enum _ChatAction { viewMembers, muteNotifications, exportChat, starMessage }
 
 // ─── Stateful body ──────────────────────────────────────────────────────────
 class _ChatViewBody extends StatefulWidget {
-  const _ChatViewBody();
+  final ChatArgs args;
+  const _ChatViewBody({required this.args});
 
   @override
   State<_ChatViewBody> createState() => _ChatViewBodyState();
 }
 
 class _ChatViewBodyState extends State<_ChatViewBody> {
-  late final ChatController _chatController;
-
-  @override
-  void initState() {
-    super.initState();
-    _chatController = ChatController(
-      initialMessageList: _demoMessages,
-      scrollController: ScrollController(),
-      currentUser: ChatUser(id: '1', name: 'Flutter Dev'),
-      otherUsers: [ChatUser(id: '2', name: 'Simform')],
-    );
-  }
+  ChatController? _chatController;
+  bool _controllerInitialized = false;
 
   @override
   void dispose() {
-    _chatController.dispose();
+    _chatController?.dispose();
+    context.read<ChatBloc>().add(
+      UnsubscribeFromChat(widget.args.conversationId),
+    );
     super.dispose();
   }
 
-  // ─── Send handler ──────────────────────────────────────────────────────────
-  // void _onSendTap(
-  //   String message,
-  //   ReplyMessage replyMessage,
-  //   MessageType messageType,
-  // ) {
-  //   _chatController.addMessage(
-  //     Message(
-  //       id: const Uuid().v4(),
-  //       message: message,
-  //       createdAt: DateTime.now(),
-  //       sentBy: '1',
-  //       replyMessage: replyMessage,
-  //       messageType: messageType,
-  //     ),
-  //   );
-  // }
+  // Called once when first messages arrive
+  void _initController(ChatState state) {
+    if (_controllerInitialized) return;
+
+    final currentUsername = context.read<CurrentUserCubit>().state.username;
+
+    // Match current user by username
+    final currentSender = state.participants.firstWhere(
+      (p) => p.username == currentUsername,
+    );
+
+    // Everyone else is an other user
+    final otherSenders = state.participants
+        .where((p) => p.id != currentSender.id)
+        .toList();
+
+    _chatController = ChatController(
+      initialMessageList: const [],
+      scrollController: ScrollController(),
+      currentUser: ChatUser(
+        id: currentSender.id.toString(),
+        name: currentSender.name,
+      ),
+      otherUsers: otherSenders
+          .map((s) => ChatUser(id: s.id.toString(), name: s.name))
+          .toList(),
+    );
+
+    _controllerInitialized = true;
+  }
+
+  void _syncToController(List<MessageEntity> messages) {
+    if (_chatController == null) return;
+
+    final currentUserId = _chatController!.currentUser.id;
+    final chatViewMessages = messages
+        .map((e) => e.toChatViewMessage(currentUserId))
+        .toList();
+
+    _chatController!.loadMoreData(chatViewMessages);
+  }
 
   // ─── Menu action handler ──────────────────────────────────────────────────
   void _onMenuAction(_ChatAction action) {
@@ -88,14 +121,43 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
-    
 
-    return BlocBuilder<ChatBloc, ChatState>(
+    return BlocConsumer<ChatBloc, ChatState>(
+      listenWhen: (prev, curr) => prev.messages != curr.messages,
+      listener: (BuildContext context, ChatState state) {
+        if (state.participants.isNotEmpty) {
+          _initController(state); // 👈 init once on first data
+        }
+        _syncToController(state.messages);
+        // Trigger rebuild so ChatView gets the controller
+        setState(() {});
+      },
       builder: (context, state) {
-        
+        if (_chatController == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
         return ChatView(
+          chatViewStateConfig: ChatViewStateConfiguration(
+            onReloadButtonTap: () {
+              context.read<ChatBloc>().add(
+                FetchInitialMessages(widget.args.conversationId),
+              );
+            },
+            loadingWidgetConfig: const ChatViewStateWidgetConfiguration(
+              title: 'Loading messages...',
+            ),
+            errorWidgetConfig: ChatViewStateWidgetConfiguration(
+              title: state.errorMessage ?? 'Something went wrong',
+              subTitle: 'Tap reload to try again',
+            ),
+            noMessageWidgetConfig: const ChatViewStateWidgetConfiguration(
+              title: 'No messages yet',
+              subTitle: 'Say hello 👋',
+            ),
+          ),
+
           // onSendTap: _onSendTap,
-          chatController: _chatController,
+          chatController: _chatController!,
           chatViewState: ChatViewState.hasMessages,
 
           // ─── Features ──────────────────────────────────────────────────────────
@@ -188,18 +250,6 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
               borderRadius: BorderRadius.circular(16),
             ),
           ),
-
-          // ─── Reply message ─────────────────────────────────────────────────────
-          // repliedMessageConfig: RepliedMessageConfiguration(
-          //   backgroundColor: AppColorsFromTheme.grayForTheme(context),
-          //   textStyle: AppTextStyle.interRegular14.copyWith(
-          //     color: colorScheme.onSurface.withOpacity(0.7),
-          //   ),
-          //   replyTitleTextStyle: AppTextStyle.interSemiBold16.copyWith(
-          //     color: colorScheme.primary,
-          //   ),
-          //   closeIconColor: colorScheme.onSurface,
-          // ),
 
           // ─── Reaction popup (long-press) ───────────────────────────────────────
           reactionPopupConfig: ReactionPopupConfiguration(

@@ -14,4 +14,9 @@ class SenderEntity {
     this.country,
     this.city,
   });
+  @override
+  bool operator ==(Object other) => other is SenderEntity && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
