@@ -10,6 +10,7 @@ import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_v
 import 'package:archilink/features/Edit_Profile/presentation/view/location_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/skills_view.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
+import 'package:archilink/features/Search/presentation/views/search_view.dart';
 import 'package:archilink/features/Splash/presentation/views/splash_view.dart';
 import 'package:archilink/features/Chat/presentation/view/chat_list_view.dart';
 import 'package:archilink/features/Chat/presentation/view/app_chat_view.dart';
@@ -72,7 +73,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => const SkillsView());
     case CreatePostView.name:
       return MaterialPageRoute(builder: (context) => const CreatePostView());
-
+    case SearchView.name:
+      return MaterialPageRoute(builder: (context) => const SearchView());
     default:
       return MaterialPageRoute(
         builder: (context) =>

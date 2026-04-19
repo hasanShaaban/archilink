@@ -12,6 +12,11 @@ abstract class AppTextStyle {
     fontFamily: 'Manjari',
     fontWeight: FontWeight.normal
   );
+  static const TextStyle manjariRegular16 = TextStyle(
+    fontSize: 16,
+    fontFamily: 'Manjari',
+    fontWeight: FontWeight.normal
+  );
   static const TextStyle manjariBold25 = TextStyle(
     fontSize: 25,
     fontFamily: 'Manjari',

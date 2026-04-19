@@ -1,10 +1,12 @@
+
 import 'package:archilink/core/network/websocket/pusher_client.dart';
+import 'package:archilink/core/network/websocket/reverb_client.dart';
 import 'package:archilink/features/Auth/domain/data_source/auth_local_data_source.dart';
 import 'package:dio/dio.dart';
 
 class AuthInterceptor extends Interceptor {
   final AuthLocalDataSource local;
-  final PusherClient pusherClient;
+  final ReverbClient pusherClient;
 
   AuthInterceptor(this.local, this.pusherClient);
   @override

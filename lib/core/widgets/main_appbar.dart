@@ -3,13 +3,12 @@ import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/app_bar_action_button.dart';
 import 'package:archilink/features/Home/presentation/views/widgets/home_page_tap_bar.dart';
 import 'package:archilink/features/Chat/presentation/view/chat_list_view.dart';
+import 'package:archilink/features/Search/presentation/views/search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class MainAppBar extends StatelessWidget {
-  const MainAppBar({
-    super.key, required this.withTabbar,
-  });
+  const MainAppBar({super.key, required this.withTabbar});
 
   final bool withTabbar;
 
@@ -35,21 +34,30 @@ class MainAppBar extends StatelessWidget {
         AppBarActionButton(
           icon: Assets.assetsIconsMail,
           onPress: () {
-            Navigator.of(context, rootNavigator: true).pushNamed(ChatListView.name);
+            Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamed(ChatListView.name);
           },
         ),
         AppBarActionButton(
           icon: Assets.assetsIconsSearch,
-          onPress: () {},
+          onPress: () {
+            Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamed(SearchView.name);
+          },
         ),
       ],
-      bottom: withTabbar? PreferredSize(
-        preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height * 50 / 874,
-        ),
-        child: HomePageTapbar(),
-      ): PreferredSize(preferredSize: Size.zero, child: SizedBox()),
+      bottom: withTabbar
+          ? PreferredSize(
+              preferredSize: Size.fromHeight(
+                MediaQuery.of(context).size.height * 50 / 874,
+              ),
+              child: HomePageTapbar(),
+            )
+          : PreferredSize(preferredSize: Size.zero, child: SizedBox()),
     );
   }
 }
-

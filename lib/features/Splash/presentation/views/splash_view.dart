@@ -1,6 +1,4 @@
 import 'dart:ui';
-
-import 'package:archilink/core/network/websocket/pusher_client.dart';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
@@ -56,7 +54,7 @@ class _SplashViewBodyState extends State<SplashViewBody> {
 
     if (token != null) {
       // Fire and forget — PusherClient._initialized guard prevents double init
-      sl<PusherClient>().init(token: token);
+      // sl<ReverbClient>().init(token: token);
     }
 
     if (rememberMe != null && rememberMe) {

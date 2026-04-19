@@ -5,6 +5,7 @@ import 'package:archilink/core/network/interceptors/error_interceptor.dart';
 import 'package:archilink/core/network/interceptors/log_interceptor.dart';
 import 'package:archilink/core/network/network_config.dart';
 import 'package:archilink/core/network/websocket/pusher_client.dart';
+import 'package:archilink/core/network/websocket/reverb_client.dart';
 import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/services/notification/data_source/fcm_data_source.dart';
 import 'package:archilink/core/services/notification/data_source/fcm_data_source_impl.dart';
@@ -81,7 +82,8 @@ Future<void> initServiceLocator({
   ///Services
   ///----------
   ///
-  sl.registerLazySingleton(() => PusherClient.instance);
+  // sl.registerLazySingleton(() => PusherClient.instance);
+  sl.registerLazySingleton(() => ReverbClient.instance);
   sl.registerLazySingleton<MediaPickerService>(
     () => PostImagesPicker(),
     instanceName: kPostImagePicker,
@@ -155,7 +157,7 @@ Future<void> initServiceLocator({
   ///Interceptor
   ///----------
   sl.registerLazySingleton<AuthInterceptor>(
-    () => AuthInterceptor(sl(), sl<PusherClient>()),
+    () => AuthInterceptor(sl(), sl<ReverbClient>()),
   );
   sl.registerLazySingleton<ErrorInterceptor>(() => ErrorInterceptor());
   sl.registerLazySingleton<LogInterseptor>(() => LogInterseptor());
@@ -249,7 +251,7 @@ Future<void> initServiceLocator({
       sl<AuthRepo>(),
       sl<CurrentUserCubit>(),
       sl<NotificationRepo>(),
-      sl<PusherClient>(),
+      sl<ReverbClient>(),
     ),
   );
   sl.registerLazySingleton(() => UniversitiesCubit(sl<EditProfileRepo>()));
