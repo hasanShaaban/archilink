@@ -1,6 +1,6 @@
-import 'package:archilink/features/Chat/data/model/reaction_model.dart';
-import 'package:archilink/features/Chat/data/model/sender_model.dart';
-import 'package:archilink/features/Chat/domain/entity/message_entity.dart';
+import 'package:archilink/features/Chat/data/model/chat_model/reaction_model.dart';
+import 'package:archilink/features/Chat/data/model/chat_model/sender_model.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/message_entity.dart';
 
 class MessageModel extends MessageEntity {
   const MessageModel({

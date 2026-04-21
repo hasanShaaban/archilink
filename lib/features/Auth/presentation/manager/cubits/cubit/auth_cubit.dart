@@ -15,14 +15,14 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
   final NotificationRepo notificationRepo;
   final CurrentUserCubit currentUserCubit;
-  final ReverbClient pusherClient;
+  final ReverbClient reverbClient;
   // final PusherClient pusherClient;
 
   AuthCubit(
     this.authRepo,
     this.currentUserCubit,
     this.notificationRepo,
-    this.pusherClient,
+    this.reverbClient,
   ) : super(AuthInitial());
 
   Future<void> login({
@@ -41,7 +41,7 @@ class AuthCubit extends Cubit<AuthState> {
         currentUserCubit.setUsername(success.username);
         currentUserCubit.setToken(success.accessToken);
 
-        await pusherClient.init(token: success.accessToken);
+        await reverbClient.init(token: success.accessToken);
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());
@@ -75,7 +75,7 @@ class AuthCubit extends Cubit<AuthState> {
         currentUserCubit.setUsername(success.user.username);
         currentUserCubit.setToken(success.token);
 
-        await pusherClient.init(token: success.token);
+        await reverbClient.init(token: success.token);
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());

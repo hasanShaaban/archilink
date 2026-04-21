@@ -2,7 +2,8 @@ import 'package:archilink/core/error/exception_to_faliure_mapper.dart';
 import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Chat/domain/data_source/chat_remote_data_source.dart';
-import 'package:archilink/features/Chat/domain/entity/messages_reponse_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/messages_reponse_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_list_view_entity.dart/chat_list_entity.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_repo.dart';
 import 'package:dartz/dartz.dart';
 
@@ -20,6 +21,18 @@ class ChatRepoImpl extends ChatRepo {
         conversationId: conversationId,
         page: page,
       );
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, ChatListEntity>> getChats() async {
+    try {
+      final result = await remoteDataSource.getChats();
       return right(result);
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));

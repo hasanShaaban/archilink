@@ -1,5 +1,5 @@
-import 'package:archilink/features/Chat/domain/entity/reaction_entity.dart';
-import 'package:archilink/features/Chat/domain/entity/sender_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/reaction_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/sender_entity.dart';
 
 class MessageEntity {
   final int id;

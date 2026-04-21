@@ -5,7 +5,7 @@ import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/utils/message_mapper.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Chat/domain/entity/chat_args.dart';
-import 'package:archilink/features/Chat/domain/entity/message_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/message_entity.dart';
 import 'package:archilink/features/Chat/presentation/manager/bloc/chat_bloc.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
@@ -127,7 +127,7 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
       listenWhen: (prev, curr) => prev.messages != curr.messages,
       listener: (BuildContext context, ChatState state) {
         if (state.participants.isNotEmpty) {
-          _initController(state); // 👈 init once on first data
+          _initController(state); 
           _syncToController(state.messages);
         }
         

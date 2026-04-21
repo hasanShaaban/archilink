@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:archilink/core/network/websocket/reverb_client.dart';
-import 'package:archilink/features/Chat/data/model/message_model.dart';
+import 'package:archilink/features/Chat/data/model/chat_model/message_model.dart';
 import 'package:archilink/features/Chat/domain/data_source/chat_websocket_remote_data_source.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
 

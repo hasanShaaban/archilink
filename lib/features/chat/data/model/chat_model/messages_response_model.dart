@@ -1,6 +1,6 @@
-import 'package:archilink/features/Chat/data/model/message_model.dart';
-import 'package:archilink/features/Chat/data/model/messages_pagination_model.dart';
-import 'package:archilink/features/Chat/domain/entity/messages_reponse_entity.dart';
+import 'package:archilink/features/Chat/data/model/chat_model/message_model.dart';
+import 'package:archilink/features/Chat/data/model/chat_model/messages_pagination_model.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/messages_reponse_entity.dart';
 
 class MessagesResponseModel extends MessagesResponseEntity {
   const MessagesResponseModel({

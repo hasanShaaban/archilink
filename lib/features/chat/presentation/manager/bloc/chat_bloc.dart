@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:archilink/features/Chat/domain/entity/message_entity.dart';
-import 'package:archilink/features/Chat/domain/entity/sender_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/message_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/sender_entity.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_repo.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
 import 'package:archilink/features/Chat/domain/usecase/listen_to_chat_usecase.dart';

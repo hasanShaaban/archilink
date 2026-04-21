@@ -20,7 +20,7 @@ class ReverbClient {
 
     const options = PusherChannelsOptions.fromHost(
       scheme: 'ws',
-      host: '10.0.2.2',
+      host: '127.0.0.1',
       key: 'jxwpfroqsx4mu4lyl0ke',
       port: 8080,
       shouldSupplyMetadataQueries: true,
@@ -46,13 +46,12 @@ class ReverbClient {
         debugPrint('Reverb connected — socket_id:');
       },
     );
+    log('ReverbClient initialized with token: $token');
 
-    
     await _client!.connect();
     _socketId = _client!.socketId;
     _initialized = true;
     log('ReverbClient connected with socket_id: $_socketId');
-    log('ReverbClient initialized with token: $token');
   }
 
   PrivateChannel privateChannel(String channelName) {
@@ -64,7 +63,7 @@ class ReverbClient {
       authorizationDelegate:
           EndpointAuthorizableChannelTokenAuthorizationDelegate.forPrivateChannel(
             authorizationEndpoint: Uri.parse(
-              'http://10.0.2.2:8000/broadcasting/auth',
+              'http://127.0.0.1:8000/broadcasting/auth',
             ),
             headers: {
               'Authorization': 'Bearer $_token',

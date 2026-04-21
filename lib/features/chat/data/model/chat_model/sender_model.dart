@@ -1,4 +1,4 @@
-import 'package:archilink/features/Chat/domain/entity/sender_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/sender_entity.dart';
 
 class SenderModel extends SenderEntity {
   const SenderModel({

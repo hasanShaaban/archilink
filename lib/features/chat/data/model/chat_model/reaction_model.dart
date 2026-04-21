@@ -1,4 +1,4 @@
-import 'package:archilink/features/Chat/domain/entity/reaction_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/reaction_entity.dart';
 
 class ReactionModel extends ReactionEntity {
   const ReactionModel({
