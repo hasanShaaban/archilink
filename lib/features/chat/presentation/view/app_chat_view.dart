@@ -74,7 +74,7 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
         .toList();
 
     _chatController = ChatController(
-      initialMessageList: const [],
+      initialMessageList: [],
       scrollController: ScrollController(),
       currentUser: ChatUser(
         id: currentSender.id.toString(),
@@ -94,9 +94,10 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
     final currentUserId = _chatController!.currentUser.id;
     final chatViewMessages = messages
         .map((e) => e.toChatViewMessage(currentUserId))
-        .toList();
+        .toList().reversed.toList();
 
     _chatController!.loadMoreData(chatViewMessages);
+    
   }
 
   // ─── Menu action handler ──────────────────────────────────────────────────
@@ -127,8 +128,9 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
       listener: (BuildContext context, ChatState state) {
         if (state.participants.isNotEmpty) {
           _initController(state); // 👈 init once on first data
+          _syncToController(state.messages);
         }
-        _syncToController(state.messages);
+        
         // Trigger rebuild so ChatView gets the controller
         setState(() {});
       },
@@ -327,32 +329,3 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
     );
   }
 }
-
-// ─── Demo data ────────────────────────────────────────────────────────────────
-final List<Message> _demoMessages = [
-  Message(
-    id: '1',
-    message: 'Hi there!',
-    createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
-    sentBy: '2',
-  ),
-  Message(
-    id: '2',
-    message: 'Hello! How are you?',
-    createdAt: DateTime.now().subtract(const Duration(minutes: 4)),
-    sentBy: '1',
-  ),
-  Message(
-    id: '3',
-    message: 'Doing great! Check this out 👇',
-    createdAt: DateTime.now().subtract(const Duration(minutes: 3)),
-    sentBy: '2',
-    replyMessage: const ReplyMessage(
-      messageId: '1',
-      message: 'Hi there!',
-      replyTo: '2',
-      replyBy: '2',
-      messageType: MessageType.text,
-    ),
-  ),
-];

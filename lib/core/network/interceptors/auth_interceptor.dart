@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 class AuthInterceptor extends Interceptor {
   final AuthLocalDataSource local;
   final ReverbClient pusherClient;
+  // final PusherClient pusherClient;
 
   AuthInterceptor(this.local, this.pusherClient);
   @override

@@ -17,7 +17,6 @@ class ReverbClient {
   Future<void> init({required String token}) async {
     if (_initialized) return;
     _token = token;
-    log(token);
 
     const options = PusherChannelsOptions.fromHost(
       scheme: 'ws',
@@ -36,9 +35,8 @@ class ReverbClient {
       },
     );
 
-    _socketId = _client!.socketId;
     _client!.onConnectionEstablished.listen(
-      onError: (e){
+      onError: (e) {
         debugPrint('Reverb connection error : $e');
       },
       onDone: () {
@@ -49,8 +47,11 @@ class ReverbClient {
       },
     );
 
+    
     await _client!.connect();
+    _socketId = _client!.socketId;
     _initialized = true;
+    log('ReverbClient connected with socket_id: $_socketId');
     log('ReverbClient initialized with token: $token');
   }
 

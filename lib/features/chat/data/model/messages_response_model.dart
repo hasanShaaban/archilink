@@ -11,7 +11,7 @@ class MessagesResponseModel extends MessagesResponseEntity {
   // Parses the full API response:
   // { "status": "success", "message": { "messages": [...], "pagination": {...} } }
   factory MessagesResponseModel.fromJson(Map<String, dynamic> json) {
-    final body = json['message'] as Map<String, dynamic>;
+    final body = json['data'] as Map<String, dynamic>;
 
     return MessagesResponseModel(
       messages: (body['messages'] as List)

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/core/network/websocket/pusher_client.dart';
 import 'package:archilink/core/network/websocket/reverb_client.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/domain/repo/notification_repo.dart';
@@ -15,6 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
   final NotificationRepo notificationRepo;
   final CurrentUserCubit currentUserCubit;
   final ReverbClient pusherClient;
+  // final PusherClient pusherClient;
 
   AuthCubit(
     this.authRepo,
@@ -39,7 +41,7 @@ class AuthCubit extends Cubit<AuthState> {
         currentUserCubit.setUsername(success.username);
         currentUserCubit.setToken(success.accessToken);
 
-        // await pusherClient.init(token: success.accessToken);
+        await pusherClient.init(token: success.accessToken);
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());
@@ -73,7 +75,7 @@ class AuthCubit extends Cubit<AuthState> {
         currentUserCubit.setUsername(success.user.username);
         currentUserCubit.setToken(success.token);
 
-        // await pusherClient.init(token: success.token);
+        await pusherClient.init(token: success.token);
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());
