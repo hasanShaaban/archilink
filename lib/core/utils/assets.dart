@@ -82,6 +82,10 @@ class Assets {
   /// assets/icons/filter-vertical.svg
   static const String assetsIconsFilterVertical = "assets/icons/filter-vertical.svg";
 
+  /// Assets for assetsIconsFilters
+  /// assets/icons/filters.svg
+  static const String assetsIconsFilters = "assets/icons/filters.svg";
+
   /// Assets for assetsIconsGmail
   /// assets/icons/gmail.svg
   static const String assetsIconsGmail = "assets/icons/gmail.svg";
