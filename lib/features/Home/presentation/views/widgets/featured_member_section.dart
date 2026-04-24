@@ -29,10 +29,16 @@ class FeaturedMemberSection extends StatelessWidget {
               itemCount: 10,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
-                return FeaturedMemberItem(
-                  lang: lang,
-                  width: width,
-                  height: height,
+                return Padding(
+                  padding: EdgeInsets.only(
+                    right: lang.local == 'en' ? width * 30 / 402 : 0,
+                    left: lang.local == 'ar' ? width * 30 / 402 : 0,
+                  ),
+                  child: FeaturedMemberItem(
+                    lang: lang,
+                    width: width,
+                    height: height,
+                  ),
                 );
               },
             ),
@@ -42,4 +48,3 @@ class FeaturedMemberSection extends StatelessWidget {
     );
   }
 }
-

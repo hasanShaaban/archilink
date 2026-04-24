@@ -1,4 +1,3 @@
-
 import 'package:archilink/features/Post/presentation/view/widgets/post_actions.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_body.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_locaion_date_and_tags.dart';
@@ -51,15 +50,17 @@ class Post extends StatelessWidget {
               //------------// User image section //-------------------------------------------------------------------------
               GestureDetector(
                 onTap: () {
-                  final myUsername =
-                      context.read<CurrentUserCubit>().state.username;
+                  final myUsername = context
+                      .read<CurrentUserCubit>()
+                      .state
+                      .username;
                   final isMine =
                       myUsername != null && myUsername == entity.owner.username;
                   if (isMine) {
                     context.read<ProfileCubit>().getPersonlProfile();
-                    BlocProvider.of<ProfileBloc>(context).add(
-                      LoadInitialProfilePosts(),
-                    );
+                    BlocProvider.of<ProfileBloc>(
+                      context,
+                    ).add(LoadInitialProfilePosts());
                     sl<MainTabController>().setIndex(2);
                     return;
                   }

@@ -1,5 +1,6 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/features/Search/presentation/manager/cubit/search_cubit.dart';
+import 'package:archilink/features/Search/presentation/views/search_results_view.dart';
 import 'package:archilink/features/Search/presentation/views/widgets/filter_options.dart';
 import 'package:archilink/features/Search/presentation/views/widgets/search_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,12 @@ class _SearchViewState extends State<SearchView> {
                 const SizedBox(height: 16),
                 Divider(),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(
+                      context,
+                      rootNavigator: true,
+                    ).pushNamed(SearchResultsView.name);
+                  },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
