@@ -25,9 +25,8 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource{
   }
   
   @override
-  Future<void> clearUsername() {
-    // TODO: implement clearUsername
-    throw UnimplementedError();
+  Future<void> clearUsername() async {
+    await storage.delete(_usernameKey);
   }
   
   @override

@@ -38,7 +38,9 @@ class _SearchViewState extends State<SearchView> {
       create: (_) => SearchCubit(sl<SearchRepo>()),
       child: Scaffold(
         body: SafeArea(
-          child: SearchViewBody(searchController: _searchController),
+          child: SingleChildScrollView(
+            child: SearchViewBody(searchController: _searchController),
+          ),
         ),
       ),
     );
@@ -67,10 +69,7 @@ class SearchViewBody extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 16,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: SearchAppBar(searchController: _searchController),
           ),
           FitlersOptions(),
@@ -90,10 +89,7 @@ class SearchViewBody extends StatelessWidget {
               );
             },
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -111,5 +107,3 @@ class SearchViewBody extends StatelessWidget {
     );
   }
 }
-
-

@@ -8,6 +8,7 @@ import 'package:archilink/features/Profile/presentation/manager/bloc/profile_blo
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/profile_page_body.dart';
 import 'package:archilink/features/Main/presentation/views/widgets/nav_bar_icon_and_label.dart';
+import 'package:archilink/features/settings/presentation/views/setting_page.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,7 +36,7 @@ class _MainViewBodyState extends State<MainViewBody> {
     HomePageBody(),
     Center(child: Text('store')), //TODO: store page
     ProfilePageBody(type: ProfileType.personalProfile),
-    Center(child: Text('settings')), //TODO: Setting page
+    SettingPage(),
   ];
 
   // Section: Navigation bar items

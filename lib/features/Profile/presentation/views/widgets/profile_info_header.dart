@@ -3,7 +3,6 @@ import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/constants.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
-import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/follow_cubit.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/update_profile_image_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/personal_profile_buttons.dart';
@@ -83,7 +82,7 @@ Widget _buildButtons(
   }
   if (type == ProfileType.userProfile) {
     return BlocProvider(
-      create: (context) => FollowCubit(sl<ProfileRepo>()),
+      create: (context) => sl<FollowCubit>(),
       child: UserProfileButtons(
         height: height,
         width: width,

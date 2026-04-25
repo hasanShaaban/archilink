@@ -5,7 +5,6 @@ import 'package:archilink/features/Chat/domain/entity/chat_args.dart';
 import 'package:archilink/features/Chat/presentation/view/app_chat_view.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/follow_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_custom_button.dart';
-import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';

@@ -20,7 +20,7 @@ class ReverbClient {
 
     const options = PusherChannelsOptions.fromHost(
       scheme: 'ws',
-      host: '10.95.129.92',
+      host: '10.95.129.85',
       key: 'jxwpfroqsx4mu4lyl0ke',
       port: 8080,
       shouldSupplyMetadataQueries: true,
@@ -63,7 +63,7 @@ class ReverbClient {
       authorizationDelegate:
           EndpointAuthorizableChannelTokenAuthorizationDelegate.forPrivateChannel(
             authorizationEndpoint: Uri.parse(
-              'http://10.95.129.92:8000/broadcasting/auth',
+              'http://10.95.129.85:8000/broadcasting/auth',
             ),
             headers: {
               'Authorization': 'Bearer $_token',

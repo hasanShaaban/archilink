@@ -8,12 +8,17 @@ class FollowCubit extends Cubit<FollowState> {
   final ProfileRepo profileRepo;
   FollowCubit(this.profileRepo) : super(const FollowState());
 
+  void _safeEmit(FollowState nextState) {
+    if (isClosed) return;
+    emit(nextState);
+  }
+
   void setInitial({
     required bool isFollowing,
     bool force = false,
   }) {
-    if (state.isInitialized && !force) return;
-    emit(
+    if (isClosed || (state.isInitialized && !force)) return;
+    _safeEmit(
       state.copyWith(
         isFollowing: isFollowing,
         isInitialized: true,
@@ -23,9 +28,9 @@ class FollowCubit extends Cubit<FollowState> {
   }
 
   Future<void> follow(String username) async {
-    if (state.isSubmitting) return;
+    if (isClosed || state.isSubmitting) return;
     // Optimistic UI: show followed state immediately.
-    emit(
+    _safeEmit(
       state.copyWith(
         isFollowing: true,
         isSubmitting: true,
@@ -33,15 +38,16 @@ class FollowCubit extends Cubit<FollowState> {
       ),
     );
     final result = await profileRepo.follow(username);
+    if (isClosed) return;
     result.fold(
-      (failure) => emit(
+      (failure) => _safeEmit(
         state.copyWith(
           isFollowing: false,
           isSubmitting: false,
           errorMessage: failure.message,
         ),
       ),
-      (success) => emit(
+      (success) => _safeEmit(
         state.copyWith(
           isFollowing: success,
           isSubmitting: false,
@@ -51,9 +57,9 @@ class FollowCubit extends Cubit<FollowState> {
     );
   }
   Future<void> unfollow(String username) async {
-    if (state.isSubmitting) return;
+    if (isClosed || state.isSubmitting) return;
     // Optimistic UI: show followed state immediately.
-    emit(
+    _safeEmit(
       state.copyWith(
         isFollowing: false,
         isSubmitting: true,
@@ -61,15 +67,16 @@ class FollowCubit extends Cubit<FollowState> {
       ),
     );
     final result = await profileRepo.unfollow(username);
+    if (isClosed) return;
     result.fold(
-      (failure) => emit(
+      (failure) => _safeEmit(
         state.copyWith(
           isFollowing: true,
           isSubmitting: false,
           errorMessage: failure.message,
         ),
       ),
-      (success) => emit(
+      (success) => _safeEmit(
         state.copyWith(
           isFollowing: !success,
           isSubmitting: false,

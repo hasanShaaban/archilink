@@ -4,7 +4,6 @@ import 'package:archilink/core/network/interceptors/auth_interceptor.dart';
 import 'package:archilink/core/network/interceptors/error_interceptor.dart';
 import 'package:archilink/core/network/interceptors/log_interceptor.dart';
 import 'package:archilink/core/network/network_config.dart';
-import 'package:archilink/core/network/websocket/pusher_client.dart';
 import 'package:archilink/core/network/websocket/reverb_client.dart';
 import 'package:archilink/core/services/media_picker_service.dart';
 import 'package:archilink/core/services/notification/data_source/fcm_data_source.dart';
@@ -68,10 +67,16 @@ import 'package:archilink/features/Profile/domain/data_source/profile_local_data
 import 'package:archilink/features/Profile/domain/data_source/profile_remote_data_source.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
+import 'package:archilink/features/Profile/presentation/manager/cubit/follow_cubit.dart';
 import 'package:archilink/features/Search/data/data_source/search_remote_data_source_impl.dart';
 import 'package:archilink/features/Search/data/repo/search_repo_impl.dart';
 import 'package:archilink/features/Search/domain/data_source/search_remote_data_source.dart';
 import 'package:archilink/features/Search/domain/repo/search_repo.dart';
+import 'package:archilink/features/settings/data/data_source/setting_remote_data_source_impl.dart';
+import 'package:archilink/features/settings/data/repo/setting_repo_impl.dart';
+import 'package:archilink/features/settings/domain/data_source/setting_remote_data_source.dart';
+import 'package:archilink/features/settings/domain/repo/setting_repo.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/settings_session_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
@@ -158,6 +163,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<SearchRemoteDataSource>(
     () => SearchRemoteDataSourceImpl(sl()),
   );
+  sl.registerLazySingleton<SettingRemoteDataSource>(
+    () => SettingRemoteDataSourceImpl(sl()),
+  );
   sl.registerLazySingleton<FCMDataSource>(() => FCMDataSourceImpl());
 
   ///----------
@@ -240,6 +248,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<SearchRepo>(
     () => SearchRepoImpl(sl<SearchRemoteDataSource>()),
   );
+  sl.registerLazySingleton<SettingRepo>(
+    () => SettingRepoImpl(sl<SettingRemoteDataSource>()),
+  );
 
   ///---------
   ///Usecases
@@ -266,4 +277,13 @@ Future<void> initServiceLocator({
   );
   sl.registerLazySingleton(() => UniversitiesCubit(sl<EditProfileRepo>()));
   sl.registerLazySingleton(() => ChatBloc(sl(), sl<ChatRepo>()));
+  sl.registerFactory(() => FollowCubit(sl<ProfileRepo>()));
+  sl.registerFactory(
+    () => SettingsSessionCubit(
+      sl<SettingRepo>(),
+      sl<AuthLocalDataSource>(),
+      sl<CurrentUserCubit>(),
+      sl<ReverbClient>(),
+    ),
+  );
 }

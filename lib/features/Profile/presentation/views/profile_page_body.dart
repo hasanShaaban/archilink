@@ -47,9 +47,12 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
               child: Skeletonizer(
                 ignoreContainers: false,
                 effect: ShimmerEffect(
-                  
-                  highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                  baseColor: AppColorsFromTheme.grayForTheme(context).withOpacity(0.5),
+                  highlightColor: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.5),
+                  baseColor: AppColorsFromTheme.grayForTheme(
+                    context,
+                  ).withOpacity(0.5),
                 ),
                 enabled: isSkeleton,
                 child: RefreshIndicator(
@@ -59,13 +62,18 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                   onRefresh: () async {
                     if (widget.type == ProfileType.personalProfile) {
                       context.read<ProfileCubit>().getPersonlProfile();
+                      context.read<ProfileBloc>().add(
+                        LoadInitialProfilePosts(),
+                      );
                     }
                     if (widget.type == ProfileType.userProfile) {
                       context.read<ProfileCubit>().getUserProfile(
                         profileData.username,
                       );
+                      context.read<ProfileBloc>().add(
+                        LoadInitialProfilePosts(username: profileData.username),
+                      );
                     }
-                    context.read<ProfileBloc>().add(LoadInitialProfilePosts());
                   },
                   notificationPredicate: (notification) =>
                       notification.depth == 0 || notification.depth == 2,
@@ -78,11 +86,12 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                                 child: AppBar(
                                   title: Text(
                                     'UserName\'s Profile',
-                                    style: AppTextStyle.interSemiBold16.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
+                                    style: AppTextStyle.interSemiBold16
+                                        .copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
                                   ),
                                 ),
                               ),

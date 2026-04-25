@@ -9,6 +9,7 @@ class UserModel extends UserEntity {
     required super.isVerified,
     super.country,
     super.city,
+    required super.isFollowing,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +18,7 @@ class UserModel extends UserEntity {
       name: json['name'] as String,
       username: json['username'] as String,
       userAvatar: json['user_avatar'] as String?,
+      isFollowing: json['is_following'] as bool,
       isVerified: json['is_verified'] as bool,
       country: json['country'] as String?,
       city: json['city'] as String?,
@@ -24,12 +26,13 @@ class UserModel extends UserEntity {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'username': username,
-        'user_avatar': userAvatar,
-        'is_verified': isVerified,
-        'country': country,
-        'city': city,
-      };
+    'id': id,
+    'name': name,
+    'username': username,
+    'user_avatar': userAvatar,
+    'is_verified': isVerified,
+    'is_following': isFollowing,
+    'country': country,
+    'city': city,
+  };
 }
