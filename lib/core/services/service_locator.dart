@@ -68,6 +68,10 @@ import 'package:archilink/features/Profile/domain/data_source/profile_local_data
 import 'package:archilink/features/Profile/domain/data_source/profile_remote_data_source.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
+import 'package:archilink/features/Search/data/data_source/search_remote_data_source_impl.dart';
+import 'package:archilink/features/Search/data/repo/search_repo_impl.dart';
+import 'package:archilink/features/Search/domain/data_source/search_remote_data_source.dart';
+import 'package:archilink/features/Search/domain/repo/search_repo.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
@@ -151,6 +155,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<ChatRemoteDataSource>(
     () => ChatRemoteDataSourceImpl(sl()),
   );
+  sl.registerLazySingleton<SearchRemoteDataSource>(
+    () => SearchRemoteDataSourceImpl(sl()),
+  );
   sl.registerLazySingleton<FCMDataSource>(() => FCMDataSourceImpl());
 
   ///----------
@@ -229,6 +236,9 @@ Future<void> initServiceLocator({
       sl<AuthLocalDataSource>(),
       sl<NotificationDisplayService>(),
     ),
+  );
+  sl.registerLazySingleton<SearchRepo>(
+    () => SearchRepoImpl(sl<SearchRemoteDataSource>()),
   );
 
   ///---------

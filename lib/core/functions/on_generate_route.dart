@@ -16,7 +16,11 @@ import 'package:archilink/features/Splash/presentation/views/splash_view.dart';
 import 'package:archilink/features/Chat/presentation/view/chat_list_view.dart';
 import 'package:archilink/features/Chat/presentation/view/app_chat_view.dart';
 import 'package:archilink/features/Post_Details/presentation/view/post_details_view.dart';
+import 'package:archilink/core/services/service_locator.dart';
+import 'package:archilink/features/Search/domain/repo/search_repo.dart';
+import 'package:archilink/features/Search/presentation/manager/cubit/search_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:archilink/features/Main/presentation/views/main_page.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -77,7 +81,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case SearchView.name:
       return MaterialPageRoute(builder: (context) => const SearchView());
     case SearchResultsView.name:
-      return MaterialPageRoute(builder: (context) => const SearchResultsView());
+      return MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (_) => SearchCubit(sl<SearchRepo>())..fetchSearchResults(),
+          child: const SearchResultsView(),
+        ),
+      );
     default:
       return MaterialPageRoute(
         builder: (context) =>

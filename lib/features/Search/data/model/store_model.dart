@@ -8,7 +8,7 @@ class StoreModel extends StoreEntity {
     super.description,
     super.city,
     super.country,
-    required super.storeLogoUrl,
+    super.storeLogoUrl,
     required super.isActive,
   });
 
@@ -20,7 +20,7 @@ class StoreModel extends StoreEntity {
       description: json['description'] as String?,
       city: json['city'] as String?,
       country: json['country'] as String?,
-      storeLogoUrl: json['store_logo_url'] as String,
+      storeLogoUrl: json['store_logo_url'] as String? ,
       isActive: json['is_active'] as bool,
     );
   }

@@ -158,6 +158,10 @@ class Assets {
   /// assets/icons/report.svg
   static const String assetsIconsReport = "assets/icons/report.svg";
 
+  /// Assets for assetsIconsRightArrow
+  /// assets/icons/right_arrow.svg
+  static const String assetsIconsRightArrow = "assets/icons/right_arrow.svg";
+
   /// Assets for assetsIconsSave
   /// assets/icons/Save.svg
   static const String assetsIconsSave = "assets/icons/Save.svg";

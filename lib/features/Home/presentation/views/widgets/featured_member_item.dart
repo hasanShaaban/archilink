@@ -1,6 +1,8 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/Search/domain/entity/user_entity.dart';
 import 'package:archilink/generated/l10n.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -10,11 +12,28 @@ class FeaturedMemberItem extends StatelessWidget {
     required this.lang,
     required this.width,
     required this.height,
+    this.user,
   });
 
   final S lang;
   final double width;
   final double height;
+  final UserEntity? user; //TODO: make it required
+
+  String _formatLocation(UserEntity? user) {
+    if (user == null) {
+      return 'no location';
+    }
+
+    final city = user.city?.trim();
+    final country = user.country?.trim();
+    final parts = [
+      if (city != null && city.isNotEmpty) city,
+      if (country != null && country.isNotEmpty) country,
+    ];
+
+    return parts.isNotEmpty ? parts.join(',') : 'no location';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +48,15 @@ class FeaturedMemberItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             color: Theme.of(context).colorScheme.secondary,
           ),
+          child: Center(
+            child: SizedBox(
+              width: 30,
+              height: 30,
+              child: user != null && user!.userAvatar != null
+                  ? CachedNetworkImage(imageUrl: user!.userAvatar!)
+                  : SvgPicture.asset(Assets.assetsIconsUser),
+            ),
+          ),
         ),
         SizedBox(
           width: width * 88 / 402,
@@ -38,10 +66,12 @@ class FeaturedMemberItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Adam Hasan', //-----------------name
+                  user != null
+                      ? user!.name
+                      : 'Adam Hasan', //-----------------name
                   style: AppTextStyle.mallannaRegular14.copyWith(
                     overflow: TextOverflow.ellipsis,
-                    height: 1.8
+                    height: 1.8,
                   ),
                 ),
                 Row(
@@ -55,7 +85,7 @@ class FeaturedMemberItem extends StatelessWidget {
                     SizedBox(
                       width: width * 64 / 402,
                       child: Text(
-                        'Aleppo,Syria', //-----------------location
+                        _formatLocation(user), //-----------------location
                         style: AppTextStyle.mallannaRegular12.copyWith(
                           color: Theme.of(context).colorScheme.tertiary,
                           overflow: TextOverflow.ellipsis,
@@ -80,7 +110,9 @@ class FeaturedMemberItem extends StatelessWidget {
             },
             style: TextButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -91,7 +123,12 @@ class FeaturedMemberItem extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
                 SizedBox(width: 6),
-                Text(lang.follow, style: AppTextStyle.interMedium10.copyWith(color: Theme.of(context).colorScheme.onSurface)),
+                Text(
+                  lang.follow,
+                  style: AppTextStyle.interMedium10.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
               ],
             ),
           ),

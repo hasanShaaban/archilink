@@ -5,7 +5,7 @@ class StoreEntity {
   final String? description;
   final String? city;
   final String? country;
-  final String storeLogoUrl;
+  final String? storeLogoUrl;
   final bool isActive;
 
   const StoreEntity({

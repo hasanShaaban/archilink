@@ -29,9 +29,9 @@ class FollowState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isFollowing,
-        isSubmitting,
-        errorMessage,
-        isInitialized,
-      ];
+    isFollowing,
+    isSubmitting,
+    errorMessage,
+    isInitialized,
+  ];
 }

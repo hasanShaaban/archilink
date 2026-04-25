@@ -1,5 +1,4 @@
 import 'package:archilink/core/services/media_picker_service.dart';
-import 'package:archilink/core/services/profile_image_picker.dart';
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/constants.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
