@@ -6,6 +6,8 @@ import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/settings_session_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/settings_session_state.dart';
+import 'package:archilink/features/settings/presentation/views/followers_and_following_view.dart';
+import 'package:archilink/features/settings/presentation/views/my_activity_view.dart';
 import 'package:archilink/features/settings/presentation/views/widgets/setting_option.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,16 +22,16 @@ class SettingPage extends StatelessWidget {
       child: BlocConsumer<SettingsSessionCubit, SettingsSessionState>(
         listener: (context, state) {
           if (state is SettingsSessionError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              appSnackBar(context, state.failure, state.message),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(appSnackBar(context, state.failure, state.message));
           }
 
           if (state is SettingsSessionLoggedOut) {
-            Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-              AuthView.name,
-              (route) => false,
-            );
+            Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamedAndRemoveUntil(AuthView.name, (route) => false);
           }
         },
         builder: (context, state) {
@@ -83,7 +85,12 @@ class SettingPage extends StatelessWidget {
                             colorScheme: colorScheme,
                             icon: Assets.assetsIconsFollowersAndFollowings,
                             title: 'Followers & Followings',
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(
+                                context,
+                                rootNavigator: true,
+                              ).pushNamed(FollowersAndFollowingView.name);
+                            },
                           ),
                         ],
                       ),
@@ -103,7 +110,12 @@ class SettingPage extends StatelessWidget {
                             colorScheme: colorScheme,
                             icon: Assets.assetsIconsMyActivity,
                             title: 'My Activity',
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(
+                                context,
+                                rootNavigator: true,
+                              ).pushNamed(MyActivityView.name);
+                            },
                           ),
                           SettingOption(
                             colorScheme: colorScheme,
@@ -148,7 +160,9 @@ class SettingPage extends StatelessWidget {
                             icon: Assets.assetsIconsLogout,
                             title: 'Log out',
                             onTap: () async {
-                              final confirmed = await _showLogoutDialog(context);
+                              final confirmed = await _showLogoutDialog(
+                                context,
+                              );
                               if (!context.mounted || !confirmed) return;
                               context.read<SettingsSessionCubit>().logout();
                             },
@@ -180,6 +194,7 @@ class SettingPage extends StatelessWidget {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text('Log out'),
         content: Text('Are you sure you want to log out?'),
         actions: [

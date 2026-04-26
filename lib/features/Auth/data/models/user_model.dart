@@ -1,5 +1,5 @@
 
-import 'package:archilink/features/Auth/domain/entity/user_entity.dart';
+import 'package:archilink/features/Auth/domain/entity/auth_user_entity.dart';
 
 class UserModel {
   final int id;
@@ -32,8 +32,8 @@ class UserModel {
     );
   }
 
-  UserEntity toEntity() {
-    return UserEntity(
+  AuthUserEntity toEntity() {
+    return AuthUserEntity(
       id: id,
       name: name,
       username: username,

@@ -76,6 +76,7 @@ import 'package:archilink/features/settings/data/data_source/setting_remote_data
 import 'package:archilink/features/settings/data/repo/setting_repo_impl.dart';
 import 'package:archilink/features/settings/domain/data_source/setting_remote_data_source.dart';
 import 'package:archilink/features/settings/domain/repo/setting_repo.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/followers_and_following_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/settings_session_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
@@ -284,6 +285,12 @@ Future<void> initServiceLocator({
       sl<AuthLocalDataSource>(),
       sl<CurrentUserCubit>(),
       sl<ReverbClient>(),
+    ),
+  );
+  sl.registerFactory(
+    () => FollowersAndFollowingCubit(
+      sl<SettingRepo>(),
+      sl<CurrentUserCubit>(),
     ),
   );
 }

@@ -19,6 +19,9 @@ import 'package:archilink/features/Post_Details/presentation/view/post_details_v
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/features/Search/domain/repo/search_repo.dart';
 import 'package:archilink/features/Search/presentation/manager/cubit/search_cubit.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/followers_and_following_cubit.dart';
+import 'package:archilink/features/settings/presentation/views/followers_and_following_view.dart';
+import 'package:archilink/features/settings/presentation/views/my_activity_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:archilink/features/Main/presentation/views/main_page.dart';
@@ -87,6 +90,15 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
           child: const SearchResultsView(),
         ),
       );
+    case FollowersAndFollowingView.name:
+      return MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (_) => sl<FollowersAndFollowingCubit>()..fetchFollowers(),
+          child: const FollowersAndFollowingView(),
+        ),
+      );
+    case MyActivityView.name:
+      return MaterialPageRoute(builder: (context) => const MyActivityView());
     default:
       return MaterialPageRoute(
         builder: (context) =>

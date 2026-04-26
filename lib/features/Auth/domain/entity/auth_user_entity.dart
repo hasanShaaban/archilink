@@ -1,4 +1,4 @@
-class UserEntity {
+class AuthUserEntity {
   final int id;
   final String name;
   final String username;
@@ -7,7 +7,7 @@ class UserEntity {
   final DateTime updatedAt;
   final String? phoneNumber;
 
-  const UserEntity({
+  const AuthUserEntity({
     required this.id,
     required this.name,
     required this.username,

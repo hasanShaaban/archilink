@@ -1,8 +1,8 @@
 import 'package:archilink/features/Auth/domain/entity/profile_record_entity.dart';
-import 'package:archilink/features/Auth/domain/entity/user_entity.dart';
+import 'package:archilink/features/Auth/domain/entity/auth_user_entity.dart';
 
 class RegisterEntity {
-  final UserEntity user;
+  final AuthUserEntity user;
   final ProfileRecordEntity profile;
   final String token;
 
