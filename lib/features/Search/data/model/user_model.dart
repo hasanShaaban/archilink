@@ -11,7 +11,7 @@ class UserModel extends UserEntity {
     super.city,
     required super.isFollowing,
   });
-
+  
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] as int,

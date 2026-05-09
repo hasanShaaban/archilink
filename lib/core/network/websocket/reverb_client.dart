@@ -20,7 +20,7 @@ class ReverbClient {
 
     const options = PusherChannelsOptions.fromHost(
       scheme: 'ws',
-      host: '10.95.129.4',
+      host: '10.209.144.103',
       key: 'jxwpfroqsx4mu4lyl0ke',
       port: 8080,
       shouldSupplyMetadataQueries: true,

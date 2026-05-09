@@ -47,7 +47,7 @@ class PostsResultsTab extends StatelessWidget {
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
-              return _PostSearchItem(width: width, post: state.posts[index]);
+              return PostSearchItem(width: width, post: state.posts[index]);
             },
             itemCount: state.posts.length + (state.isLoadingMorePosts ? 1 : 0),
           ),
@@ -57,8 +57,8 @@ class PostsResultsTab extends StatelessWidget {
   }
 }
 
-class _PostSearchItem extends StatelessWidget {
-  const _PostSearchItem({required this.width, required this.post});
+class PostSearchItem extends StatelessWidget {
+  const PostSearchItem({super.key, required this.width, required this.post});
 
   final double width;
   final PostEntity post;

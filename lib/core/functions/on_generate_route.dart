@@ -20,6 +20,7 @@ import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/features/Search/domain/repo/search_repo.dart';
 import 'package:archilink/features/Search/presentation/manager/cubit/search_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/followers_and_following_cubit.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/liked_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/views/followers_and_following_view.dart';
 import 'package:archilink/features/settings/presentation/views/my_activity_view.dart';
 import 'package:flutter/material.dart';
@@ -98,7 +99,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         ),
       );
     case MyActivityView.name:
-      return MaterialPageRoute(builder: (context) => const MyActivityView());
+      return MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (_) => sl<LikedPostsCubit>()..fetchLikedPosts(),
+          child: const MyActivityView(),
+        ),
+      );
     default:
       return MaterialPageRoute(
         builder: (context) =>
