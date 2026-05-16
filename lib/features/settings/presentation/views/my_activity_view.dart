@@ -1,9 +1,11 @@
-
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
-
+import 'package:archilink/features/settings/presentation/manager/cubit/comments_history_cubit.dart';
+import 'package:archilink/features/settings/presentation/views/widgets/comments_history_list_view.dart';
 import 'package:archilink/features/settings/presentation/views/widgets/liked_post_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 class MyActivityView extends StatelessWidget {
   const MyActivityView({super.key});
 
@@ -78,7 +80,7 @@ class _MyActivityTabsState extends State<_MyActivityTabs> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return GestureDetector(
-      onTap: () => setState(() => _selectedTab = tab),
+      onTap: () => _onTabSelected(tab),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
@@ -114,10 +116,23 @@ class _MyActivityTabsState extends State<_MyActivityTabs> {
       case _ActivityTab.comments:
         return const Center(
           key: ValueKey('comments'),
-          child: Text('Comments', style: AppTextStyle.interMedium12),
+          child: CommentsHistoryListView(),
         );
     }
   }
+
+  void _onTabSelected(_ActivityTab tab) {
+    if (_selectedTab == tab) return;
+    setState(() => _selectedTab = tab);
+
+    if (tab == _ActivityTab.comments) {
+      final commentsCubit = context.read<CommentsHistoryCubit>();
+      final state = commentsCubit.state;
+      if (state.commentsPage == 0 &&
+          !state.isLoadingComments &&
+          !state.hasCommentsData) {
+        commentsCubit.fetchCommentsHistory();
+      }
+    }
+  }
 }
-
-

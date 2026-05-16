@@ -3,6 +3,7 @@ import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Main/presentation/manager/main_tab_controller.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/post_body.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_user_image.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_username_and_date.dart';
 import 'package:archilink/features/Post_Details/domain/repo/post_details_repo.dart';
@@ -125,7 +126,6 @@ class _LikedPostsListViewState extends State<LikedPostsListView> {
                             ).add(LoadInitialProfilePosts());
                             sl<MainTabController>().setIndex(2);
                             Navigator.pop(context);
-                            Navigator.pop(context);
                             return;
                           }
                           Navigator.of(
@@ -167,10 +167,12 @@ class _LikedPostsListViewState extends State<LikedPostsListView> {
                                 ],
                               ),
                               SizedBox(height: 8),
-                              Text(
-                                likedPost.body,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
+                              PostBody(
+                                width: width,
+                                height: MediaQuery.of(context).size.height,
+                                withDetails: false,
+                                body: likedPost.body,
+                                mediaItems: likedPost.mediaItems,
                               ),
                               SizedBox(height: 8),
                               Row(
