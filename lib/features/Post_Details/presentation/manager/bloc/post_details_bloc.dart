@@ -40,6 +40,7 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
     on<ToggleCommentLike>(_onToggleCommentLike);
     on<RefreshPostDetails>(_onRefreshPostDetails);
     on<AddComment>(_onAddComment);
+    on<DeleteComment>(_onDeleteComment);
   }
   Future<void> _onAddComment(
     AddComment event,
@@ -106,6 +107,38 @@ class PostDetailsBloc extends Bloc<PostDetailsEvent, PostDetailsState> {
           CommentNode(comment: realComment),
         );
         emit(state.copyWith(comments: confirmed));
+      },
+    );
+  }
+
+  Future<void> _onDeleteComment(
+    DeleteComment event,
+    Emitter<PostDetailsState> emit,
+  ) async {
+    final updatedComments = _removeTempComment(event.parentId, event.commentId);
+    final updatedPost = event.parentId == null
+        ? state.post.copyWith(
+            commentsCount: (state.post.commentsCount - 1).clamp(0, 1 << 30).toInt(),
+          )
+        : state.post;
+
+    emit(state.copyWith(
+      comments: updatedComments,
+      post: updatedPost,
+    ));
+
+    final result = await repo.deleteComment(event.commentId);
+
+    result.fold(
+      (failure) {
+        emit(state.copyWith(failure: failure));
+      },
+      (success) {
+        if (!success) {
+          emit(state.copyWith(
+            failure: const ServerFailure(message: 'Failed to delete comment'),
+          ));
+        }
       },
     );
   }

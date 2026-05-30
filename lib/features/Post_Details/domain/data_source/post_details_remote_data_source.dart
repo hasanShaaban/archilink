@@ -12,4 +12,5 @@ abstract class PostDetailsRemoteDataSource {
     required String body,
     int? parentId,
   });
+  Future<bool> deleteComment(int commentId);
 }

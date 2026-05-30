@@ -65,3 +65,14 @@ class AddComment extends PostDetailsEvent {
   @override
   List<Object> get props => [body, parentId ?? -1];
 }
+
+class DeleteComment extends PostDetailsEvent {
+  final int commentId;
+  final int? parentId;
+
+  const DeleteComment({required this.commentId, this.parentId});
+
+  @override
+  List<Object> get props => [commentId, parentId ?? -1];
+}
+

@@ -25,6 +25,62 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
   final ScrollController _scrollController = ScrollController();
   int _lastTopLevelCount = 0;
 
+  Future<void> _showCommentOptionsMenu(
+    CommentEntity comment,
+    Offset position,
+  ) async {
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final selected = await showMenu<String>(
+      color: AppColorsFromTheme.grayForTheme(context),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      context: context,
+      position: RelativeRect.fromRect(
+        Rect.fromLTWH(position.dx, position.dy, 0, 0),
+        Offset.zero & overlay.size,
+      ),
+      items: const [
+        PopupMenuItem<String>(
+          value: 'delete',
+          child: Row(
+            children: [
+              Icon(Icons.delete_outline),
+              SizedBox(width: 8),
+              Text('Delete'),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'report',
+          child: Row(
+            children: [
+              Icon(Icons.flag_outlined),
+              SizedBox(width: 8),
+              Text('Report'),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (!mounted || selected == null) return;
+
+    if (selected == 'delete') {
+      context.read<PostDetailsBloc>().add(
+            DeleteComment(
+              commentId: comment.id,
+              parentId: comment.parentId,
+            ),
+          );
+      return;
+    }
+
+    if (selected == 'report') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Report selected for comment #${comment.id}')),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -157,20 +213,18 @@ class _PostDetailsViewBodyState extends State<PostDetailsViewBody> {
                       enabled: state.isLoadingComments,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: InkWell(
-                          onLongPress: () {
-                            //TODO implement comment options (edit, delete, report)
+                        child: Comment(
+                          onReply: widget.onReply,
+                          onLongPress: (comment, position) {
+                            _showCommentOptionsMenu(comment, position);
                           },
-                          child: Comment(
-                            onReply: widget.onReply,
-                            key: state.isLoadingComments
-                                ? null
-                                : ValueKey(state.comments[index].comment.id),
-                            width: width,
-                            entity: state.isLoadingComments
-                                ? fakeComments[index]
-                                : state.comments[index],
-                          ),
+                          key: state.isLoadingComments
+                              ? null
+                              : ValueKey(state.comments[index].comment.id),
+                          width: width,
+                          entity: state.isLoadingComments
+                              ? fakeComments[index]
+                              : state.comments[index],
                         ),
                       ),
                     );

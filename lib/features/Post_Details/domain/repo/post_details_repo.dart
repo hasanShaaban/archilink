@@ -23,4 +23,5 @@ abstract class PostDetailsRepo {
     required String body,
     int? parentId,
   });
+  Future<Either<Failure, bool>> deleteComment(int commentId);
 }

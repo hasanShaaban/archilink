@@ -100,4 +100,16 @@ class PostDetailsRepoImpl implements PostDetailsRepo {
       return left(CacheFailure());
     }
   }
+  
+  @override
+  Future<Either<Failure, bool>> deleteComment(int commentId) async {
+    try {
+      final result = await remoteDataSource.deleteComment(commentId);
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }
