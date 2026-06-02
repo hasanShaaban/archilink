@@ -9,6 +9,8 @@ part 'post_menu_state.dart';
 
 class PostMenuCubit extends Cubit<PostMenuState> {
   final PostRepo repo;
+  final Set<int> hiddenPostIds = {};
+  final Set<int> closedPostIds = {};
 
   PostMenuCubit(this.repo) : super(const PostMenuInitial());
 
@@ -38,9 +40,45 @@ class PostMenuCubit extends Cubit<PostMenuState> {
     );
   }
 
+  /// Hide a post.
+  Future<void> hidePost({required int postId}) async {
+    emit(PostMenuLoading(action: PostMenuAction.hide, postId: postId));
+
+    final result = await repo.hidePost(postId: postId);
+
+    result.fold(
+      (failure) {
+        log('PostMenuCubit: hide failed – $failure');
+        emit(PostMenuFailure(
+          action: PostMenuAction.hide,
+          postId: postId,
+          message: failure.message,
+        ));
+      },
+      (success) {
+        log('PostMenuCubit: hide success – $success');
+        hiddenPostIds.add(postId);
+        emit(PostMenuSuccess(
+          action: PostMenuAction.hide,
+          postId: postId,
+          message: 'Post hidden successfully',
+        ));
+      },
+    );
+  }
+
+  /// Close/delete a hidden post row.
+  void closeHiddenPost({required int postId}) {
+    closedPostIds.add(postId);
+    emit(PostMenuSuccess(
+      action: PostMenuAction.hide,
+      postId: postId,
+      message: '',
+    ));
+  }
+
   // ─── Add future menu actions below ───────────────────────────
   //
-  // Future<void> hidePost({required int postId}) async { ... }
   // Future<void> reportPost({required int postId}) async { ... }
   // Future<void> editPost({required int postId}) async { ... }
   // Future<void> deletePost({required int postId}) async { ... }

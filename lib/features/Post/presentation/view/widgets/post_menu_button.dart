@@ -68,7 +68,7 @@ class PostMenuButton extends StatelessWidget {
               // TODO: wire delete action.
               break;
             case PostMenuAction.hide:
-              // TODO: wire hide action.
+              context.read<PostMenuCubit>().hidePost(postId: postId);
               break;
             case PostMenuAction.report:
               // TODO: wire report action.
