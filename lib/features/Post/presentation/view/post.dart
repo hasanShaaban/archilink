@@ -100,7 +100,10 @@ class Post extends StatelessWidget {
                               owner: entity.owner,
                             ),
                             //----------------// Post more options section //--------------------------------------------------------
-                            PostMenuButton(username: entity.owner.username),
+                            PostMenuButton(
+                              username: entity.owner.username,
+                              postId: entity.id,
+                            ),
                           ],
                         ),
                         const SizedBox(height: 9),

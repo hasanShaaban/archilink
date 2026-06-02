@@ -20,4 +20,16 @@ class PostRepoImpl implements PostRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> interestPost({required int postId}) async {
+    try {
+      final result = await remoteDataSource.interestPost(postId: postId);
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

@@ -12,6 +12,7 @@ import 'package:archilink/features/Edit_Profile/domain/repo/edit_profile_repo.da
 import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/edit_profile_cubit.dart';
 import 'package:archilink/features/Edit_Profile/presentation/manager/cubit/universities_cubit.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
+import 'package:archilink/features/Post/presentation/manager/cubit/post_menu_cubit.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(create: (context) => ProfileCubit(sl<ProfileRepo>())),
         BlocProvider(create: (context) => sl<PostLikeCubit>()),
+        BlocProvider(create: (context) => sl<PostMenuCubit>()),
         BlocProvider(create: (context) => sl<ProfileBloc>()),
         
         BlocProvider(

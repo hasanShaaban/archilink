@@ -56,6 +56,7 @@ import 'package:archilink/features/Post/data/repo/post_repo_impl.dart';
 import 'package:archilink/features/Post/domain/data_soource/post_remote_data_source.dart';
 import 'package:archilink/features/Post/domain/repo/post_repo.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
+import 'package:archilink/features/Post/presentation/manager/cubit/post_menu_cubit.dart';
 import 'package:archilink/features/Post_Details/data/data_source/post_details_remote_data_source_impl.dart';
 import 'package:archilink/features/Post_Details/data/repo/post_details_repo_impl.dart';
 import 'package:archilink/features/Post_Details/domain/data_source/post_details_remote_data_source.dart';
@@ -267,6 +268,7 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton(() => CurrentUserCubit(sl()));
   sl.registerLazySingleton(() => CheckUsernameCubit(sl()));
   sl.registerLazySingleton(() => PostLikeCubit(sl()));
+  sl.registerLazySingleton(() => PostMenuCubit(sl()));
   sl.registerLazySingleton(
     () => ProfileBloc(sl<ProfileRepo>(), sl<PostLikeCubit>()),
   );

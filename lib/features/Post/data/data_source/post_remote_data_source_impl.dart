@@ -22,4 +22,18 @@ class PostRemoteDataSourceImpl implements PostRemoteDataSource {
       throw AppException.handelDioException(e);
     }
   }
+
+  @override
+  Future<bool> interestPost({required int postId}) async {
+    try {
+      final response = await apiService.post('posts/$postId/interested');
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'something went wrong');
+      }
+      return data['status'] == 'success';
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }
