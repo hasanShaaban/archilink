@@ -23,6 +23,7 @@ import 'package:archilink/features/settings/presentation/manager/cubit/followers
 import 'package:archilink/features/settings/presentation/manager/cubit/liked_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/comments_history_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_cubit.dart';
+import 'package:archilink/features/settings/presentation/views/customer_support_chat_view.dart';
 import 'package:archilink/features/settings/presentation/views/customer_support_view.dart';
 import 'package:archilink/features/settings/presentation/views/followers_and_following_view.dart';
 import 'package:archilink/features/settings/presentation/views/my_activity_view.dart';
@@ -124,6 +125,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case CustomerSupportView.name:
       return MaterialPageRoute(
         builder: (context) => const CustomerSupportView(),
+      );
+    case CustomerSupportChatView.name:
+      return MaterialPageRoute(
+        builder: (context) => const CustomerSupportChatView(),
       );
     default:
       return MaterialPageRoute(

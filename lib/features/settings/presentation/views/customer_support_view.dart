@@ -1,5 +1,6 @@
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
+import 'package:archilink/features/settings/presentation/views/customer_support_chat_view.dart';
 import 'package:archilink/features/settings/presentation/views/widgets/customer_support_input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -23,36 +24,49 @@ class CustomerSupportView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      children: [
-                        Row(
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(
+                            context,
+                            rootNavigator: true,
+                          ).pushNamed(CustomerSupportChatView.name);
+                        },
+                        child: Column(
                           children: [
-                            SvgPicture.asset(
-                              Assets.assetsIconsDot,
-                              // ignore: deprecated_member_use
-                              color: Theme.of(context).colorScheme.primary,
+                            Row(
+                              children: [
+                                SvgPicture.asset(
+                                  Assets.assetsIconsDot,
+                                  // ignore: deprecated_member_use
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'You have a reply',
+                                  style: AppTextStyle.interMedium10.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'You have a reply',
-                              style: AppTextStyle.interMedium10.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                            const SizedBox(height: 4),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Your chat',
+                                  style: AppTextStyle.interSemiBold16,
+                                ),
+                                const Icon(Icons.arrow_forward_ios, size: 16),
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Your chat',
-                              style: AppTextStyle.interSemiBold16,
-                            ),
-                            const Icon(Icons.arrow_forward_ios, size: 16),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
                     const SizedBox(height: 12),
                     const Divider(thickness: 1),
