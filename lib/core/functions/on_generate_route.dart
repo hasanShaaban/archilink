@@ -22,8 +22,10 @@ import 'package:archilink/features/Search/presentation/manager/cubit/search_cubi
 import 'package:archilink/features/settings/presentation/manager/cubit/followers_and_following_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/liked_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/comments_history_cubit.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_cubit.dart';
 import 'package:archilink/features/settings/presentation/views/followers_and_following_view.dart';
 import 'package:archilink/features/settings/presentation/views/my_activity_view.dart';
+import 'package:archilink/features/settings/presentation/views/saved_collecation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:archilink/features/Main/presentation/views/main_page.dart';
@@ -109,6 +111,13 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
             BlocProvider(create: (_) => sl<CommentsHistoryCubit>()),
           ],
           child: const MyActivityView(),
+        ),
+      );
+    case SavedCollecationView.name:
+      return MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (_) => sl<UserCollectionsCubit>()..fetchCollections(),
+          child: const SavedCollecationView(),
         ),
       );
     default:

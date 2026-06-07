@@ -9,9 +9,11 @@ import 'package:archilink/features/Auth/domain/data_source/auth_local_data_sourc
 import 'package:archilink/features/Post/domain/entity/posts_entity.dart';
 import 'package:archilink/features/Profile/domain/data_source/profile_local_data_source.dart';
 import 'package:archilink/features/Profile/domain/data_source/profile_remote_data_source.dart';
+import 'package:archilink/features/Profile/domain/entity/follow_status.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:dartz/dartz.dart';
+
 
 class ProfileRepoImpl implements ProfileRepo {
   final ProfileRemoteDataSource remoteDataSource;
@@ -88,7 +90,7 @@ class ProfileRepoImpl implements ProfileRepo {
   }
 
   @override
-  Future<Either<Failure, bool>> follow(String username) async {
+  Future<Either<Failure, FollowStatus>> follow(String username) async {
     try {
       final model = await remoteDataSource.follow(username);
       return right(model);
@@ -98,6 +100,7 @@ class ProfileRepoImpl implements ProfileRepo {
       return left(UnknownFailure());
     }
   }
+
   
   @override
   Future<Either<Failure, bool>> unfollow(String username) async{

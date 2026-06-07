@@ -3,7 +3,9 @@ import 'package:archilink/core/network/api_service.dart';
 import 'package:archilink/features/Post/data/models/posts_model.dart';
 import 'package:archilink/features/Profile/data/model/profile_model.dart';
 import 'package:archilink/features/Profile/domain/data_source/profile_remote_data_source.dart';
+import 'package:archilink/features/Profile/domain/entity/follow_status.dart';
 import 'package:dio/dio.dart';
+
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   final ApiService apiService;
@@ -56,21 +58,28 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   }
 
   @override
-  Future<bool> follow(String username) async {
+  Future<FollowStatus> follow(String username) async {
     try {
       final response = await apiService.post('user-relations/follow/$username');
       final status = response.data?['status'];
+      final message = response.data?['message'] as String?;
       if (status == null) {
-        throw ServerException(message: 'Invalid profile reponse');
+        throw ServerException(message: 'Invalid follow response');
       }
       if (status == 'fail' && response.data?['error'] != null) {
         throw ServerException(message: 'You are already following this user.');
       }
-      return status == 'success' ? true : false;
+      // "Requested Successfully." → private profile, follow request pending.
+      // "User Followed Successfully." → public profile, immediately followed.
+      if (message != null && message.toLowerCase().contains('request')) {
+        return FollowStatus.requested;
+      }
+      return FollowStatus.followed;
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }
   }
+
 
   @override
   Future<bool> unfollow(String username) async {

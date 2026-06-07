@@ -8,6 +8,7 @@ import 'package:archilink/features/settings/presentation/manager/cubit/settings_
 import 'package:archilink/features/settings/presentation/manager/cubit/settings_session_state.dart';
 import 'package:archilink/features/settings/presentation/views/followers_and_following_view.dart';
 import 'package:archilink/features/settings/presentation/views/my_activity_view.dart';
+import 'package:archilink/features/settings/presentation/views/saved_collecation_view.dart';
 import 'package:archilink/features/settings/presentation/views/widgets/setting_option.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -121,7 +122,12 @@ class SettingPage extends StatelessWidget {
                             colorScheme: colorScheme,
                             icon: Assets.assetsIconsSavedCollection,
                             title: 'Saved Collections',
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(
+                                context,
+                                rootNavigator: true,
+                              ).pushNamed(SavedCollecationView.name);
+                            },
                           ),
                           SettingOption(
                             colorScheme: colorScheme,

@@ -81,6 +81,7 @@ import 'package:archilink/features/settings/presentation/manager/cubit/followers
 import 'package:archilink/features/settings/presentation/manager/cubit/liked_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/comments_history_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/settings_session_cubit.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
@@ -299,4 +300,5 @@ Future<void> initServiceLocator({
   );
   sl.registerFactory(() => LikedPostsCubit(sl<SettingRepo>()));
   sl.registerFactory(() => CommentsHistoryCubit(sl<SettingRepo>()));
+  sl.registerFactory(() => UserCollectionsCubit(sl<SettingRepo>()));
 }

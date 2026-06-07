@@ -1,5 +1,6 @@
 import 'package:archilink/features/Post/data/models/posts_model.dart';
 import 'package:archilink/features/Profile/data/model/profile_model.dart';
+import 'package:archilink/features/Profile/domain/entity/follow_status.dart';
 
 abstract class ProfileRemoteDataSource {
   Future<ProfileModel> getProfile({required String username});
@@ -8,6 +9,7 @@ abstract class ProfileRemoteDataSource {
     required String username,
     required int page,
   });
-  Future<bool> follow(String username);
+  Future<FollowStatus> follow(String username);
   Future<bool> unfollow(String username);
 }
+

@@ -1,3 +1,4 @@
+import 'package:archilink/features/Profile/domain/entity/follow_status.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -35,6 +36,7 @@ class FollowCubit extends Cubit<FollowState> {
         isFollowing: true,
         isSubmitting: true,
         errorMessage: null,
+        clearFollowStatus: true,
       ),
     );
     final result = await profileRepo.follow(username);
@@ -45,13 +47,15 @@ class FollowCubit extends Cubit<FollowState> {
           isFollowing: false,
           isSubmitting: false,
           errorMessage: failure.message,
+          clearFollowStatus: true,
         ),
       ),
-      (success) => _safeEmit(
+      (status) => _safeEmit(
         state.copyWith(
-          isFollowing: success,
+          isFollowing: status == FollowStatus.followed,
           isSubmitting: false,
           errorMessage: null,
+          followStatus: status,
         ),
       ),
     );

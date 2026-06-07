@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<PostLikeCubit>()),
         BlocProvider(create: (context) => sl<PostMenuCubit>()),
         BlocProvider(create: (context) => sl<ProfileBloc>()),
-        
+
         BlocProvider(
           create: (context) => CreatePostCubit(
             mediaPickerService: sl<MediaPickerService>(

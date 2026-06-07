@@ -20,7 +20,7 @@ class ReverbClient {
 
     const options = PusherChannelsOptions.fromHost(
       scheme: 'ws',
-      host: '10.57.208.103',
+      host: '10.132.180.103',
       key: 'jxwpfroqsx4mu4lyl0ke',
       port: 8080,
       shouldSupplyMetadataQueries: true,
@@ -33,7 +33,6 @@ class ReverbClient {
         debugPrint('Pusher error: $exception');
         refresh();
       },
-      
     );
 
     _client!.onConnectionEstablished.listen(
