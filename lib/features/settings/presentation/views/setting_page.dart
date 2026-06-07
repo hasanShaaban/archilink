@@ -6,6 +6,7 @@ import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/settings_session_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/settings_session_state.dart';
+import 'package:archilink/features/settings/presentation/views/customer_support_view.dart';
 import 'package:archilink/features/settings/presentation/views/followers_and_following_view.dart';
 import 'package:archilink/features/settings/presentation/views/my_activity_view.dart';
 import 'package:archilink/features/settings/presentation/views/saved_collecation_view.dart';
@@ -159,7 +160,12 @@ class SettingPage extends StatelessWidget {
                             colorScheme: colorScheme,
                             icon: Assets.assetsIconsCustomerSupport,
                             title: 'Customer Support',
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(
+                                context,
+                                rootNavigator: true,
+                              ).pushNamed(CustomerSupportView.name);
+                            },
                           ),
                           SettingOption(
                             colorScheme: colorScheme,
