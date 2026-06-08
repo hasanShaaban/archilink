@@ -16,17 +16,29 @@ class CustomerSupportInputField extends StatefulWidget {
 
 class _CustomerSupportInputFieldState extends State<CustomerSupportInputField> {
   late final TextEditingController _messageController;
+  bool _isButtonEnabled = false;
 
   @override
   void initState() {
     super.initState();
     _messageController = TextEditingController();
+    _messageController.addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
+    _messageController.removeListener(_onTextChanged);
     _messageController.dispose();
     super.dispose();
+  }
+
+  void _onTextChanged() {
+    final text = _messageController.text.trim();
+    if (text.isNotEmpty != _isButtonEnabled) {
+      setState(() {
+        _isButtonEnabled = text.isNotEmpty;
+      });
+    }
   }
 
   void _handleSend() {
@@ -78,9 +90,11 @@ class _CustomerSupportInputFieldState extends State<CustomerSupportInputField> {
         ),
         const SizedBox(width: 12),
         TextButton(
-          onPressed: _handleSend,
+          onPressed: _isButtonEnabled ? _handleSend : null,
           style: TextButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backgroundColor: _isButtonEnabled
+                ? Theme.of(context).colorScheme.primary
+                : AppColorsFromTheme.grayForTheme(context),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),

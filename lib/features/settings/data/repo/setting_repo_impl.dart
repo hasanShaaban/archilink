@@ -6,6 +6,7 @@ import 'package:archilink/features/settings/domain/entity/comments_history_entit
 import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
 import 'package:archilink/features/settings/domain/entity/followers_and_followings_entity.dart';
 import 'package:archilink/features/settings/domain/entity/liked_posts_entity.dart';
+import 'package:archilink/features/settings/domain/entity/send_support_message_response_entity.dart';
 import 'package:archilink/features/settings/domain/entity/user_collection_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_messages_entity.dart';
 import 'package:archilink/features/settings/domain/repo/setting_repo.dart';
@@ -122,6 +123,22 @@ class SettingRepoImpl extends SettingRepo {
     try {
       final result = await remoteDataSource.getCustomerSupportMessages(
         page: page,
+      );
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, SendSupportMessageResponseEntity>> sendSupportMessage({
+    required String message,
+  }) async {
+    try {
+      final result = await remoteDataSource.sendSupportMessage(
+        message: message,
       );
       return right(result);
     } on AppException catch (e) {

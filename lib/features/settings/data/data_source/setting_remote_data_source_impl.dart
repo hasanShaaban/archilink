@@ -5,6 +5,7 @@ import 'package:archilink/features/settings/data/model/customer_support_chat_mod
 import 'package:archilink/features/settings/data/model/customer_support_messages_model.dart';
 import 'package:archilink/features/settings/data/model/followers_and_following_model.dart';
 import 'package:archilink/features/settings/data/model/liked_posts_model.dart';
+import 'package:archilink/features/settings/data/model/send_support_message_response_model.dart';
 import 'package:archilink/features/settings/data/model/user_collection_model.dart';
 import 'package:archilink/features/settings/domain/data_source/setting_remote_data_source.dart';
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
@@ -12,6 +13,7 @@ import 'package:archilink/features/settings/domain/entity/customer_support_chat_
 import 'package:archilink/features/settings/domain/entity/customer_support_messages_entity.dart';
 import 'package:archilink/features/settings/domain/entity/followers_and_followings_entity.dart';
 import 'package:archilink/features/settings/domain/entity/liked_posts_entity.dart';
+import 'package:archilink/features/settings/domain/entity/send_support_message_response_entity.dart';
 import 'package:archilink/features/settings/domain/entity/user_collection_entity.dart';
 import 'package:dio/dio.dart';
 
@@ -153,6 +155,25 @@ class SettingRemoteDataSourceImpl extends SettingRemoteDataSource {
         );
       }
       return CustomerSupportMessagesModel.fromJson(data);
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<SendSupportMessageResponseEntity> sendSupportMessage({
+    required String message,
+  }) async {
+    try {
+      final response = await apiService.post(
+        'customer-support/messages',
+        body: {'content': message},
+      );
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'Invalid send support message response');
+      }
+      return SendSupportMessageResponseModel.fromJson(data);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }
