@@ -24,6 +24,7 @@ import 'package:archilink/features/settings/presentation/manager/cubit/liked_pos
 import 'package:archilink/features/settings/presentation/manager/cubit/comments_history_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_chat_cubit.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_messages_cubit.dart';
 import 'package:archilink/features/settings/presentation/views/customer_support_chat_view.dart';
 import 'package:archilink/features/settings/presentation/views/customer_support_view.dart';
 import 'package:archilink/features/settings/presentation/views/followers_and_following_view.dart';
@@ -132,7 +133,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       );
     case CustomerSupportChatView.name:
       return MaterialPageRoute(
-        builder: (context) => const CustomerSupportChatView(),
+        builder: (context) => BlocProvider(
+          create: (_) => sl<CustomerSupportMessagesCubit>()..fetchMessages(),
+          child: const CustomerSupportChatView(),
+        ),
       );
     default:
       return MaterialPageRoute(
