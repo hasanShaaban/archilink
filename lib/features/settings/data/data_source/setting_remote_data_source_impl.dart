@@ -1,11 +1,13 @@
 import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/network/api_service.dart';
 import 'package:archilink/features/settings/data/model/comments_history_model.dart';
+import 'package:archilink/features/settings/data/model/customer_support_chat_model.dart';
 import 'package:archilink/features/settings/data/model/followers_and_following_model.dart';
 import 'package:archilink/features/settings/data/model/liked_posts_model.dart';
 import 'package:archilink/features/settings/data/model/user_collection_model.dart';
 import 'package:archilink/features/settings/domain/data_source/setting_remote_data_source.dart';
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
+import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
 import 'package:archilink/features/settings/domain/entity/followers_and_followings_entity.dart';
 import 'package:archilink/features/settings/domain/entity/liked_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/user_collection_entity.dart';
@@ -112,6 +114,22 @@ class SettingRemoteDataSourceImpl extends SettingRemoteDataSource {
         throw ServerException(message: 'Invalid collections response');
       }
       return UserCollectionModel.fromJsonList(data);
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<CustomerSupportChatEntity> getCustomerSupportChatDetails() async {
+    try {
+      final response = await apiService.get('customer-support/my-support-chat');
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(
+          message: 'Invalid customer support chat response',
+        );
+      }
+      return CustomerSupportChatModel.fromJson(data);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }

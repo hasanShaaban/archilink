@@ -3,6 +3,7 @@ import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/settings/domain/data_source/setting_remote_data_source.dart';
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
+import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
 import 'package:archilink/features/settings/domain/entity/followers_and_followings_entity.dart';
 import 'package:archilink/features/settings/domain/entity/liked_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/user_collection_entity.dart';
@@ -93,6 +94,19 @@ class SettingRepoImpl extends SettingRepo {
   Future<Either<Failure, List<UserCollectionEntity>>> getCollections() async {
     try {
       final result = await remoteDataSource.getCollections();
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, CustomerSupportChatEntity>>
+  getCustomerSupportChatDetails() async {
+    try {
+      final result = await remoteDataSource.getCustomerSupportChatDetails();
       return right(result);
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));

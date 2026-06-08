@@ -1,5 +1,6 @@
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
+import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
 import 'package:archilink/features/settings/domain/entity/followers_and_followings_entity.dart';
 import 'package:archilink/features/settings/domain/entity/liked_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/user_collection_entity.dart';
@@ -20,4 +21,6 @@ abstract class SettingRepo {
     required int page,
   });
   Future<Either<Failure, List<UserCollectionEntity>>> getCollections();
+  Future<Either<Failure, CustomerSupportChatEntity>>
+  getCustomerSupportChatDetails();
 }
