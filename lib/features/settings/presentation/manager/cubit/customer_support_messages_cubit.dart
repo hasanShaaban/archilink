@@ -1,16 +1,22 @@
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/message_entity.dart';
 import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/sender_entity.dart';
+import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
 import 'package:archilink/features/settings/domain/repo/setting_repo.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_chat_cubit.dart';
 import 'package:bloc/bloc.dart';
 import 'customer_support_messages_state.dart';
 
 class CustomerSupportMessagesCubit extends Cubit<CustomerSupportMessagesState> {
-  CustomerSupportMessagesCubit(this._settingRepo, this._currentUserCubit)
-      : super(const CustomerSupportMessagesInitial());
+  CustomerSupportMessagesCubit(
+    this._settingRepo,
+    this._currentUserCubit,
+    this._chatCubit,
+  ) : super(const CustomerSupportMessagesInitial());
 
   final SettingRepo _settingRepo;
   final CurrentUserCubit _currentUserCubit;
+  final CustomerSupportChatCubit _chatCubit;
 
   Future<void> fetchMessages({bool refresh = false}) async {
     if (state.isLoadingMessages || state.isLoadingMoreMessages) return;
@@ -134,6 +140,16 @@ class CustomerSupportMessagesCubit extends Cubit<CustomerSupportMessagesState> {
             messageStatuses: successStatuses,
             messages: successMessages,
             sendMessageFailure: null,
+          ),
+        );
+
+        _chatCubit.updateLastMessage(
+          CustomerSupportLastMessageEntity(
+            id: realMessage.id,
+            chatId: realMessage.chatId,
+            content: realMessage.content,
+            sentAt: realMessage.sentAt ?? DateTime.now(),
+            editedAt: realMessage.editedAt,
           ),
         );
       },

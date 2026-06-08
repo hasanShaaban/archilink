@@ -303,11 +303,12 @@ Future<void> initServiceLocator({
   sl.registerFactory(() => LikedPostsCubit(sl<SettingRepo>()));
   sl.registerFactory(() => CommentsHistoryCubit(sl<SettingRepo>()));
   sl.registerFactory(() => UserCollectionsCubit(sl<SettingRepo>()));
-  sl.registerFactory(() => CustomerSupportChatCubit(sl<SettingRepo>()));
+  sl.registerLazySingleton(() => CustomerSupportChatCubit(sl<SettingRepo>()));
   sl.registerFactory(
     () => CustomerSupportMessagesCubit(
       sl<SettingRepo>(),
       sl<CurrentUserCubit>(),
+      sl<CustomerSupportChatCubit>(),
     ),
   );
 }
