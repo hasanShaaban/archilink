@@ -56,6 +56,9 @@ class _CustomerSupportInputFieldState extends State<CustomerSupportInputField> {
       children: [
         Expanded(
           child: TextField(
+            onTapOutside: (event) {
+              FocusScope.of(context).unfocus();
+            },
             controller: _messageController,
             style: AppTextStyle.interMedium14,
             maxLines: 4,

@@ -1,3 +1,4 @@
+import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
@@ -24,10 +25,20 @@ class CustomerSupportView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              Expanded(
+                child: RefreshIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                  backgroundColor: AppColorsFromTheme.grayForTheme(context),
+                  onRefresh: () async {
+                    await context
+                        .read<CustomerSupportChatCubit>()
+                        .fetchChatDetails();
+                  },
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
@@ -184,10 +195,18 @@ class CustomerSupportView extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+          ),
               const SizedBox(height: 12),
               CustomerSupportInputField(
                 onSend: (message) {
-                  // TODO: Implement sending message to customer support
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pushNamed(
+                    CustomerSupportChatView.name,
+                    arguments: message,
+                  );
                 },
               ),
             ],

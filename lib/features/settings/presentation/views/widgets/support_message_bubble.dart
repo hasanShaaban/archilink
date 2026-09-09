@@ -34,9 +34,9 @@ class SupportMessageBubble extends StatelessWidget {
                 ),
                 onPressed: () {
                   context.read<CustomerSupportMessagesCubit>().sendMessage(
-                        message.text,
-                        tempId: message.id,
-                      );
+                    message.text,
+                    tempId: message.id,
+                  );
                 },
               ),
               const SizedBox(width: 4),
@@ -45,35 +45,96 @@ class SupportMessageBubble extends StatelessWidget {
               const SizedBox(
                 width: 14,
                 height: 14,
-                child: CircularProgressIndicator(
-                  strokeWidth: 1.5,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 1.5),
               ),
               const SizedBox(width: 8),
             ],
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.7,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isFailed
-                      ? Theme.of(context).colorScheme.error
-                      : Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.5),
-                  width: 1.5,
-                ),
-              ),
-              child: Text(
-                message.text,
-                style: AppTextStyle.interMedium14.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+            Material(
+              color: Colors.transparent,
+              child: Builder(
+                builder: (buttonContext) {
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onLongPress: () {
+                      if (message.id != null) {
+                        final RenderBox renderBox =
+                            buttonContext.findRenderObject() as RenderBox;
+                        final offset = renderBox.localToGlobal(Offset.zero);
+
+                        showMenu(
+                          context: context,
+                          color: AppColorsFromTheme.grayForTheme(context),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          position: RelativeRect.fromLTRB(
+                            offset.dx,
+                            offset.dy,
+                            offset.dx + renderBox.size.width,
+                            offset.dy + renderBox.size.height,
+                          ),
+                          items: [
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.delete_outline,
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Delete message',
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.error,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ).then((value) {
+                          if (value == 'delete') {
+                            context
+                                .read<CustomerSupportMessagesCubit>()
+                                .deleteMessage(message.id!);
+                          }
+                        });
+                      }
+                    },
+                    child: Ink(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isFailed
+                              ? Theme.of(context).colorScheme.error
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.5),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.7,
+                        ),
+                        child: Text(
+                          message.text,
+                          style: AppTextStyle.interMedium14.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],

@@ -160,6 +160,26 @@ class CustomerSupportMessagesCubit extends Cubit<CustomerSupportMessagesState> {
     emit(state.copyWith(sendMessageFailure: null));
   }
 
+  void deleteMessage(int messageId) {
+    // Remove from pending
+    final updatedPending = List<MessageEntity>.from(state.pendingMessages);
+    updatedPending.removeWhere((m) => m.id == messageId);
+
+    // Remove from messages
+    final updatedMessages = List<MessageEntity>.from(state.messages);
+    updatedMessages.removeWhere((m) => m.id == messageId);
+
+    // Remove from statuses
+    final updatedStatuses = Map<int, MessageStatus>.from(state.messageStatuses);
+    updatedStatuses.remove(messageId);
+
+    emit(state.copyWith(
+      pendingMessages: updatedPending,
+      messages: updatedMessages,
+      messageStatuses: updatedStatuses,
+    ));
+  }
+
   List<MessageEntity> _mergeMessages(
     List<MessageEntity> currentMessages,
     List<MessageEntity> incomingMessages,

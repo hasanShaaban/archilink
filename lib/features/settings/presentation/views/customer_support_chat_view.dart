@@ -1,4 +1,5 @@
 import 'package:archilink/core/functions/snack_bar_builder.dart';
+import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_messages_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_messages_state.dart';
@@ -26,7 +27,9 @@ class SupportMessage {
 }
 
 class CustomerSupportChatView extends StatefulWidget {
-  const CustomerSupportChatView({super.key});
+  const CustomerSupportChatView({super.key, this.initialMessage});
+
+  final String? initialMessage;
 
   static const String name = 'customerSupportChatView';
 
@@ -42,6 +45,15 @@ class _CustomerSupportChatViewState extends State<CustomerSupportChatView> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<CustomerSupportMessagesCubit>().sendMessage(
+            widget.initialMessage!,
+          );
+        }
+      });
+    }
   }
 
   @override
@@ -97,8 +109,7 @@ class _CustomerSupportChatViewState extends State<CustomerSupportChatView> {
           >(
             listenWhen: (prev, current) =>
                 current.sendMessageFailure != null &&
-                current.sendMessageFailure !=
-                    prev.sendMessageFailure,
+                current.sendMessageFailure != prev.sendMessageFailure,
             listener: (context, state) {
               if (state.sendMessageFailure != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -194,35 +205,49 @@ class _CustomerSupportChatViewState extends State<CustomerSupportChatView> {
                         child: Column(
                           children: [
                             Expanded(
-                              child: ListView.builder(
-                                controller: _scrollController,
-                                reverse: true,
-                                itemCount:
-                                    displayItems.length +
-                                    (state.isLoadingMoreMessages ? 1 : 0),
-                                itemBuilder: (context, index) {
-                                  if (index == displayItems.length) {
-                                    return const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 8.0,
-                                      ),
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                  final item = displayItems[index];
-
-                                  if (item is String) {
-                                    return SupportDateDivider(date: item);
-                                  }
-
-                                  final message = item as SupportMessage;
-                                  return SupportMessageBubble(message: message);
+                              child: RefreshIndicator(
+                                color: Theme.of(context).colorScheme.primary,
+                                backgroundColor:
+                                    AppColorsFromTheme.grayForTheme(context),
+                                onRefresh: () async {
+                                  await context
+                                      .read<CustomerSupportMessagesCubit>()
+                                      .fetchMessages(refresh: true);
                                 },
+                                child: ListView.builder(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  controller: _scrollController,
+                                  reverse: true,
+                                  itemCount:
+                                      displayItems.length +
+                                      (state.isLoadingMoreMessages ? 1 : 0),
+                                  itemBuilder: (context, index) {
+                                    if (index == displayItems.length) {
+                                      return const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 8.0,
+                                        ),
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    final item = displayItems[index];
+
+                                    if (item is String) {
+                                      return SupportDateDivider(date: item);
+                                    }
+
+                                    final message = item as SupportMessage;
+                                    return SupportMessageBubble(
+                                      message: message,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             const SizedBox(height: 12),

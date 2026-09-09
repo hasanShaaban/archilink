@@ -4,7 +4,8 @@ import 'package:bloc/bloc.dart';
 import 'customer_support_chat_state.dart';
 
 class CustomerSupportChatCubit extends Cubit<CustomerSupportChatState> {
-  CustomerSupportChatCubit(this._settingRepo) : super(const CustomerSupportChatInitial());
+  CustomerSupportChatCubit(this._settingRepo)
+    : super(const CustomerSupportChatInitial());
 
   final SettingRepo _settingRepo;
 
@@ -27,10 +28,7 @@ class CustomerSupportChatCubit extends Cubit<CustomerSupportChatState> {
     if (state.isLoadingChatDetails) return;
 
     emit(
-      state.copyWith(
-        isLoadingChatDetails: true,
-        chatDetailsErrorMessage: null,
-      ),
+      state.copyWith(isLoadingChatDetails: true, chatDetailsErrorMessage: null),
     );
 
     final result = await _settingRepo.getCustomerSupportChatDetails();
