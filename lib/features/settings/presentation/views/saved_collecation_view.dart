@@ -1,5 +1,7 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
+import 'package:archilink/features/settings/domain/entity/user_collection_entity.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/collection_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_state.dart';
 import 'package:archilink/features/settings/presentation/views/widgets/sliding_collections_section.dart';
@@ -19,11 +21,40 @@ class SavedCollecationView extends StatefulWidget {
 class _SavedCollecationViewState extends State<SavedCollecationView> {
   late final PageController _pageController;
   int _currentPage = 0;
+  int? _selectedCollectionId;
+
+  static final _dummyCollections = List.generate(
+    4,
+    (i) => UserCollectionEntity(
+      id: -(i + 1),
+      userId: 0,
+      title: 'Loading ${i + 1}',
+      isDefault: i == 0,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+  );
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchInitialDefaultCollectionPosts();
+    });
+  }
+
+  void _fetchInitialDefaultCollectionPosts() {
+    final collectionsState = context.read<UserCollectionsCubit>().state;
+    if (collectionsState.hasCollectionsData && _selectedCollectionId == null) {
+      final defaultCol = collectionsState.defaultCollection;
+      if (defaultCol != null) {
+        setState(() => _selectedCollectionId = defaultCol.id);
+        context.read<CollectionPostsCubit>().fetchCollectionPosts(
+              collectionId: defaultCol.id,
+            );
+      }
+    }
   }
 
   @override
@@ -53,12 +84,23 @@ class _SavedCollecationViewState extends State<SavedCollecationView> {
               ),
               const Divider(thickness: 1),
               const SizedBox(height: 8),
-              BlocBuilder<UserCollectionsCubit, UserCollectionsState>(
+              BlocConsumer<UserCollectionsCubit, UserCollectionsState>(
+                listener: (context, state) {
+                  if (state.hasCollectionsData && _selectedCollectionId == null) {
+                    final defaultCol = state.defaultCollection;
+                    if (defaultCol != null) {
+                      setState(() => _selectedCollectionId = defaultCol.id);
+                      context.read<CollectionPostsCubit>().fetchCollectionPosts(
+                            collectionId: defaultCol.id,
+                          );
+                    }
+                  }
+                },
                 builder: (context, state) {
                   final isLoading = state.isLoadingCollections;
-                  final collectionNames = isLoading
-                      ? const ['Loading 1', 'Loading 2', 'Loading 3', 'Loading 4']
-                      : state.collections.map((e) => e.title).toList();
+                  final collectionsList = isLoading
+                      ? _dummyCollections
+                      : state.collections;
 
                   if (state.collectionsErrorMessage != null) {
                     return Center(
@@ -84,16 +126,27 @@ class _SavedCollecationViewState extends State<SavedCollecationView> {
                     effect: ShimmerEffect(
                       highlightColor: Theme.of(
                         context,
-                      ).colorScheme.primary.withOpacity(0.5),
+                      ).colorScheme.primary.withValues(alpha: 0.5),
                       baseColor: AppColorsFromTheme.grayForTheme(
                         context,
-                      ).withOpacity(0.5),
+                      ).withValues(alpha: 0.5),
                     ),
                     enabled: isLoading,
                     child: SlidingCollectionsSection(
                       pageController: _pageController,
                       currentPage: _currentPage,
-                      collections: collectionNames,
+                      collections: collectionsList,
+                      selectedCollectionId: _selectedCollectionId,
+                      onCollectionSelected: (collection) {
+                        if (_selectedCollectionId != collection.id) {
+                          setState(() => _selectedCollectionId = collection.id);
+                          context
+                              .read<CollectionPostsCubit>()
+                              .fetchCollectionPosts(
+                                collectionId: collection.id,
+                              );
+                        }
+                      },
                       onPageChanged: (index) {
                         setState(() {
                           _currentPage = index;
@@ -116,3 +169,4 @@ class _SavedCollecationViewState extends State<SavedCollecationView> {
     );
   }
 }
+

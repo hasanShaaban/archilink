@@ -16,6 +16,14 @@ class UserCollectionsState extends Equatable {
 
   bool get hasCollectionsData => collections.isNotEmpty;
 
+  UserCollectionEntity? get defaultCollection {
+    try {
+      return collections.firstWhere((c) => c.isDefault);
+    } catch (_) {
+      return collections.isNotEmpty ? collections.first : null;
+    }
+  }
+
   UserCollectionsState copyWith({
     List<UserCollectionEntity>? collections,
     bool? isLoadingCollections,

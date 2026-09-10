@@ -1,8 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
+import 'package:archilink/features/Post/presentation/manager/cubit/post_save_cubit.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_action_button.dart';
+import 'package:archilink/features/Post/presentation/view/widgets/save_to_collection_bottom_sheet.dart';
+import 'package:archilink/features/settings/domain/entity/user_collection_entity.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -40,7 +45,7 @@ class PostActions extends StatelessWidget {
             ],
           ),
           PostShareButton(),
-          PostSaveButton(),
+          PostSaveButton(postId: postId),
         ],
       ),
     );
@@ -115,29 +120,71 @@ class PostShareButton extends StatelessWidget {
   }
 }
 
-class PostSaveButton extends StatefulWidget {
-  const PostSaveButton({super.key});
+class PostSaveButton extends StatelessWidget {
+  final int postId;
 
-  @override
-  State<PostSaveButton> createState() => _PostSaveButtonState();
-}
+  const PostSaveButton({super.key, required this.postId});
 
-class _PostSaveButtonState extends State<PostSaveButton> {
-  bool saved = false;
   @override
   Widget build(BuildContext context) {
-    return PostActionButton(
-      onTap: () {
-        setState(() {
-          saved = !saved;
-        });
+    final isSaved = context.select<PostSaveCubit, bool>(
+      (cubit) => cubit.isPostSaved(postId),
+    );
+
+    return BlocListener<PostSaveCubit, PostSaveState>(
+      listenWhen: (previous, current) {
+        if (current is PostSaveSuccess && current.postId == postId) return true;
+        if (current is PostSaveFailure && current.postId == postId) return true;
+        return false;
       },
-      icon: SvgPicture.asset(
-        saved ? Assets.assetsIconsSaveFilled : Assets.assetsIconsSave,
-        width: 24,
-        color: saved ? null : Theme.of(context).colorScheme.onSurface,
+      listener: (context, state) {
+        if (state is PostSaveSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        } else if (state is PostSaveFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        }
+      },
+      child: PostActionButton(
+        onTap: () async {
+          final selectedCollection =
+              await showModalBottomSheet<UserCollectionEntity>(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (bottomSheetContext) => BlocProvider(
+              create: (_) => sl<UserCollectionsCubit>()..fetchCollections(),
+              child: const SaveToCollectionBottomSheet(),
+            ),
+          );
+
+          if (!context.mounted) return;
+
+          if (selectedCollection != null) {
+            context.read<PostSaveCubit>().savePost(
+                  postId: postId,
+                  collectionId: selectedCollection.id,
+                  collectionTitle: selectedCollection.title,
+                );
+          } else {
+            // User skipped choosing specific collection (like tap outside the bottom sheet)
+            // The manager will use the id of the default collection
+            context.read<PostSaveCubit>().savePost(
+                  postId: postId,
+                );
+          }
+        },
+        icon: SvgPicture.asset(
+          isSaved ? Assets.assetsIconsSaveFilled : Assets.assetsIconsSave,
+          width: 24,
+          color: isSaved ? null : Theme.of(context).colorScheme.onSurface,
+        ),
+        withCount: false,
       ),
-      withCount: false,
     );
   }
 }
+

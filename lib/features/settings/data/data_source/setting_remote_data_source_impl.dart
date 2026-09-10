@@ -1,5 +1,6 @@
 import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/network/api_service.dart';
+import 'package:archilink/features/settings/data/model/collection_posts_model.dart';
 import 'package:archilink/features/settings/data/model/comments_history_model.dart';
 import 'package:archilink/features/settings/data/model/customer_support_chat_model.dart';
 import 'package:archilink/features/settings/data/model/customer_support_messages_model.dart';
@@ -8,6 +9,7 @@ import 'package:archilink/features/settings/data/model/liked_posts_model.dart';
 import 'package:archilink/features/settings/data/model/send_support_message_response_model.dart';
 import 'package:archilink/features/settings/data/model/user_collection_model.dart';
 import 'package:archilink/features/settings/domain/data_source/setting_remote_data_source.dart';
+import 'package:archilink/features/settings/domain/entity/collection_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_messages_entity.dart';
@@ -117,7 +119,23 @@ class SettingRemoteDataSourceImpl extends SettingRemoteDataSource {
       if (data == null) {
         throw ServerException(message: 'Invalid collections response');
       }
-      return UserCollectionModel.fromJsonList(data);
+      return UserCollectionModel.fromJsonList(data['data']);
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<CollectionPostsEntity> getCollectionPosts({
+    required int collectionId,
+  }) async {
+    try {
+      final response = await apiService.get('collections/$collectionId/items');
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'Invalid collection posts response');
+      }
+      return CollectionPostsModel.fromJson(data);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }

@@ -57,6 +57,7 @@ import 'package:archilink/features/Post/domain/data_soource/post_remote_data_sou
 import 'package:archilink/features/Post/domain/repo/post_repo.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_menu_cubit.dart';
+import 'package:archilink/features/Post/presentation/manager/cubit/post_save_cubit.dart';
 import 'package:archilink/features/Post_Details/data/data_source/post_details_remote_data_source_impl.dart';
 import 'package:archilink/features/Post_Details/data/repo/post_details_repo_impl.dart';
 import 'package:archilink/features/Post_Details/domain/data_source/post_details_remote_data_source.dart';
@@ -82,6 +83,7 @@ import 'package:archilink/features/settings/presentation/manager/cubit/liked_pos
 import 'package:archilink/features/settings/presentation/manager/cubit/comments_history_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/settings_session_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_cubit.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/collection_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_chat_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_messages_cubit.dart';
 import 'package:dio/dio.dart';
@@ -273,6 +275,12 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton(() => PostLikeCubit(sl()));
   sl.registerLazySingleton(() => PostMenuCubit(sl()));
   sl.registerLazySingleton(
+    () => PostSaveCubit(
+      postRepo: sl<PostRepo>(),
+      settingRepo: sl<SettingRepo>(),
+    ),
+  );
+  sl.registerLazySingleton(
     () => ProfileBloc(sl<ProfileRepo>(), sl<PostLikeCubit>()),
   );
   sl.registerLazySingleton(
@@ -303,6 +311,7 @@ Future<void> initServiceLocator({
   sl.registerFactory(() => LikedPostsCubit(sl<SettingRepo>()));
   sl.registerFactory(() => CommentsHistoryCubit(sl<SettingRepo>()));
   sl.registerFactory(() => UserCollectionsCubit(sl<SettingRepo>()));
+  sl.registerFactory(() => CollectionPostsCubit(sl<SettingRepo>()));
   sl.registerFactory(() => CustomerSupportChatCubit(sl<SettingRepo>()));
   sl.registerFactory(
     () => CustomerSupportMessagesCubit(

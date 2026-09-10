@@ -56,8 +56,7 @@ class _SplashViewBodyState extends State<SplashViewBody> {
 
     if (token != null) {
       // Fire and forget — PusherClient._initialized guard prevents double init
-      sl<ReverbClient>().init(token: token);
-      // sl<PusherClient>().init(token: token);
+      // sl<ReverbClient>().init(token: token);//TODO: Fix WebSocket Error: Client not connected.
     }
 
     if (rememberMe != null && rememberMe) {

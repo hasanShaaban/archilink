@@ -1,3 +1,4 @@
+import 'package:archilink/features/settings/domain/entity/user_collection_entity.dart';
 import 'package:archilink/features/settings/presentation/views/widgets/collection_card.dart';
 import 'package:archilink/features/settings/presentation/views/widgets/collection_page_indector.dart';
 import 'package:flutter/material.dart';
@@ -9,19 +10,25 @@ class SlidingCollectionsSection extends StatelessWidget {
     required this.currentPage,
     required this.collections,
     required this.onPageChanged,
+    this.selectedCollectionId,
+    this.onCollectionSelected,
   });
 
   final PageController pageController;
   final int currentPage;
-  final List<String> collections;
+  final List<UserCollectionEntity> collections;
   final ValueChanged<int> onPageChanged;
+  final int? selectedCollectionId;
+  final ValueChanged<UserCollectionEntity>? onCollectionSelected;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final containerSize = size.height * 0.055;
     final double cardHeight = containerSize + 32; // 16 top + 16 bottom padding
-    final double gridHeight = cardHeight * 2; // 2 rows
+    final double gridHeight = collections.length > 2
+        ? cardHeight * 2
+        : cardHeight; // 2 rows
 
     return Column(
       children: [
@@ -49,7 +56,12 @@ class SlidingCollectionsSection extends StatelessWidget {
                 ),
                 itemCount: pageItems.length,
                 itemBuilder: (context, index) {
-                  return CollectionCard(title: pageItems[index]);
+                  final item = pageItems[index];
+                  return CollectionCard(
+                    title: item.title,
+                    isSelected: item.id == selectedCollectionId,
+                    onTap: () => onCollectionSelected?.call(item),
+                  );
                 },
               );
             },
@@ -63,3 +75,4 @@ class SlidingCollectionsSection extends StatelessWidget {
     );
   }
 }
+

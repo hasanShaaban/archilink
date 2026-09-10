@@ -1,3 +1,4 @@
+import 'package:archilink/features/settings/domain/entity/collection_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_messages_entity.dart';
@@ -18,7 +19,7 @@ abstract class SettingRemoteDataSource {
   });
   Future<LikedPostsEntity> getLikedPosts({required int page});
   Future<CommentsHistoryEntity> getCommentsHistory({required int page});
-  Future<List<UserCollectionEntity>> getCollections();
+
   Future<CustomerSupportChatEntity> getCustomerSupportChatDetails();
   Future<CustomerSupportMessagesEntity> getCustomerSupportMessages({
     required int page,
@@ -26,4 +27,8 @@ abstract class SettingRemoteDataSource {
   Future<SendSupportMessageResponseEntity> sendSupportMessage({
     required String message,
   });
+
+  //Collections reqests
+  Future<List<UserCollectionEntity>> getCollections();
+  Future<CollectionPostsEntity> getCollectionPosts({required int collectionId});
 }

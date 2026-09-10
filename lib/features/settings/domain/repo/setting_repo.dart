@@ -1,4 +1,5 @@
 import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/features/settings/domain/entity/collection_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
 import 'package:archilink/features/settings/domain/entity/followers_and_followings_entity.dart';
@@ -29,5 +30,9 @@ abstract class SettingRepo {
   getCustomerSupportMessages({required int page});
   Future<Either<Failure, SendSupportMessageResponseEntity>> sendSupportMessage({
     required String message,
+  });
+
+  Future<Either<Failure, CollectionPostsEntity>> getCollectionPosts({
+    required int collectionId,
   });
 }

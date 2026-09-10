@@ -5,4 +5,8 @@ abstract class PostRepo {
   Future<Either<Failure, bool>> togglePostLike({required int postId});
   Future<Either<Failure, bool>> interestPost({required int postId});
   Future<Either<Failure, bool>> hidePost({required int postId});
+  Future<Either<Failure, bool>> savePost({
+    required int postId,
+    required int collectionId,
+  });
 }

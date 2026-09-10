@@ -11,6 +11,7 @@ import 'package:equatable/equatable.dart';
 
 part 'auth_state.dart';
 
+//TODO: Fix WebSocket Error: Client not connected.
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
   final NotificationRepo notificationRepo;
@@ -41,7 +42,7 @@ class AuthCubit extends Cubit<AuthState> {
         currentUserCubit.setUsername(success.username);
         currentUserCubit.setToken(success.accessToken);
 
-        await reverbClient.init(token: success.accessToken);
+        // await reverbClient.init(token: success.accessToken);
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());
@@ -75,7 +76,7 @@ class AuthCubit extends Cubit<AuthState> {
         currentUserCubit.setUsername(success.user.username);
         currentUserCubit.setToken(success.token);
 
-        await reverbClient.init(token: success.token);
+        // await reverbClient.init(token: success.token);
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());

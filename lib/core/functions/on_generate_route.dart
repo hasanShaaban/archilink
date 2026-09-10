@@ -25,6 +25,7 @@ import 'package:archilink/features/settings/presentation/manager/cubit/followers
 import 'package:archilink/features/settings/presentation/manager/cubit/liked_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/comments_history_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_cubit.dart';
+import 'package:archilink/features/settings/presentation/manager/cubit/collection_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_chat_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_messages_cubit.dart';
 import 'package:archilink/features/settings/presentation/views/customer_support_chat_view.dart';
@@ -121,8 +122,15 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       );
     case SavedCollecationView.name:
       return MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (_) => sl<UserCollectionsCubit>()..fetchCollections(),
+        builder: (context) => MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => sl<UserCollectionsCubit>()..fetchCollections(),
+            ),
+            BlocProvider(
+              create: (_) => sl<CollectionPostsCubit>(),
+            ),
+          ],
           child: const SavedCollecationView(),
         ),
       );
