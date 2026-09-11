@@ -28,9 +28,9 @@ class EditProfileRemoteDataSourceImpl extends EditProfileRemoteDataSource {
   Future<bool> updateProfile(EditProfileRequestBody requestBody) async {
     try {
       final body = <String, dynamic>{};
-
       if (requestBody.fullName != null) body['name'] = requestBody.fullName;
       if (requestBody.bio != null) body['bio'] = requestBody.bio;
+      if (requestBody.aboutMe != null) body['about_me'] = requestBody.aboutMe;
       if (requestBody.country != null) body['country'] = requestBody.country;
       if (requestBody.city != null) body['city'] = requestBody.city;
 

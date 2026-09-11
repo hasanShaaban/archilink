@@ -1,4 +1,3 @@
-
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +15,7 @@ class ProfileDetailsContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,

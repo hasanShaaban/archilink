@@ -6,6 +6,8 @@ class ProfileEntity extends Equatable {
   final String? profilePictureUrl;
   final String? bio;
   final bool isFollowing;
+  final bool isVerified;
+  final String privacySetting;
   final int followersCount;
   final int followingCount;
   final int postsCount;
@@ -25,7 +27,41 @@ class ProfileEntity extends Equatable {
     required this.role,
     required this.details,
     required this.bio,
+    this.isVerified = false,
+    this.privacySetting = 'public',
   });
+
+  ProfileEntity copyWith({
+    String? name,
+    String? username,
+    String? profilePictureUrl,
+    String? bio,
+    bool? isFollowing,
+    bool? isVerified,
+    String? privacySetting,
+    int? followersCount,
+    int? followingCount,
+    int? postsCount,
+    int? projectCount,
+    String? role,
+    ProfileDetailsEntity? details,
+  }) {
+    return ProfileEntity(
+      name: name ?? this.name,
+      username: username ?? this.username,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      bio: bio ?? this.bio,
+      isFollowing: isFollowing ?? this.isFollowing,
+      isVerified: isVerified ?? this.isVerified,
+      privacySetting: privacySetting ?? this.privacySetting,
+      followersCount: followersCount ?? this.followersCount,
+      followingCount: followingCount ?? this.followingCount,
+      postsCount: postsCount ?? this.postsCount,
+      projectCount: projectCount ?? this.projectCount,
+      role: role ?? this.role,
+      details: details ?? this.details,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -33,10 +69,12 @@ class ProfileEntity extends Equatable {
     username,
     bio,
     profilePictureUrl,
+    isFollowing,
+    isVerified,
+    privacySetting,
     followersCount,
     followingCount,
     postsCount,
-    isFollowing,
     projectCount,
     role,
     details,

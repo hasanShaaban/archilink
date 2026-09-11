@@ -1,4 +1,3 @@
-
 import 'package:archilink/features/Edit_Profile/domain/entity/edit_profile_request_body.dart';
 import 'package:archilink/features/Edit_Profile/domain/repo/edit_profile_repo.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
@@ -43,7 +42,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
           (c) => ContactInfo(
             handle: c.username,
             platform: c.platform,
-            url: c.url!,
+            url: c.url ?? '',
           ),
         )
         .toList();
@@ -307,7 +306,9 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     final (String? city, String? country) = state.hasBasicInfoChanges
         ? _parseLocation(state.location)
         : (null, null);
-    final String? aboutMe = state.hasAboutMeChanges ? state.aboutMe.trim() : null;
+    final String? aboutMe = state.hasAboutMeChanges
+        ? state.aboutMe.trim()
+        : null;
     // Skills — send full list or null
     final List<String>? skills = state.hasSkillsChanges
         ? List.from(state.skills)
@@ -328,6 +329,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     return EditProfileRequestBody(
       fullName: fullName,
       bio: bio,
+      aboutMe: aboutMe,
       city: city,
       country: country,
       skills: skills,
@@ -351,9 +353,8 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   }
 
   AcademicExperianceRequestBody _mapAcademicExperience(AcademicExperience e) {
-
     return AcademicExperianceRequestBody(
-      university: e.universityId, 
+      university: e.universityId,
       degree: e.degree,
       fieldOfStudy: e.fieldOfStudy,
       startDate: e.startYear!,
@@ -384,5 +385,3 @@ class EditProfileCubit extends Cubit<EditProfileState> {
 extension on String {
   String? nullIfEmpty() => trim().isEmpty ? null : trim();
 }
-
-

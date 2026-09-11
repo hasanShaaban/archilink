@@ -4,36 +4,35 @@ import 'package:archilink/features/Post/data/models/posts_model.dart';
 import 'package:archilink/features/Home/domain/data_source/home_remote_data_source.dart';
 import 'package:dio/dio.dart';
 
-class HomeRemoteDataSourceImpl implements HomeRemoteDataSource{
+class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
   final ApiService apiService;
 
   HomeRemoteDataSourceImpl(this.apiService);
-  
+
   @override
-  Future<PostsModel> getGlobalFeed({required int page}) async{
+  Future<PostsModel> getGlobalFeed({required int page}) async {
     try {
       final response = await apiService.get('home/global-feed?page=$page');
       final data = response.data?['data'];
-      if(data == null){
+      if (data == null) {
         throw ServerException(message: "Invalid data response");
       }
       return PostsModel.fromJson(data);
-
-    }on DioException catch(e){
+    } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }
   }
-  
+
   @override
-  Future<PostsModel> getFollowingFeed({required int page}) async{
+  Future<PostsModel> getFollowingFeed({required int page}) async {
     try {
-      final reponse = await apiService.get('home/followed-feed');
+      final reponse = await apiService.get('home/followed-feed?page=$page');
       final data = reponse.data?['data'];
-      if(data == null ){
+      if (data == null) {
         throw ServerException(message: 'Invalid data response');
       }
       return PostsModel.fromJson(data);
-    }on DioException catch(e){
+    } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }
   }

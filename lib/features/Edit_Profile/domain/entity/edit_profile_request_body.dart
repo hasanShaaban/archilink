@@ -1,6 +1,7 @@
 class EditProfileRequestBody {
   final String? fullName;
   final String? bio;
+  final String? aboutMe;
   final String? country;
   final String? city;
   final List<String>? skills;
@@ -10,6 +11,7 @@ class EditProfileRequestBody {
   EditProfileRequestBody({
     required this.fullName,
     required this.bio,
+    this.aboutMe,
     required this.country,
     required this.city,
     required this.academicExperiences,
