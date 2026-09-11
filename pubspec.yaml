@@ -59,6 +59,7 @@ dependencies:
   
   skeletonizer: ^2.1.2
   wechat_assets_picker: ^10.1.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_lints: ^5.0.0

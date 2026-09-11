@@ -135,9 +135,11 @@ class ProfileDetailsPage extends StatelessWidget {
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (int i = 0;
-                      i < details.academicExperiences.length;
-                      i++) ...[
+                  for (
+                    int i = 0;
+                    i < details.academicExperiences.length;
+                    i++
+                  ) ...[
                     if (i > 0) const SizedBox(height: 8),
                     _buildAcademicExperienceRow(
                       context,
@@ -192,8 +194,9 @@ class ProfileDetailsPage extends StatelessWidget {
                       title: details.contactInfo[i].username.isNotEmpty
                           ? details.contactInfo[i].username
                           : (details.contactInfo[i].url ??
-                              details.contactInfo[i].platform),
+                                details.contactInfo[i].platform),
                       icon: _chooseContactIcon(details.contactInfo[i].platform),
+                      url: details.contactInfo[i].url,
                     ),
                   ],
                 ],
