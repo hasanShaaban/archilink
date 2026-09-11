@@ -8,11 +8,19 @@ class UserCollectionsState extends Equatable {
     this.collections = const <UserCollectionEntity>[],
     this.isLoadingCollections = false,
     this.collectionsErrorMessage,
+    this.isCreatingCollection = false,
+    this.createCollectionErrorMessage,
+    this.isEditingCollection = false,
+    this.editCollectionErrorMessage,
   });
 
   final List<UserCollectionEntity> collections;
   final bool isLoadingCollections;
   final String? collectionsErrorMessage;
+  final bool isCreatingCollection;
+  final String? createCollectionErrorMessage;
+  final bool isEditingCollection;
+  final String? editCollectionErrorMessage;
 
   bool get hasCollectionsData => collections.isNotEmpty;
 
@@ -28,6 +36,10 @@ class UserCollectionsState extends Equatable {
     List<UserCollectionEntity>? collections,
     bool? isLoadingCollections,
     Object? collectionsErrorMessage = _noChange,
+    bool? isCreatingCollection,
+    Object? createCollectionErrorMessage = _noChange,
+    bool? isEditingCollection,
+    Object? editCollectionErrorMessage = _noChange,
   }) {
     return UserCollectionsState(
       collections: collections ?? this.collections,
@@ -35,6 +47,14 @@ class UserCollectionsState extends Equatable {
       collectionsErrorMessage: collectionsErrorMessage == _noChange
           ? this.collectionsErrorMessage
           : collectionsErrorMessage as String?,
+      isCreatingCollection: isCreatingCollection ?? this.isCreatingCollection,
+      createCollectionErrorMessage: createCollectionErrorMessage == _noChange
+          ? this.createCollectionErrorMessage
+          : createCollectionErrorMessage as String?,
+      isEditingCollection: isEditingCollection ?? this.isEditingCollection,
+      editCollectionErrorMessage: editCollectionErrorMessage == _noChange
+          ? this.editCollectionErrorMessage
+          : editCollectionErrorMessage as String?,
     );
   }
 
@@ -43,6 +63,10 @@ class UserCollectionsState extends Equatable {
         collections,
         isLoadingCollections,
         collectionsErrorMessage,
+        isCreatingCollection,
+        createCollectionErrorMessage,
+        isEditingCollection,
+        editCollectionErrorMessage,
       ];
 }
 

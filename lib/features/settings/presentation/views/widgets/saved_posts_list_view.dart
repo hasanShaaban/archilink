@@ -6,6 +6,7 @@ import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/curren
 import 'package:archilink/features/Main/presentation/manager/main_tab_controller.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
+import 'package:archilink/features/Post/presentation/manager/cubit/post_save_cubit.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_body.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_user_image.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/post_username_and_date.dart';
@@ -14,6 +15,7 @@ import 'package:archilink/features/Post_Details/presentation/view/post_details_v
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
+import 'package:archilink/features/settings/domain/entity/collection_posts_entity.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/collection_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/collection_posts_state.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,37 @@ class SavedPostsListView extends StatefulWidget {
 
 class _SavedPostsListViewState extends State<SavedPostsListView> {
   int? _loadingPostId;
+  final Set<int> _unsavingItemIds = {};
+
+  Future<void> _unsavePost(CollectionItemEntity item) async {
+    if (_unsavingItemIds.contains(item.id)) return;
+
+    setState(() => _unsavingItemIds.add(item.id));
+
+    final result = await context
+        .read<CollectionPostsCubit>()
+        .removeItemFromCollection(itemId: item.id);
+
+    if (!mounted) return;
+
+    setState(() => _unsavingItemIds.remove(item.id));
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failure.message)),
+        );
+      },
+      (success) {
+        if (sl.isRegistered<PostSaveCubit>()) {
+          sl<PostSaveCubit>().removeSavedPost(item.collectibleId);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Post removed from collection')),
+        );
+      },
+    );
+  }
 
   static final _dummySkeletonPosts = [
     PostEntity(
@@ -162,6 +195,8 @@ class _SavedPostsListViewState extends State<SavedPostsListView> {
                   isLoadingDetails: false,
                   onGoToPost: () {},
                   onUserTap: () {},
+                  onUnsave: () {},
+                  isUnsaving: false,
                 );
               },
             ),
@@ -238,6 +273,8 @@ class _SavedPostsListViewState extends State<SavedPostsListView> {
               isLoadingDetails: _loadingPostId == post.id,
               onGoToPost: () => _openPostDetails(post),
               onUserTap: () => _navigateToProfile(post.owner.username),
+              onUnsave: () => _unsavePost(collectionItem),
+              isUnsaving: _unsavingItemIds.contains(collectionItem.id),
             );
           },
         );
@@ -253,6 +290,8 @@ class _SavedPostCard extends StatelessWidget {
     required this.isLoadingDetails,
     required this.onGoToPost,
     required this.onUserTap,
+    required this.onUnsave,
+    this.isUnsaving = false,
   });
 
   final double width;
@@ -260,6 +299,8 @@ class _SavedPostCard extends StatelessWidget {
   final bool isLoadingDetails;
   final VoidCallback onGoToPost;
   final VoidCallback onUserTap;
+  final VoidCallback onUnsave;
+  final bool isUnsaving;
 
   @override
   Widget build(BuildContext context) {
@@ -304,14 +345,30 @@ class _SavedPostCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          SvgPicture.asset(
-                            Assets.assetsIconsSaveFilled,
-                            colorFilter: ColorFilter.mode(
-                              Theme.of(context).colorScheme.primary,
-                              BlendMode.srcIn,
-                            ),
-                            width: 22,
-                            height: 22,
+                          IconButton(
+                            onPressed: isUnsaving ? null : onUnsave,
+                            tooltip: 'Unsave post',
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: isUnsaving
+                                ? SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  )
+                                : SvgPicture.asset(
+                                    Assets.assetsIconsSaveFilled,
+                                    colorFilter: ColorFilter.mode(
+                                      Theme.of(context).colorScheme.primary,
+                                      BlendMode.srcIn,
+                                    ),
+                                    width: 22,
+                                    height: 22,
+                                  ),
                           ),
                           const SizedBox(width: 16),
                           TextButton(

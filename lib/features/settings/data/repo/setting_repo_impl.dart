@@ -164,4 +164,68 @@ class SettingRepoImpl extends SettingRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> createCollection({
+    required String title,
+  }) async {
+    try {
+      final result = await remoteDataSource.createCollection(title: title);
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> removeItemFromCollection({
+    required int itemId,
+  }) async {
+    try {
+      final result = await remoteDataSource.removeItemFromCollection(
+        itemId: itemId,
+      );
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> removeCollection({
+    required int collectionId,
+  }) async {
+    try {
+      final result = await remoteDataSource.removeCollection(
+        collectionId: collectionId,
+      );
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> editCollectionName({
+    required String name,
+    required int id,
+  }) async {
+    try {
+      final result = await remoteDataSource.editCollectionName(
+        name: name,
+        id: id,
+      );
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

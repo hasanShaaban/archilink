@@ -37,6 +37,19 @@ final class PostSaveSuccess extends PostSaveState {
   List<Object?> get props => [postId, collectionId, collectionTitle, message];
 }
 
+final class PostUnsaveSuccess extends PostSaveState {
+  final int postId;
+  final String message;
+
+  const PostUnsaveSuccess({
+    required this.postId,
+    this.message = 'Post removed from saved',
+  });
+
+  @override
+  List<Object?> get props => [postId, message];
+}
+
 final class PostSaveFailure extends PostSaveState {
   final int postId;
   final String message;

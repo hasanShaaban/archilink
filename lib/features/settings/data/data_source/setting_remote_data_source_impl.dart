@@ -196,4 +196,74 @@ class SettingRemoteDataSourceImpl extends SettingRemoteDataSource {
       throw AppException.handelDioException(e);
     }
   }
+
+  @override
+  Future<bool> createCollection({required String title}) async {
+    try {
+      final response = await apiService.post(
+        'collections',
+        body: {'title': title},
+      );
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'Invalid create collection response');
+      }
+
+      return data['status'] == 'success';
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<bool> removeItemFromCollection({required int itemId}) async {
+    try {
+      final response = await apiService.delete(
+        'collections/item/$itemId/remove-item',
+      );
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(
+          message: 'Invalid remove item from collection response',
+        );
+      }
+      return data['status'] == 'success';
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<bool> removeCollection({required int collectionId}) async {
+    try {
+      final response = await apiService.delete('collections/$collectionId');
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'Invalid remove collection response');
+      }
+      return data['status'] == 'success';
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<bool> editCollectionName({
+    required String name,
+    required int id,
+  }) async {
+    try {
+      final response = await apiService.patch(
+        'collections/$id',
+        body: {'title': name},
+      );
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'Invalid edit collection response');
+      }
+      return data['status'] == 'success';
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }

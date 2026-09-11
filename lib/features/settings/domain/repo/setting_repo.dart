@@ -35,4 +35,11 @@ abstract class SettingRepo {
   Future<Either<Failure, CollectionPostsEntity>> getCollectionPosts({
     required int collectionId,
   });
+  Future<Either<Failure, bool>> createCollection({required String title});
+  Future<Either<Failure, bool>> removeItemFromCollection({required int itemId});
+  Future<Either<Failure, bool>> removeCollection({required int collectionId});
+  Future<Either<Failure, bool>> editCollectionName({
+    required String name,
+    required int id,
+  });
 }

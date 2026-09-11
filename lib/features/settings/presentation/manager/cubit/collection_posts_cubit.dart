@@ -1,5 +1,7 @@
+import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/settings/domain/repo/setting_repo.dart';
 import 'package:bloc/bloc.dart';
+import 'package:dartz/dartz.dart';
 import 'collection_posts_state.dart';
 
 class CollectionPostsCubit extends Cubit<CollectionPostsState> {
@@ -50,5 +52,25 @@ class CollectionPostsCubit extends Cubit<CollectionPostsState> {
         );
       },
     );
+  }
+
+  Future<Either<Failure, bool>> removeItemFromCollection({
+    required int itemId,
+  }) async {
+    final result = await _settingRepo.removeItemFromCollection(itemId: itemId);
+    if (isClosed) return left(UnknownFailure());
+
+    result.fold(
+      (_) {},
+      (success) {
+        if (success) {
+          final updatedItems =
+              state.items.where((item) => item.id != itemId).toList();
+          emit(state.copyWith(items: updatedItems));
+        }
+      },
+    );
+
+    return result;
   }
 }

@@ -5,12 +5,17 @@ import 'package:archilink/features/Post/presentation/manager/cubit/post_save_cub
 import 'package:archilink/features/settings/domain/entity/user_collection_entity.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/user_collections_state.dart';
+import 'package:archilink/features/settings/presentation/views/widgets/collection_title_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class SaveToCollectionBottomSheet extends StatelessWidget {
   const SaveToCollectionBottomSheet({super.key});
+
+  void _showAddCollectionDialog(BuildContext context) {
+    CollectionTitleDialog.show(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +63,7 @@ class SaveToCollectionBottomSheet extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      // TODO: implement create new collection
-                    },
+                    onPressed: () => _showAddCollectionDialog(context),
                     tooltip: 'New collection',
                     icon: SvgPicture.asset(
                       Assets.assetsIconsAdd,
@@ -276,3 +279,4 @@ class _CollectionItemTile extends StatelessWidget {
     );
   }
 }
+

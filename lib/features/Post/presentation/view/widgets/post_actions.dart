@@ -134,11 +134,16 @@ class PostSaveButton extends StatelessWidget {
     return BlocListener<PostSaveCubit, PostSaveState>(
       listenWhen: (previous, current) {
         if (current is PostSaveSuccess && current.postId == postId) return true;
+        if (current is PostUnsaveSuccess && current.postId == postId) return true;
         if (current is PostSaveFailure && current.postId == postId) return true;
         return false;
       },
       listener: (context, state) {
         if (state is PostSaveSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        } else if (state is PostUnsaveSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
@@ -150,6 +155,11 @@ class PostSaveButton extends StatelessWidget {
       },
       child: PostActionButton(
         onTap: () async {
+          if (isSaved) {
+            context.read<PostSaveCubit>().unsavePost(postId: postId);
+            return;
+          }
+
           final selectedCollection =
               await showModalBottomSheet<UserCollectionEntity>(
             context: context,

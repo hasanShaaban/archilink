@@ -19,8 +19,6 @@ import 'package:archilink/features/Post_Details/presentation/view/post_details_v
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/features/Search/domain/repo/search_repo.dart';
 import 'package:archilink/features/Search/presentation/manager/cubit/search_cubit.dart';
-import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
-import 'package:archilink/features/settings/domain/repo/setting_repo.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/followers_and_following_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/liked_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/comments_history_cubit.dart';
@@ -136,25 +134,25 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       );
     case CustomerSupportView.name:
       return MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (_) => sl<CustomerSupportChatCubit>()..fetchChatDetails(),
+        builder: (context) => BlocProvider.value(
+          value: sl<CustomerSupportChatCubit>()..fetchChatDetails(),
           child: const CustomerSupportView(),
         ),
       );
     case CustomerSupportChatView.name:
       final initialMessage = settings.arguments as String?;
       return MaterialPageRoute(
-        builder: (context) {
-          final chatCubit = context.read<CustomerSupportChatCubit>();
-          return BlocProvider(
-            create: (_) => CustomerSupportMessagesCubit(
-              sl<SettingRepo>(),
-              sl<CurrentUserCubit>(),
-              chatCubit,
-            )..fetchMessages(),
-            child: CustomerSupportChatView(initialMessage: initialMessage),
-          );
-        },
+        builder: (context) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(
+              value: sl<CustomerSupportChatCubit>(),
+            ),
+            BlocProvider(
+              create: (_) => sl<CustomerSupportMessagesCubit>()..fetchMessages(),
+            ),
+          ],
+          child: CustomerSupportChatView(initialMessage: initialMessage),
+        ),
       );
     default:
       return MaterialPageRoute(

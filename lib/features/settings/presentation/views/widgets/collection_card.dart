@@ -8,11 +8,13 @@ class CollectionCard extends StatelessWidget {
     required this.title,
     this.isSelected = false,
     this.onTap,
+    this.onLongPress,
   });
 
   final String title;
   final bool isSelected;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,7 @@ class CollectionCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),

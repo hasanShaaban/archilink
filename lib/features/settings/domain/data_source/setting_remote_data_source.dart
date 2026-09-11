@@ -31,4 +31,8 @@ abstract class SettingRemoteDataSource {
   //Collections reqests
   Future<List<UserCollectionEntity>> getCollections();
   Future<CollectionPostsEntity> getCollectionPosts({required int collectionId});
+  Future<bool> createCollection({required String title});
+  Future<bool> removeItemFromCollection({required int itemId});
+  Future<bool> removeCollection({required int collectionId});
+  Future<bool> editCollectionName({required String name, required int id});
 }
