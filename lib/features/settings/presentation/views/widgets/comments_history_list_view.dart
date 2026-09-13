@@ -135,9 +135,6 @@ class _CommentsHistoryListViewState extends State<CommentsHistoryListView> {
                       context.read<ProfileCubit>().getUserProfile(
                         post.owner.username,
                       );
-                      BlocProvider.of<ProfileBloc>(context).add(
-                        LoadInitialProfilePosts(username: post.owner.username),
-                      );
                     },
                     child: PostUserImage(
                       width: width,

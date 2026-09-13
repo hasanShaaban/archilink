@@ -135,11 +135,6 @@ class _LikedPostsListViewState extends State<LikedPostsListView> {
                           context.read<ProfileCubit>().getUserProfile(
                             likedPost.owner.username,
                           );
-                          BlocProvider.of<ProfileBloc>(context).add(
-                            LoadInitialProfilePosts(
-                              username: likedPost.owner.username,
-                            ),
-                          );
                         },
                         child: PostUserImage(
                           width: width,

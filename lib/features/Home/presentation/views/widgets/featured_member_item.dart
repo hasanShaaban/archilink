@@ -65,9 +65,6 @@ class FeaturedMemberItem extends StatelessWidget {
             rootNavigator: true,
           ).pushNamed(UserProfileView.name);
           context.read<ProfileCubit>().getUserProfile(user!.username);
-          BlocProvider.of<ProfileBloc>(
-            context,
-          ).add(LoadInitialProfilePosts(username: user!.username));
         },
         child: Column(
           children: [

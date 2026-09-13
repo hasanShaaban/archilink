@@ -157,9 +157,6 @@ class _PostState extends State<Post> {
                         context.read<ProfileCubit>().getUserProfile(
                           widget.entity.owner.username,
                         );
-                        BlocProvider.of<ProfileBloc>(context).add(
-                          LoadInitialProfilePosts(username: widget.entity.owner.username),
-                        );
                       },
                       child: PostUserImage(
                         width: widget.width,

@@ -44,7 +44,7 @@ class PostActions extends StatelessWidget {
               PostCommentButton(commentsCount: commentsCount),
             ],
           ),
-          PostShareButton(),
+          // PostShareButton(),
           PostSaveButton(postId: postId),
         ],
       ),
@@ -134,23 +134,24 @@ class PostSaveButton extends StatelessWidget {
     return BlocListener<PostSaveCubit, PostSaveState>(
       listenWhen: (previous, current) {
         if (current is PostSaveSuccess && current.postId == postId) return true;
-        if (current is PostUnsaveSuccess && current.postId == postId) return true;
+        if (current is PostUnsaveSuccess && current.postId == postId)
+          return true;
         if (current is PostSaveFailure && current.postId == postId) return true;
         return false;
       },
       listener: (context, state) {
         if (state is PostSaveSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         } else if (state is PostUnsaveSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         } else if (state is PostSaveFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       child: PostActionButton(
@@ -162,29 +163,27 @@ class PostSaveButton extends StatelessWidget {
 
           final selectedCollection =
               await showModalBottomSheet<UserCollectionEntity>(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (bottomSheetContext) => BlocProvider(
-              create: (_) => sl<UserCollectionsCubit>()..fetchCollections(),
-              child: const SaveToCollectionBottomSheet(),
-            ),
-          );
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (bottomSheetContext) => BlocProvider(
+                  create: (_) => sl<UserCollectionsCubit>()..fetchCollections(),
+                  child: const SaveToCollectionBottomSheet(),
+                ),
+              );
 
           if (!context.mounted) return;
 
           if (selectedCollection != null) {
             context.read<PostSaveCubit>().savePost(
-                  postId: postId,
-                  collectionId: selectedCollection.id,
-                  collectionTitle: selectedCollection.title,
-                );
+              postId: postId,
+              collectionId: selectedCollection.id,
+              collectionTitle: selectedCollection.title,
+            );
           } else {
             // User skipped choosing specific collection (like tap outside the bottom sheet)
             // The manager will use the id of the default collection
-            context.read<PostSaveCubit>().savePost(
-                  postId: postId,
-                );
+            context.read<PostSaveCubit>().savePost(postId: postId);
           }
         },
         icon: SvgPicture.asset(
@@ -197,4 +196,3 @@ class PostSaveButton extends StatelessWidget {
     );
   }
 }
-

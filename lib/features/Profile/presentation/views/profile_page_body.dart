@@ -26,11 +26,50 @@ class ProfilePageBody extends StatefulWidget {
 }
 
 class _ProfilePageBodyState extends State<ProfilePageBody> {
+  /// Tracks whether we have already triggered the initial posts load for the
+  /// current profile. Resets to false whenever a new fetch starts (ProfileLoading),
+  /// allowing a refresh to re-trigger the posts load.
+  bool _postsLoaded = false;
+
+  /// Returns true when the viewer is allowed to see this profile's posts.
+  bool _canViewPosts(ProfileEntity profile) {
+    if (widget.type == ProfileType.personalProfile) return true;
+    if (profile.privacySetting == 'public') return true;
+    return profile.isFollowing;
+  }
+
+  /// Dispatches [LoadInitialProfilePosts] exactly once per profile fetch,
+  /// but only when the privacy settings allow it.
+  void _tryLoadPosts(BuildContext context, ProfileEntity profile) {
+    if (_postsLoaded) return;
+    _postsLoaded = true;
+    if (_canViewPosts(profile)) {
+      context.read<ProfileBloc>().add(
+        LoadInitialProfilePosts(
+          username: widget.type == ProfileType.personalProfile
+              ? null
+              : profile.username,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
     final double width = MediaQuery.of(context).size.width;
-    return BlocBuilder<ProfileCubit, ProfileCubitState>(
+
+    return BlocConsumer<ProfileCubit, ProfileCubitState>(
+      listenWhen: (previous, current) {
+        // Reset the flag so that after a refresh the posts are re-loaded.
+        if (current is ProfileLoading) _postsLoaded = false;
+        return current is ProfileSuccess;
+      },
+      listener: (context, state) {
+        if (state is ProfileSuccess) {
+          _tryLoadPosts(context, state.profileData);
+        }
+      },
       builder: (context, state) {
         if (state is ProfileFailuer) {
           return Center(child: Text(state.errorMessage));
@@ -39,7 +78,12 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
         final bool isSkeleton = state is! ProfileSuccess;
         final ProfileEntity profileData = isSkeleton
             ? fakeProfileEntity()
-            : (state as ProfileSuccess).profileData;
+            : state.profileData;
+
+        // While skeleton is shown we always render posts placeholder.
+        // Once real data arrives we check privacy.
+        final bool postsVisible = isSkeleton || _canViewPosts(profileData);
+
         return DefaultTabController(
           length: 2,
           child: Scaffold(
@@ -62,17 +106,15 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                   onRefresh: () async {
                     if (widget.type == ProfileType.personalProfile) {
                       context.read<ProfileCubit>().getPersonlProfile();
-                      context.read<ProfileBloc>().add(
-                        LoadInitialProfilePosts(),
-                      );
+                      // LoadInitialProfilePosts is dispatched by the listener
+                      // once ProfileSuccess arrives.
                     }
                     if (widget.type == ProfileType.userProfile) {
                       context.read<ProfileCubit>().getUserProfile(
                         profileData.username,
                       );
-                      context.read<ProfileBloc>().add(
-                        LoadInitialProfilePosts(username: profileData.username),
-                      );
+                      // LoadInitialProfilePosts is dispatched by the listener
+                      // once ProfileSuccess arrives (privacy re-evaluated then).
                     }
                   },
                   notificationPredicate: (notification) =>
@@ -113,7 +155,11 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                       physics: NeverScrollableScrollPhysics(),
                       dragStartBehavior: DragStartBehavior.down,
                       children: [
-                        ProfilePostsPage(width: width, height: height),
+                        ProfilePostsPage(
+                          width: width,
+                          height: height,
+                          postsVisible: postsVisible,
+                        ),
                         ProfileDetailsPage(entity: profileData),
                       ],
                     ),

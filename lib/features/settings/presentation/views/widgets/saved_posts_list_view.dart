@@ -160,9 +160,6 @@ class _SavedPostsListViewState extends State<SavedPostsListView> {
       rootNavigator: true,
     ).pushNamed(UserProfileView.name);
     context.read<ProfileCubit>().getUserProfile(username);
-    BlocProvider.of<ProfileBloc>(context).add(
-      LoadInitialProfilePosts(username: username),
-    );
   }
 
   @override

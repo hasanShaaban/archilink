@@ -53,9 +53,6 @@ class PostSearchItem extends StatelessWidget {
                 context.read<ProfileCubit>().getUserProfile(
                   post.owner.username,
                 );
-                BlocProvider.of<ProfileBloc>(
-                  context,
-                ).add(LoadInitialProfilePosts(username: post.owner.username));
               },
               child: PostUserImage(
                 width: width,
