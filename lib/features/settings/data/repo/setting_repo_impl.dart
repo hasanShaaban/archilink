@@ -5,6 +5,7 @@ import 'package:archilink/features/settings/domain/data_source/setting_remote_da
 import 'package:archilink/features/settings/domain/entity/collection_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
+import 'package:archilink/features/settings/domain/entity/follow_request_entity.dart';
 import 'package:archilink/features/settings/domain/entity/followers_and_followings_entity.dart';
 import 'package:archilink/features/settings/domain/entity/liked_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/send_support_message_response_entity.dart';
@@ -221,6 +222,34 @@ class SettingRepoImpl extends SettingRepo {
         name: name,
         id: id,
       );
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, FollowRequestsEntity>> getIncomingRequests({
+    required int page,
+  }) async {
+    try {
+      final result = await remoteDataSource.getIncomingRequests(page: page);
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, FollowRequestsEntity>> getOutgoingRequests({
+    required int page,
+  }) async {
+    try {
+      final result = await remoteDataSource.getOutgoingRequests(page: page);
       return right(result);
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));

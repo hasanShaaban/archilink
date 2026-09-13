@@ -3,7 +3,7 @@ class UserEntity {
   final String name;
   final String username;
   final String? userAvatar;
-  final bool isVerified;
+  final bool? isVerified;
   final bool isFollowing;
   final String? country;
   final String? city;

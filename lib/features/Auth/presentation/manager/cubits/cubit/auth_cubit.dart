@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:archilink/core/error/failure.dart';
-import 'package:archilink/core/network/websocket/pusher_client.dart';
 import 'package:archilink/core/network/websocket/reverb_client.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/domain/repo/notification_repo.dart';
@@ -39,8 +38,10 @@ class AuthCubit extends Cubit<AuthState> {
       (failure) => emit(AuthError(failure.message, failure: failure)),
       (success) async {
         authRepo.setRememberMe(rememberMe);
-        currentUserCubit.setUsername(success.username);
-        currentUserCubit.setToken(success.accessToken);
+        currentUserCubit.setUser(
+          username: success.username,
+          token: success.accessToken,
+        );
 
         // await reverbClient.init(token: success.accessToken);
 
@@ -73,8 +74,10 @@ class AuthCubit extends Cubit<AuthState> {
       (failure) => emit(AuthError(failure.message, failure: failure)),
       (success) async {
         authRepo.setRememberMe(true);
-        currentUserCubit.setUsername(success.user.username);
-        currentUserCubit.setToken(success.token);
+        currentUserCubit.setUser(
+          username: success.user.username,
+          token: success.token,
+        );
 
         // await reverbClient.init(token: success.token);
 

@@ -11,7 +11,7 @@ class UserModel extends UserEntity {
     super.city,
     required super.isFollowing,
   });
-  
+
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] as int,
@@ -19,7 +19,7 @@ class UserModel extends UserEntity {
       username: json['username'] as String,
       userAvatar: json['user_avatar'] as String?,
       isFollowing: json['is_following'] as bool,
-      isVerified: json['is_verified'] as bool,
+      isVerified: json['is_verified'] as bool?,
       country: json['country'] as String?,
       city: json['city'] as String?,
     );

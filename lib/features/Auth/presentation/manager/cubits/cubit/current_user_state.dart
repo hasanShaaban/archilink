@@ -6,6 +6,17 @@ class CurrentUserState extends Equatable {
 
   const CurrentUserState({this.username, this.token});
 
+  CurrentUserState copyWith({
+    String? username,
+    String? token,
+  }) {
+    return CurrentUserState(
+      username: username ?? this.username,
+      token: token ?? this.token,
+    );
+  }
+
   @override
   List<Object?> get props => [username, token];
 }
+

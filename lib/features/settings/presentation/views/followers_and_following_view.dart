@@ -3,8 +3,8 @@ import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/followers_and_following_cubit.dart';
 import 'package:archilink/features/settings/presentation/views/widgets/followers_tab.dart';
 import 'package:archilink/features/settings/presentation/views/widgets/following_tab.dart';
-import 'package:archilink/features/settings/presentation/views/widgets/request_action.dart';
-import 'package:archilink/features/settings/presentation/views/widgets/users_list_view.dart';
+import 'package:archilink/features/settings/presentation/views/widgets/incoming_requests_tab.dart';
+import 'package:archilink/features/settings/presentation/views/widgets/outgoing_requests_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,7 +38,12 @@ class FollowersAndFollowingViewBody extends StatelessWidget {
   }
 }
 
-enum _FollowTab { followers, following, requests }
+enum _FollowTab {
+  followers,
+  following,
+  outgoingRequests,
+  incomingRequests,
+}
 
 class _FollowersAndFollowingTabs extends StatefulWidget {
   const _FollowersAndFollowingTabs();
@@ -52,17 +57,6 @@ class _FollowersAndFollowingTabsState
     extends State<_FollowersAndFollowingTabs> {
   _FollowTab _selectedTab = _FollowTab.followers;
 
-  final List<MockUser> _requests = const [
-    MockUser(name: 'Ethan King'),
-    MockUser(name: 'Charlotte Hill'),
-    MockUser(name: 'Benjamin Lee'),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -70,26 +64,35 @@ class _FollowersAndFollowingTabsState
         const SizedBox(height: 12),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              _buildTabChip(
-                context,
-                label: 'Followers',
-                tab: _FollowTab.followers,
-              ),
-              const SizedBox(width: 8),
-              _buildTabChip(
-                context,
-                label: 'Following',
-                tab: _FollowTab.following,
-              ),
-              const SizedBox(width: 8),
-              _buildTabChip(
-                context,
-                label: 'Requests',
-                tab: _FollowTab.requests,
-              ),
-            ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildTabChip(
+                  context,
+                  label: 'Followers',
+                  tab: _FollowTab.followers,
+                ),
+                const SizedBox(width: 8),
+                _buildTabChip(
+                  context,
+                  label: 'Following',
+                  tab: _FollowTab.following,
+                ),
+                const SizedBox(width: 8),
+                _buildTabChip(
+                  context,
+                  label: 'Outgoing requests',
+                  tab: _FollowTab.outgoingRequests,
+                ),
+                const SizedBox(width: 8),
+                _buildTabChip(
+                  context,
+                  label: 'Incoming requests',
+                  tab: _FollowTab.incomingRequests,
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -119,6 +122,20 @@ class _FollowersAndFollowingTabsState
           final state = cubit.state;
           if (!state.hasFollowingData && !state.isLoadingFollowing) {
             cubit.fetchFollowing();
+          }
+        } else if (tab == _FollowTab.outgoingRequests) {
+          final cubit = context.read<FollowersAndFollowingCubit>();
+          final state = cubit.state;
+          if (!state.hasOutgoingRequestsData &&
+              !state.isLoadingOutgoingRequests) {
+            cubit.fetchOutgoingRequests();
+          }
+        } else if (tab == _FollowTab.incomingRequests) {
+          final cubit = context.read<FollowersAndFollowingCubit>();
+          final state = cubit.state;
+          if (!state.hasIncomingRequestsData &&
+              !state.isLoadingIncomingRequests) {
+            cubit.fetchIncomingRequests();
           }
         }
       },
@@ -153,13 +170,10 @@ class _FollowersAndFollowingTabsState
         return const FollowersTab(key: ValueKey('followers'));
       case _FollowTab.following:
         return const FollowingTab(key: ValueKey('following'));
-      case _FollowTab.requests:
-        return UsersListView(
-          key: const ValueKey('requests'),
-          users: _requests,
-          actionBuilder: (_) =>
-              RequestActions(onAccept: () {}, onRemove: () {}),
-        );
+      case _FollowTab.outgoingRequests:
+        return const OutgoingRequestsTab(key: ValueKey('outgoing_requests'));
+      case _FollowTab.incomingRequests:
+        return const IncomingRequestsTab(key: ValueKey('incoming_requests'));
     }
   }
 }
@@ -168,3 +182,4 @@ class MockUser {
   final String name;
   const MockUser({required this.name});
 }
+

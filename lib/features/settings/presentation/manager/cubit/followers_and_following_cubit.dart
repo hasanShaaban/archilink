@@ -1,5 +1,6 @@
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Search/domain/entity/user_entity.dart';
+import 'package:archilink/features/settings/domain/entity/follow_request_entity.dart';
 import 'package:archilink/features/settings/domain/repo/setting_repo.dart';
 import 'package:bloc/bloc.dart';
 
@@ -110,6 +111,120 @@ class FollowersAndFollowingCubit extends Cubit<FollowersAndFollowingState> {
     });
   }
 
+  Future<void> fetchOutgoingRequests({bool refresh = false}) async {
+    if (state.isLoadingOutgoingRequests || state.isLoadingMoreOutgoingRequests) {
+      return;
+    }
+
+    if (!refresh &&
+        state.outgoingRequestsPage > 0 &&
+        !state.hasMoreOutgoingRequests) {
+      return;
+    }
+
+    final nextPage = refresh ? 1 : (state.outgoingRequestsPage + 1);
+    final isFirstPage = nextPage == 1;
+    emit(
+      state.copyWith(
+        isLoadingOutgoingRequests: isFirstPage,
+        isLoadingMoreOutgoingRequests: !isFirstPage,
+        outgoingRequestsErrorMessage: null,
+      ),
+    );
+
+    final result = await _settingRepo.getOutgoingRequests(page: nextPage);
+    if (isClosed) return;
+
+    result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            isLoadingOutgoingRequests: false,
+            isLoadingMoreOutgoingRequests: false,
+            outgoingRequestsErrorMessage: failure.message,
+          ),
+        );
+      },
+      (requestsData) {
+        final requests = isFirstPage
+            ? requestsData.requests
+            : _mergeRequests(state.outgoingRequests, requestsData.requests);
+        emit(
+          state.copyWith(
+            isLoadingOutgoingRequests: false,
+            isLoadingMoreOutgoingRequests: false,
+            outgoingRequestsErrorMessage: null,
+            outgoingRequests: requests,
+            outgoingRequestsPage: requestsData.pagination.currentPage,
+            hasMoreOutgoingRequests: requestsData.pagination.hasMore,
+          ),
+        );
+      },
+    );
+  }
+
+  void removeOutgoingRequest(int id) {
+    final updated = state.outgoingRequests.where((e) => e.id != id).toList();
+    emit(state.copyWith(outgoingRequests: updated));
+  }
+
+  Future<void> fetchIncomingRequests({bool refresh = false}) async {
+    if (state.isLoadingIncomingRequests || state.isLoadingMoreIncomingRequests) {
+      return;
+    }
+
+    if (!refresh &&
+        state.incomingRequestsPage > 0 &&
+        !state.hasMoreIncomingRequests) {
+      return;
+    }
+
+    final nextPage = refresh ? 1 : (state.incomingRequestsPage + 1);
+    final isFirstPage = nextPage == 1;
+    emit(
+      state.copyWith(
+        isLoadingIncomingRequests: isFirstPage,
+        isLoadingMoreIncomingRequests: !isFirstPage,
+        incomingRequestsErrorMessage: null,
+      ),
+    );
+
+    final result = await _settingRepo.getIncomingRequests(page: nextPage);
+    if (isClosed) return;
+
+    result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            isLoadingIncomingRequests: false,
+            isLoadingMoreIncomingRequests: false,
+            incomingRequestsErrorMessage: failure.message,
+          ),
+        );
+      },
+      (requestsData) {
+        final requests = isFirstPage
+            ? requestsData.requests
+            : _mergeRequests(state.incomingRequests, requestsData.requests);
+        emit(
+          state.copyWith(
+            isLoadingIncomingRequests: false,
+            isLoadingMoreIncomingRequests: false,
+            incomingRequestsErrorMessage: null,
+            incomingRequests: requests,
+            incomingRequestsPage: requestsData.pagination.currentPage,
+            hasMoreIncomingRequests: requestsData.pagination.hasMore,
+          ),
+        );
+      },
+    );
+  }
+
+  void removeIncomingRequest(int id) {
+    final updated = state.incomingRequests.where((e) => e.id != id).toList();
+    emit(state.copyWith(incomingRequests: updated));
+  }
+
   String? _resolveUsername() {
     final username = _currentUserCubit.state.username;
     if (username == null || username.isEmpty) return null;
@@ -125,6 +240,20 @@ class FollowersAndFollowingCubit extends Cubit<FollowersAndFollowingState> {
     for (final user in incomingUsers) {
       if (ids.add(user.id)) {
         merged.add(user);
+      }
+    }
+    return merged;
+  }
+
+  List<FollowRequestItemEntity> _mergeRequests(
+    List<FollowRequestItemEntity> currentRequests,
+    List<FollowRequestItemEntity> incomingRequests,
+  ) {
+    final merged = <FollowRequestItemEntity>[...currentRequests];
+    final ids = currentRequests.map((e) => e.id).toSet();
+    for (final request in incomingRequests) {
+      if (ids.add(request.id)) {
+        merged.add(request);
       }
     }
     return merged;

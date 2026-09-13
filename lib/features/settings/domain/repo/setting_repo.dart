@@ -2,6 +2,7 @@ import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/settings/domain/entity/collection_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
+import 'package:archilink/features/settings/domain/entity/follow_request_entity.dart';
 import 'package:archilink/features/settings/domain/entity/followers_and_followings_entity.dart';
 import 'package:archilink/features/settings/domain/entity/liked_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/send_support_message_response_entity.dart';
@@ -41,5 +42,11 @@ abstract class SettingRepo {
   Future<Either<Failure, bool>> editCollectionName({
     required String name,
     required int id,
+  });
+  Future<Either<Failure, FollowRequestsEntity>> getIncomingRequests({
+    required int page,
+  });
+  Future<Either<Failure, FollowRequestsEntity>> getOutgoingRequests({
+    required int page,
   });
 }

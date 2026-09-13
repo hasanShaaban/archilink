@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
@@ -29,16 +31,21 @@ class PostMenuButton extends StatelessWidget {
       },
       listener: (context, state) {
         if (state is PostMenuSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         } else if (state is PostMenuFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       child: PopupMenuButton<PostMenuAction>(
+        onOpened: () {
+          log(isMine.toString());
+          log(username);
+          log(myUsername.toString());
+        },
         menuPadding: EdgeInsets.zero,
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(
@@ -132,11 +139,17 @@ class PostMenuButton extends StatelessWidget {
                   ),
                   PopupMenuItem(
                     value: PostMenuAction.hide,
-                    child: item(label: 'Hide', icon: Assets.assetsIconsHidePost),
+                    child: item(
+                      label: 'Hide',
+                      icon: Assets.assetsIconsHidePost,
+                    ),
                   ),
                   PopupMenuItem(
                     value: PostMenuAction.report,
-                    child: item(label: 'Report', icon: Assets.assetsIconsReport),
+                    child: item(
+                      label: 'Report',
+                      icon: Assets.assetsIconsReport,
+                    ),
                   ),
                 ];
         },

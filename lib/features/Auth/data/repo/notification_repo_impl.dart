@@ -28,6 +28,7 @@ class NotificationRepoImpl extends NotificationRepo {
     try {
       await fcmDataSource.requestPremision();
       final token = await fcmDataSource.getToken();
+      log(token.toString());
       if (token == null) {
         await authLocalDataSource.setTokenRegistered(false);
         return left(UnknownFailure());

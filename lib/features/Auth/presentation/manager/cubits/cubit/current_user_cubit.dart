@@ -19,11 +19,15 @@ class CurrentUserCubit extends Cubit<CurrentUserState> {
   }
 
   void setUsername(String username) {
-    emit(CurrentUserState(username: username));
+    emit(state.copyWith(username: username));
   }
 
   void setToken(String token) {
-    emit(CurrentUserState(token: token));
+    emit(state.copyWith(token: token));
+  }
+
+  void setUser({required String username, required String token}) {
+    emit(state.copyWith(username: username, token: token));
   }
 
   void clear() {

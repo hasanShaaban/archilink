@@ -4,6 +4,7 @@ import 'package:archilink/features/settings/data/model/collection_posts_model.da
 import 'package:archilink/features/settings/data/model/comments_history_model.dart';
 import 'package:archilink/features/settings/data/model/customer_support_chat_model.dart';
 import 'package:archilink/features/settings/data/model/customer_support_messages_model.dart';
+import 'package:archilink/features/settings/data/model/follow_request_model.dart';
 import 'package:archilink/features/settings/data/model/followers_and_following_model.dart';
 import 'package:archilink/features/settings/data/model/liked_posts_model.dart';
 import 'package:archilink/features/settings/data/model/send_support_message_response_model.dart';
@@ -13,6 +14,7 @@ import 'package:archilink/features/settings/domain/entity/collection_posts_entit
 import 'package:archilink/features/settings/domain/entity/comments_history_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_chat_entity.dart';
 import 'package:archilink/features/settings/domain/entity/customer_support_messages_entity.dart';
+import 'package:archilink/features/settings/domain/entity/follow_request_entity.dart';
 import 'package:archilink/features/settings/domain/entity/followers_and_followings_entity.dart';
 import 'package:archilink/features/settings/domain/entity/liked_posts_entity.dart';
 import 'package:archilink/features/settings/domain/entity/send_support_message_response_entity.dart';
@@ -262,6 +264,38 @@ class SettingRemoteDataSourceImpl extends SettingRemoteDataSource {
         throw ServerException(message: 'Invalid edit collection response');
       }
       return data['status'] == 'success';
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<FollowRequestsEntity> getOutgoingRequests({required int page}) async {
+    try {
+      final response = await apiService.get(
+        'user-relations/get-outgoing-requests?page=$page',
+      );
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'Invalid incoming requests response');
+      }
+      return FollowRequestsModel.fromJson(data);
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<FollowRequestsEntity> getIncomingRequests({required int page}) async {
+    try {
+      final response = await apiService.get(
+        'user-relations/get-incoming-requests?page=$page',
+      );
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'Invalid incoming requests response');
+      }
+      return FollowRequestsModel.fromJson(data);
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }
