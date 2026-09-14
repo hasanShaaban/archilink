@@ -5,9 +5,11 @@ import 'package:archilink/core/widgets/main_appbar.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_cubit.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_state.dart';
+import 'package:archilink/features/Store/presentation/views/product_details_view.dart';
 import 'package:archilink/features/Store/presentation/views/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class StoreFeedPage extends StatelessWidget {
@@ -65,6 +67,15 @@ class _StoreFeedBodyState extends State<_StoreFeedBody> {
     await context.read<StoreFeedCubit>().fetchProducts(refresh: true);
   }
 
+  void _navigateToProductDetails(ProductEntity product) {
+    PersistentNavBarNavigator.pushNewScreen(
+      context,
+      screen: ProductDetailsView(product: product),
+      withNavBar: true,
+      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,141 +85,190 @@ class _StoreFeedBodyState extends State<_StoreFeedBody> {
           onRefresh: _handleRefresh,
           child: BlocBuilder<StoreFeedCubit, StoreFeedState>(
             builder: (context, state) {
+              if (state.errorMessage != null && !state.hasProducts) {
+                return _StoreFeedErrorView(
+                  errorMessage: state.errorMessage!,
+                  onRetry: _handleRefresh,
+                );
+              }
+
+              if (!state.isLoading && !state.hasProducts) {
+                return const _StoreFeedEmptyView();
+              }
+
               final isSkeleton = state.isLoading && !state.hasProducts;
               final products = isSkeleton
                   ? ProductEntity.dummyProducts
                   : state.products;
 
-              if (state.errorMessage != null && !state.hasProducts) {
-                return CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics(),
-                  ),
-                  slivers: [
-                    const MainAppBar(withTabbar: false),
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.error_outline_rounded,
-                                size: 48,
-                                color: Theme.of(context).colorScheme.error,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                state.errorMessage!,
-                                style: AppTextStyle.interMedium14.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: () => context
-                                    .read<StoreFeedCubit>()
-                                    .fetchProducts(refresh: true),
-                                child: const Text('Try Again'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              }
-
-              if (!state.isLoading && !state.hasProducts) {
-                return CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics(),
-                  ),
-                  slivers: [
-                    const MainAppBar(withTabbar: false),
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.storefront_outlined,
-                              size: 56,
-                              color: AppColorsFromTheme.grayForText(context),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'No products available yet',
-                              style: AppTextStyle.interMedium14.copyWith(
-                                color: AppColorsFromTheme.grayForText(context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              }
-
-              return Skeletonizer(
-                enabled: isSkeleton,
-                child: CustomScrollView(
-                  controller: _scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics(),
-                  ),
-                  slivers: [
-                    const MainAppBar(withTabbar: false),
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
-                      ),
-                      sliver: SliverGrid(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.52,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final product = products[index];
-                            return ProductCard(
-                              product: product,
-                              onTap: () {
-                                // Handle product tap
-                              },
-                            );
-                          },
-                          childCount: products.length,
-                        ),
-                      ),
-                    ),
-                    if (state.isLoadingMore)
-                      const SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                      ),
-                    const SliverToBoxAdapter(
-                      child: SizedBox(height: 20),
-                    ),
-                  ],
-                ),
+              return _StoreProductsGrid(
+                scrollController: _scrollController,
+                products: products,
+                isSkeleton: isSkeleton,
+                isLoadingMore: state.isLoadingMore,
+                onProductTap: _navigateToProductDetails,
               );
             },
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StoreProductsGrid extends StatelessWidget {
+  const _StoreProductsGrid({
+    required this.scrollController,
+    required this.products,
+    required this.isSkeleton,
+    required this.isLoadingMore,
+    required this.onProductTap,
+  });
+
+  final ScrollController scrollController;
+  final List<ProductEntity> products;
+  final bool isSkeleton;
+  final bool isLoadingMore;
+  final ValueChanged<ProductEntity> onProductTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Skeletonizer(
+      enabled: isSkeleton,
+      child: CustomScrollView(
+        controller: scrollController,
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        slivers: [
+          const MainAppBar(withTabbar: false),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.52,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final product = products[index];
+                  return ProductCard(
+                    product: product,
+                    onTap: () => onProductTap(product),
+                  );
+                },
+                childCount: products.length,
+              ),
+            ),
+          ),
+          if (isLoadingMore)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 20),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StoreFeedErrorView extends StatelessWidget {
+  const _StoreFeedErrorView({
+    required this.errorMessage,
+    required this.onRetry,
+  });
+
+  final String errorMessage;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      slivers: [
+        const MainAppBar(withTabbar: false),
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    errorMessage,
+                    style: AppTextStyle.interMedium14.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: onRetry,
+                    child: const Text('Try Again'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StoreFeedEmptyView extends StatelessWidget {
+  const _StoreFeedEmptyView();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      slivers: [
+        const MainAppBar(withTabbar: false),
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.storefront_outlined,
+                  size: 56,
+                  color: AppColorsFromTheme.grayForText(context),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'No products available yet',
+                  style: AppTextStyle.interMedium14.copyWith(
+                    color: AppColorsFromTheme.grayForText(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

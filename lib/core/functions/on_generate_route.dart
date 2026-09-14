@@ -31,6 +31,8 @@ import 'package:archilink/features/settings/presentation/views/customer_support_
 import 'package:archilink/features/settings/presentation/views/followers_and_following_view.dart';
 import 'package:archilink/features/settings/presentation/views/my_activity_view.dart';
 import 'package:archilink/features/settings/presentation/views/saved_collecation_view.dart';
+import 'package:archilink/features/Store/domain/entity/product_entity.dart';
+import 'package:archilink/features/Store/presentation/views/product_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:archilink/features/Main/presentation/views/main_page.dart';
@@ -50,6 +52,14 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       final args = settings.arguments as Map<String, dynamic>;
       return MaterialPageRoute(
         builder: (context) => PostDetailsView(post: args['post']),
+      );
+    case ProductDetailsView.name:
+      final product = settings.arguments is ProductEntity
+          ? settings.arguments as ProductEntity
+          : (settings.arguments as Map<String, dynamic>)['product']
+              as ProductEntity;
+      return MaterialPageRoute(
+        builder: (context) => ProductDetailsView(product: product),
       );
     case MainView.name:
       return MaterialPageRoute(builder: (context) => const MainView());

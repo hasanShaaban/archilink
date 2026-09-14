@@ -33,7 +33,7 @@ class ProductEntity extends Equatable {
     required this.status,
     this.createdAt,
     this.updatedAt,
-    this.currency = '\$',
+    this.currency = 'SYP',
   });
 
   /// UI convenience getters
@@ -53,9 +53,11 @@ class ProductEntity extends Equatable {
         return status
             .replaceAll('_', ' ')
             .split(' ')
-            .map((word) => word.isNotEmpty
-                ? '${word[0].toUpperCase()}${word.substring(1)}'
-                : '')
+            .map(
+              (word) => word.isNotEmpty
+                  ? '${word[0].toUpperCase()}${word.substring(1)}'
+                  : '',
+            )
             .join(' ');
     }
   }
@@ -63,7 +65,10 @@ class ProductEntity extends Equatable {
   String get location {
     final city = store.city;
     final country = store.country;
-    if (city != null && country != null && city.isNotEmpty && country.isNotEmpty) {
+    if (city != null &&
+        country != null &&
+        city.isNotEmpty &&
+        country.isNotEmpty) {
       return '$city,$country';
     } else if (city != null && city.isNotEmpty) {
       return city;
