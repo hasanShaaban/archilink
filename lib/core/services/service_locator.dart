@@ -86,6 +86,11 @@ import 'package:archilink/features/settings/presentation/manager/cubit/user_coll
 import 'package:archilink/features/settings/presentation/manager/cubit/collection_posts_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_chat_cubit.dart';
 import 'package:archilink/features/settings/presentation/manager/cubit/customer_support_messages_cubit.dart';
+import 'package:archilink/features/Store/data/data_source/store_remote_date_cource_impl.dart';
+import 'package:archilink/features/Store/data/repo/store_repo_impl.dart';
+import 'package:archilink/features/Store/domain/data_source/store_remote_date_source.dart';
+import 'package:archilink/features/Store/domain/repo/store_repo.dart';
+import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
@@ -175,6 +180,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<SettingRemoteDataSource>(
     () => SettingRemoteDataSourceImpl(sl()),
   );
+  sl.registerLazySingleton<StoreRemoteDateSource>(
+    () => StoreRemoteDataSourceImpl(apiService: sl()),
+  );
   sl.registerLazySingleton<FCMDataSource>(() => FCMDataSourceImpl());
 
   ///----------
@@ -260,6 +268,9 @@ Future<void> initServiceLocator({
   sl.registerLazySingleton<SettingRepo>(
     () => SettingRepoImpl(sl<SettingRemoteDataSource>()),
   );
+  sl.registerLazySingleton<StoreRepo>(
+    () => StoreRepoImpl(storeRemoteDataSource: sl<StoreRemoteDateSource>()),
+  );
 
   ///---------
   ///Usecases
@@ -320,4 +331,5 @@ Future<void> initServiceLocator({
       sl<CustomerSupportChatCubit>(),
     ),
   );
+  sl.registerFactory(() => StoreFeedCubit(sl<StoreRepo>()));
 }
