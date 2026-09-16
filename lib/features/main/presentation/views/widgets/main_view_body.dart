@@ -15,15 +15,113 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
-class MainViewBody extends StatefulWidget {
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
+
+class MainViewBody extends StatelessWidget {
   const MainViewBody({super.key});
 
   @override
-  State<MainViewBody> createState() => _MainViewBodyState();
+  Widget build(BuildContext context) {
+    return BlocBuilder<CurrentUserCubit, CurrentUserState>(
+      builder: (context, state) {
+        if (state.role == 'store') {
+          return const _StoreShell();
+        }
+        return const _StudentMentorShell();
+      },
+    );
+  }
 }
 
-// Section: State class for the main view
-class _MainViewBodyState extends State<MainViewBody> {
+// Section: Shell for store role (3 tabs)
+class _StoreShell extends StatefulWidget {
+  const _StoreShell();
+
+  @override
+  State<_StoreShell> createState() => _StoreShellState();
+}
+
+class _StoreShellState extends State<_StoreShell> {
+  late final PersistentTabController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PersistentTabController(initialIndex: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  final List<Widget> _pages = [
+    StoreFeedPage(),
+    ProfilePageBody(type: ProfileType.personalStoreProfile),
+    SettingPage(),
+  ];
+
+  List<PersistentBottomNavBarItem> _navBarsItems(BuildContext context, S lang) {
+    return [
+      navigationBarItem(
+        context,
+        image: Assets.assetsIconsShoppingBasket,
+        title: 'Products',
+      ),
+      navigationBarItem(
+        context,
+        image: Assets.assetsIconsUser,
+        title: lang.profile,
+      ),
+      navigationBarItem(
+        context,
+        image: Assets.assetsIconsSettings,
+        title: lang.settings,
+      ),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var lang = S.of(context);
+    return PersistentTabView(
+      decoration: NavBarDecoration(
+        border: Border(
+          top: BorderSide(
+            color: AppColorsFromTheme.lightGray(context),
+            width: 0.2,
+          ),
+        ),
+      ),
+      context,
+      screens: _pages,
+      controller: _controller,
+      items: _navBarsItems(context, lang),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      handleAndroidBackButtonPress: true,
+      resizeToAvoidBottomInset: true,
+      stateManagement: true,
+      onItemSelected: (value) {
+        if (value == 1) {
+          BlocProvider.of<ProfileCubit>(context).getPersonlProfile();
+          BlocProvider.of<ProfileBloc>(context).add(LoadInitialProfilePosts());
+        }
+      },
+      navBarStyle: NavBarStyle.style13,
+    );
+  }
+}
+
+// Section: Shell for student and mentor roles (4 tabs)
+class _StudentMentorShell extends StatefulWidget {
+  const _StudentMentorShell();
+
+  @override
+  State<_StudentMentorShell> createState() => _StudentMentorShellState();
+}
+
+class _StudentMentorShellState extends State<_StudentMentorShell> {
   late final MainTabController _tabController;
 
   @override
@@ -32,7 +130,6 @@ class _MainViewBodyState extends State<MainViewBody> {
     _tabController = sl<MainTabController>();
   }
 
-  // Section: List of pages
   final List<Widget> _pages = [
     HomePageBody(),
     StoreFeedPage(),
@@ -40,7 +137,6 @@ class _MainViewBodyState extends State<MainViewBody> {
     SettingPage(),
   ];
 
-  // Section: Navigation bar items
   List<PersistentBottomNavBarItem> _navBarsItems(BuildContext context, S lang) {
     return [
       navigationBarItem(
@@ -66,7 +162,6 @@ class _MainViewBodyState extends State<MainViewBody> {
     ];
   }
 
-  // Section: Build method for the main view
   @override
   Widget build(BuildContext context) {
     var lang = S.of(context);

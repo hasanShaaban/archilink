@@ -6,9 +6,11 @@ import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/follow_cubit.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/update_profile_image_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/personal_profile_buttons.dart';
+import 'package:archilink/features/Profile/presentation/views/widgets/personal_store_profile_buttons.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_image_section.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_info_section.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_statistics_row.dart';
+import 'package:archilink/features/Profile/presentation/views/widgets/store_profile_buttons.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/user_profile_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,6 +32,10 @@ class ProfielInfoHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isStore =
+        type == ProfileType.storeProfile ||
+        type == ProfileType.personalStoreProfile;
+
     return SliverToBoxAdapter(
       child: Column(
         children: [
@@ -59,6 +65,7 @@ class ProfielInfoHeader extends StatelessWidget {
             following: profileData.followingCount,
             posts: profileData.postsCount,
             projects: profileData.projectCount,
+            isStore: isStore,
           ),
           SizedBox(height: 19),
         ],
@@ -84,6 +91,22 @@ Widget _buildButtons(
     return BlocProvider(
       create: (context) => sl<FollowCubit>(),
       child: UserProfileButtons(
+        height: height,
+        width: width,
+        username: username,
+        isFollowing: isFollowing,
+      ),
+    );
+  }
+  if (type == ProfileType.personalStoreProfile) {
+    return Skeleton.keep(
+      child: PersonalStoreProfileButtons(width: width, profileData: profileData),
+    );
+  }
+  if (type == ProfileType.storeProfile) {
+    return BlocProvider(
+      create: (context) => sl<FollowCubit>(),
+      child: StoreProfileButtons(
         height: height,
         width: width,
         username: username,

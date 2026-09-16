@@ -41,6 +41,7 @@ class AuthCubit extends Cubit<AuthState> {
         currentUserCubit.setUser(
           username: success.username,
           token: success.accessToken,
+          role: success.role,
         );
 
         // await reverbClient.init(token: success.accessToken);
@@ -77,6 +78,7 @@ class AuthCubit extends Cubit<AuthState> {
         currentUserCubit.setUser(
           username: success.user.username,
           token: success.token,
+          role: role,
         );
 
         // await reverbClient.init(token: success.token);

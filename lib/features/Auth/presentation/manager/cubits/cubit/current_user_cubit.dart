@@ -14,6 +14,7 @@ class CurrentUserCubit extends Cubit<CurrentUserState> {
       CurrentUserState(
         username: _authLocalDataSource.getUsername(),
         token: _authLocalDataSource.getToken(),
+        role: _authLocalDataSource.getRole(),
       ),
     );
   }
@@ -26,8 +27,16 @@ class CurrentUserCubit extends Cubit<CurrentUserState> {
     emit(state.copyWith(token: token));
   }
 
-  void setUser({required String username, required String token}) {
-    emit(state.copyWith(username: username, token: token));
+  void setRole(String role) {
+    emit(state.copyWith(role: role));
+  }
+
+  void setUser({
+    required String username,
+    required String token,
+    String? role,
+  }) {
+    emit(state.copyWith(username: username, token: token, role: role));
   }
 
   void clear() {

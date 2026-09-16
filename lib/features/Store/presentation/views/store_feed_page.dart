@@ -1,12 +1,12 @@
 import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
-import 'package:archilink/core/widgets/main_appbar.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_cubit.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_state.dart';
 import 'package:archilink/features/Store/presentation/views/product_details_view.dart';
 import 'package:archilink/features/Store/presentation/views/widgets/product_card.dart';
+import 'package:archilink/features/Store/presentation/views/widgets/store_search_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -80,36 +80,54 @@ class _StoreFeedBodyState extends State<_StoreFeedBody> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: RefreshIndicator(
-          color: Theme.of(context).colorScheme.primary,
-          onRefresh: _handleRefresh,
-          child: BlocBuilder<StoreFeedCubit, StoreFeedState>(
-            builder: (context, state) {
-              if (state.errorMessage != null && !state.hasProducts) {
-                return _StoreFeedErrorView(
-                  errorMessage: state.errorMessage!,
-                  onRetry: _handleRefresh,
-                );
-              }
+        child: Column(
+          children: [
+            // Replaced MainAppBar with StoreSearchAppBar and expandable filter options
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
+              child: StoreSearchAppBar(
+                onSearchChanged: (query) {
+                  // Ready for search integration
+                },
+                onFilterChanged: ({category, status, minPrice, maxPrice}) {
+                  // Ready for filter integration
+                },
+              ),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                color: Theme.of(context).colorScheme.primary,
+                onRefresh: _handleRefresh,
+                child: BlocBuilder<StoreFeedCubit, StoreFeedState>(
+                  builder: (context, state) {
+                    if (state.errorMessage != null && !state.hasProducts) {
+                      return _StoreFeedErrorView(
+                        errorMessage: state.errorMessage!,
+                        onRetry: _handleRefresh,
+                      );
+                    }
 
-              if (!state.isLoading && !state.hasProducts) {
-                return const _StoreFeedEmptyView();
-              }
+                    if (!state.isLoading && !state.hasProducts) {
+                      return const _StoreFeedEmptyView();
+                    }
 
-              final isSkeleton = state.isLoading && !state.hasProducts;
-              final products = isSkeleton
-                  ? ProductEntity.dummyProducts
-                  : state.products;
+                    final isSkeleton = state.isLoading && !state.hasProducts;
+                    final products = isSkeleton
+                        ? ProductEntity.dummyProducts
+                        : state.products;
 
-              return _StoreProductsGrid(
-                scrollController: _scrollController,
-                products: products,
-                isSkeleton: isSkeleton,
-                isLoadingMore: state.isLoadingMore,
-                onProductTap: _navigateToProductDetails,
-              );
-            },
-          ),
+                    return _StoreProductsGrid(
+                      scrollController: _scrollController,
+                      products: products,
+                      isSkeleton: isSkeleton,
+                      isLoadingMore: state.isLoadingMore,
+                      onProductTap: _navigateToProductDetails,
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -141,11 +159,10 @@ class _StoreProductsGrid extends StatelessWidget {
           parent: BouncingScrollPhysics(),
         ),
         slivers: [
-          const MainAppBar(withTabbar: false),
           SliverPadding(
             padding: const EdgeInsets.symmetric(
               horizontal: 14,
-              vertical: 12,
+              vertical: 8,
             ),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -198,7 +215,6 @@ class _StoreFeedErrorView extends StatelessWidget {
         parent: BouncingScrollPhysics(),
       ),
       slivers: [
-        const MainAppBar(withTabbar: false),
         SliverFillRemaining(
           hasScrollBody: false,
           child: Center(
@@ -245,7 +261,6 @@ class _StoreFeedEmptyView extends StatelessWidget {
         parent: BouncingScrollPhysics(),
       ),
       slivers: [
-        const MainAppBar(withTabbar: false),
         SliverFillRemaining(
           hasScrollBody: false,
           child: Center(

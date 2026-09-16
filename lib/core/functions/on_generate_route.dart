@@ -9,6 +9,7 @@ import 'package:archilink/features/Edit_Profile/presentation/view/contact_info_v
 import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/location_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/skills_view.dart';
+import 'package:archilink/features/Profile/presentation/views/store_profile_view.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/features/Search/presentation/views/search_results_view.dart';
 import 'package:archilink/features/Search/presentation/views/search_view.dart';
@@ -65,6 +66,11 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => const MainView());
     case UserProfileView.name:
       return MaterialPageRoute(builder: (context) => const UserProfileView());
+    case StoreProfileView.name:
+      final username = settings.arguments as String;
+      return MaterialPageRoute(
+        builder: (context) => StoreProfileView(username: username),
+      );
     case EditProfileView.name:
       final args = settings.arguments as Map<String, dynamic>;
       return MaterialPageRoute(

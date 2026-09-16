@@ -6,9 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ProfileInfoSection extends StatelessWidget {
-  const ProfileInfoSection({super.key, required this.profileData});
+  const ProfileInfoSection({
+    super.key,
+    required this.profileData,
+  });
 
   final ProfileEntity? profileData;
+
+  /// Maps a raw role string (e.g. "store", "student") to a display label.
+  String _accountTypeLabel() {
+    final role = profileData?.role ?? '';
+    if (role.isEmpty) return 'Account';
+    // Capitalize first letter of each word.
+    return role
+        .split('_')
+        .map((w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1)}')
+        .join(' ') +
+        ' Account';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +84,7 @@ class ProfileInfoSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            'Student Account',
+            _accountTypeLabel(),
             style: AppTextStyle.interRegular10.copyWith(
               color: Theme.of(context).colorScheme.onSurface,
             ),

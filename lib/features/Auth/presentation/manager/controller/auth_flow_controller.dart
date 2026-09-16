@@ -52,6 +52,9 @@ class AuthFlowController extends ChangeNotifier {
     } else if (role == 'Mentor Account') {
       draft.role = 'mentor';
       notifyListeners();
+    } else if (role == 'Store Account') {
+      draft.role = 'store';
+      notifyListeners();
     } else {
       draft.role = role;
       notifyListeners();

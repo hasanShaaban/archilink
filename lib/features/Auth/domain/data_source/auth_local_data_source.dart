@@ -5,6 +5,9 @@ abstract class AuthLocalDataSource {
   Future<void> saveUsername(String username);
   String? getUsername();
   Future<void> clearUsername();
+  Future<void> saveRole(String role);
+  String? getRole();
+  Future<void> clearRole();
   Future<void> setRememberMe(bool rememberMe);
   bool? getRemeberMe();
   Future<void> setTokenRegistered(bool value);

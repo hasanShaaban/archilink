@@ -8,6 +8,7 @@ import 'package:archilink/features/Store/presentation/views/widgets/product_loca
 import 'package:archilink/features/Store/presentation/views/widgets/product_page_indicator.dart';
 import 'package:archilink/features/Store/presentation/views/widgets/product_status_chip.dart';
 import 'package:archilink/features/Store/presentation/views/widgets/store_header_tile.dart';
+import 'package:archilink/features/Profile/presentation/views/store_profile_view.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailsView extends StatefulWidget {
@@ -140,8 +141,19 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Store Header (Logo + Name + Username) before images
-          StoreHeaderTile(store: product.store),
+          // Store Header (Logo + Name + Username) — tapping navigates to the store profile
+          StoreHeaderTile(
+            store: product.store,
+            onTap: () {
+              final username = product.store.handle.isNotEmpty
+                  ? product.store.handle
+                  : product.store.name;
+              Navigator.of(context, rootNavigator: true).pushNamed(
+                StoreProfileView.name,
+                arguments: username,
+              );
+            },
+          ),
           const SizedBox(height: 12),
 
           // Image Carousel

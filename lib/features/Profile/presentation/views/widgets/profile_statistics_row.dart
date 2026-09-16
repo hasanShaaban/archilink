@@ -8,16 +8,31 @@ class ProfileStatisticsRow extends StatelessWidget {
     required this.following,
     required this.posts,
     required this.projects,
+    this.isStore = false,
   });
   final int followers;
   final int following;
   final int posts;
   final int projects;
+  /// When true, only shows Products and Followers (store profile layout).
+  final bool isStore;
 
   @override
   Widget build(BuildContext context) {
+    if (isStore) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 49),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ProfileStatisticsColumn(title: 'Products', count: '$posts'),
+            ProfileStatisticsColumn(title: 'Followers', count: '$followers'),
+          ],
+        ),
+      );
+    }
     return Padding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 49),
+      padding: const EdgeInsets.symmetric(horizontal: 49),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

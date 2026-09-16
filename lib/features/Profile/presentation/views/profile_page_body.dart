@@ -31,9 +31,11 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
   /// allowing a refresh to re-trigger the posts load.
   bool _postsLoaded = false;
 
-  /// Returns true when the viewer is allowed to see this profile's posts.
+  /// Returns true when the viewer is allowed to see this profile's posts/products.
   bool _canViewPosts(ProfileEntity profile) {
     if (widget.type == ProfileType.personalProfile) return true;
+    if (widget.type == ProfileType.personalStoreProfile) return true;
+    if (widget.type == ProfileType.storeProfile) return true;
     if (profile.privacySetting == 'public') return true;
     return profile.isFollowing;
   }
@@ -44,11 +46,12 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
     if (_postsLoaded) return;
     _postsLoaded = true;
     if (_canViewPosts(profile)) {
+      final bool isOwnProfile =
+          widget.type == ProfileType.personalProfile ||
+          widget.type == ProfileType.personalStoreProfile;
       context.read<ProfileBloc>().add(
         LoadInitialProfilePosts(
-          username: widget.type == ProfileType.personalProfile
-              ? null
-              : profile.username,
+          username: isOwnProfile ? null : profile.username,
         ),
       );
     }
@@ -104,12 +107,14 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                   backgroundColor: AppColorsFromTheme.grayForTheme(context),
                   displacement: 30,
                   onRefresh: () async {
-                    if (widget.type == ProfileType.personalProfile) {
+                    if (widget.type == ProfileType.personalProfile ||
+                        widget.type == ProfileType.personalStoreProfile) {
                       context.read<ProfileCubit>().getPersonlProfile();
                       // LoadInitialProfilePosts is dispatched by the listener
                       // once ProfileSuccess arrives.
                     }
-                    if (widget.type == ProfileType.userProfile) {
+                    if (widget.type == ProfileType.userProfile ||
+                        widget.type == ProfileType.storeProfile) {
                       context.read<ProfileCubit>().getUserProfile(
                         profileData.username,
                       );
@@ -121,7 +126,9 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                       notification.depth == 0 || notification.depth == 2,
                   child: NestedScrollView(
                     headerSliverBuilder: (_, _) => [
-                      widget.type == ProfileType.personalProfile
+                      // Own profiles use the main app bar; others show a back-button AppBar.
+                      (widget.type == ProfileType.personalProfile ||
+                              widget.type == ProfileType.personalStoreProfile)
                           ? MainAppBar(withTabbar: false)
                           : SliverToBoxAdapter(
                               child: Skeleton.keep(
@@ -144,11 +151,20 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                         height: height,
                         profileData: profileData,
                       ),
+                      // LoadingNewPost is only relevant for the regular personal profile.
                       if (widget.type == ProfileType.personalProfile)
                         LoadingNewPost(),
                       SliverPersistentHeader(
                         pinned: true,
-                        delegate: ProfileTabBarDelegate(),
+                        // Store profiles label the first tab "Products" instead of "Posts".
+                        delegate: ProfileTabBarDelegate(
+                          firstTabLabel:
+                              (widget.type == ProfileType.storeProfile ||
+                                      widget.type ==
+                                          ProfileType.personalStoreProfile)
+                                  ? 'Products'
+                                  : 'Posts',
+                        ),
                       ),
                     ],
                     body: TabBarView(

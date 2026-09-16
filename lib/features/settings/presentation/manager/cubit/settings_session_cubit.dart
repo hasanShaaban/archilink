@@ -37,6 +37,7 @@ class SettingsSessionCubit extends Cubit<SettingsSessionState> {
 
       await _authLocalDataSource.clearToken();
       await _authLocalDataSource.clearUsername();
+      await _authLocalDataSource.clearRole();
       await _authLocalDataSource.setRememberMe(false);
       await _authLocalDataSource.setTokenRegistered(false);
       _currentUserCubit.clear();
