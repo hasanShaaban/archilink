@@ -2,9 +2,11 @@ import 'dart:developer';
 
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/core/network/websocket/reverb_client.dart';
+import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/domain/repo/notification_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
+import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -38,10 +40,29 @@ class AuthCubit extends Cubit<AuthState> {
       (failure) => emit(AuthError(failure.message, failure: failure)),
       (success) async {
         authRepo.setRememberMe(rememberMe);
+
+        String? role = success.role;
+        if ((role == null || role.isEmpty) && sl.isRegistered<ProfileRepo>()) {
+          try {
+            final profileResult = await sl<ProfileRepo>()
+                .getUserProfile(username: success.username);
+            profileResult.fold(
+              (_) {},
+              (profile) {
+                if (profile.role.isNotEmpty) {
+                  role = profile.role;
+                }
+              },
+            );
+          } catch (_) {}
+        }
+
+        final normalizedRole = role?.toLowerCase().trim();
+
         currentUserCubit.setUser(
           username: success.username,
           token: success.accessToken,
-          role: success.role,
+          role: normalizedRole,
         );
 
         // await reverbClient.init(token: success.accessToken);

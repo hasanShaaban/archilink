@@ -28,7 +28,9 @@ class CurrentUserCubit extends Cubit<CurrentUserState> {
   }
 
   void setRole(String role) {
-    emit(state.copyWith(role: role));
+    final normalized = role.toLowerCase().trim();
+    _authLocalDataSource.saveRole(normalized);
+    emit(state.copyWith(role: normalized));
   }
 
   void setUser({
@@ -36,7 +38,11 @@ class CurrentUserCubit extends Cubit<CurrentUserState> {
     required String token,
     String? role,
   }) {
-    emit(state.copyWith(username: username, token: token, role: role));
+    final normalized = role?.toLowerCase().trim();
+    if (normalized != null && normalized.isNotEmpty) {
+      _authLocalDataSource.saveRole(normalized);
+    }
+    emit(state.copyWith(username: username, token: token, role: normalized));
   }
 
   void clear() {

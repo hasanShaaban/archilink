@@ -16,11 +16,24 @@ class AuthTokenModel {
   });
 
   factory AuthTokenModel.fromJson(Map<String, dynamic> json) {
+    String? role;
+    if (json['role'] is String) {
+      role = json['role'];
+    } else if (json['user'] is Map && json['user']['role'] is String) {
+      role = json['user']['role'];
+    } else if (json['profile'] is Map && json['profile']['role'] is String) {
+      role = json['profile']['role'];
+    }
+
+    final username = (json['username'] ??
+            (json['user'] is Map ? json['user']['username'] : null) ??
+            '') as String;
+
     return AuthTokenModel(
-      accessToken: json['access_token'],
-      tokenType: json['token_type'],
-      username: json['username'],
-      role: json['role'],
+      accessToken: (json['access_token'] ?? json['token'] ?? '') as String,
+      tokenType: (json['token_type'] ?? 'Bearer') as String,
+      username: username,
+      role: role?.toLowerCase().trim(),
     );
   }
 

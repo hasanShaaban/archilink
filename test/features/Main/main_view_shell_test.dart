@@ -3,6 +3,7 @@ import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/storage/local_storage.dart';
 import 'package:archilink/features/Auth/data/data_source/auth_local_data_source_impl.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
+import 'package:archilink/core/widgets/main_appbar.dart';
 import 'package:archilink/features/Home/domain/repo/home_repo.dart';
 import 'package:archilink/features/Home/presentation/views/home_page_body.dart';
 import 'package:archilink/features/Main/presentation/manager/main_tab_controller.dart';
@@ -164,6 +165,16 @@ void main() {
     // Verify tabs items
     expect(tabView.items.length, 3);
     expect(tabView.items[0].title, 'Products');
+  });
+
+  testWidgets('store user does not encounter HomePageBody or MainAppBar (no home search icon)', (tester) async {
+    currentUserCubit.setRole('store');
+
+    await tester.pumpWidget(buildTestWidget());
+
+    // HomePageBody and MainAppBar (which contains the home search icon) must not be mounted
+    expect(find.byType(HomePageBody), findsNothing);
+    expect(find.byType(MainAppBar), findsNothing);
   });
 
   testWidgets('renders 4-tab _StudentMentorShell for role == "student"', (tester) async {

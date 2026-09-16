@@ -15,9 +15,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EditProfileView extends StatefulWidget {
-  const EditProfileView({super.key, required this.profileData});
+  const EditProfileView({
+    super.key,
+    required this.profileData,
+    this.isStore = false,
+  });
 
   final ProfileEntity profileData;
+  final bool isStore;
 
   static const name = '/editProfile';
 
@@ -105,6 +110,9 @@ class _EditProfileViewState extends State<EditProfileView> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<EditProfileCubit>();
+    final bool isStore = widget.isStore ||
+        widget.profileData.role.toLowerCase().trim() == 'store' ||
+        widget.profileData.role.toLowerCase().trim() == 'store account';
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -178,8 +186,10 @@ class _EditProfileViewState extends State<EditProfileView> {
                             },
                           ),
 
-                          Divider(height: 1),
-                          EditProfileAccountTypeButton(),
+                          if (!isStore) ...[
+                            Divider(height: 1),
+                            EditProfileAccountTypeButton(),
+                          ],
 
                           Divider(height: 1),
                           RoutedViewRow(
@@ -187,21 +197,27 @@ class _EditProfileViewState extends State<EditProfileView> {
                             route: AboutMeView.name,
                           ),
 
-                          Divider(height: 1),
-                          RoutedViewRow(
-                            title: 'Academic Experience',
-                            route: AcademicExperianceView.name,
-                          ),
+                          if (!isStore) ...[
+                            Divider(height: 1),
+                            RoutedViewRow(
+                              title: 'Academic Experience',
+                              route: AcademicExperianceView.name,
+                            ),
+                          ],
+
                           Divider(height: 1),
                           RoutedViewRow(
                             title: 'Contact Information',
                             route: ContactInfoView.name,
                           ),
-                          Divider(height: 1),
-                          RoutedViewRow(
-                            title: 'Skills',
-                            route: SkillsView.name,
-                          ),
+
+                          if (!isStore) ...[
+                            Divider(height: 1),
+                            RoutedViewRow(
+                              title: 'Skills',
+                              route: SkillsView.name,
+                            ),
+                          ],
                         ],
                       ),
                     ),

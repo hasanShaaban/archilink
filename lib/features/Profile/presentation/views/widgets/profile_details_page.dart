@@ -3,15 +3,21 @@ import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/widgets/expandable_text.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
+import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/connect_info_row.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_details_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class ProfileDetailsPage extends StatelessWidget {
-  const ProfileDetailsPage({super.key, required this.entity});
+  const ProfileDetailsPage({
+    super.key,
+    required this.entity,
+    this.type,
+  });
 
   final ProfileEntity entity;
+  final ProfileType? type;
 
   String _chooseContactIcon(String platform) {
     switch (platform.trim().toLowerCase()) {
@@ -89,11 +95,15 @@ class ProfileDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isStore =
+        type == ProfileType.storeProfile ||
+        type == ProfileType.personalStoreProfile;
+
     final details = entity.details;
     final hasAboutMe =
         details.aboutMe != null && details.aboutMe!.trim().isNotEmpty;
-    final hasAcademic = details.academicExperiences.isNotEmpty;
-    final hasSkills = details.skills.isNotEmpty;
+    final hasAcademic = !isStore && details.academicExperiences.isNotEmpty;
+    final hasSkills = !isStore && details.skills.isNotEmpty;
     final hasContactInfo = details.contactInfo.isNotEmpty;
 
     final hasAnyDetails =
@@ -120,7 +130,7 @@ class ProfileDetailsPage extends StatelessWidget {
         children: [
           if (hasAboutMe) ...[
             ProfileDetailsContainer(
-              title: 'About me',
+              title: isStore ? 'About Us' : 'About me',
               content: ExpandableText(
                 details.aboutMe!.trim(),
                 trimLines: 3,

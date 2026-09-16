@@ -27,8 +27,8 @@ class AuthRepoImpl implements AuthRepo {
       );
       await localDataSource.saveToken(model.accessToken);
       await localDataSource.saveUsername(model.username);
-      if (model.role != null) {
-        await localDataSource.saveRole(model.role!);
+      if (model.role != null && model.role!.isNotEmpty) {
+        await localDataSource.saveRole(model.role!.toLowerCase().trim());
       }
       return right(model.toEntity());
     } on AppException catch (e) {

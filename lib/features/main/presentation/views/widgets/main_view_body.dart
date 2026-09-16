@@ -24,7 +24,8 @@ class MainViewBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<CurrentUserCubit, CurrentUserState>(
       builder: (context, state) {
-        if (state.role == 'store') {
+        final role = state.role?.toLowerCase().trim();
+        if (role == 'store' || role == 'store account') {
           return const _StoreShell();
         }
         return const _StudentMentorShell();

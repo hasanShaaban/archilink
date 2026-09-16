@@ -4,6 +4,7 @@ class ProfileEntity extends Equatable {
   final String name;
   final String username;
   final String? profilePictureUrl;
+  final String? bannerImageUrl;
   final String? bio;
   final bool isFollowing;
   final bool isVerified;
@@ -19,6 +20,7 @@ class ProfileEntity extends Equatable {
     required this.name,
     required this.username,
     required this.profilePictureUrl,
+    this.bannerImageUrl,
     required this.followersCount,
     required this.isFollowing,
     required this.followingCount,
@@ -35,6 +37,7 @@ class ProfileEntity extends Equatable {
     String? name,
     String? username,
     String? profilePictureUrl,
+    String? bannerImageUrl,
     String? bio,
     bool? isFollowing,
     bool? isVerified,
@@ -50,6 +53,7 @@ class ProfileEntity extends Equatable {
       name: name ?? this.name,
       username: username ?? this.username,
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      bannerImageUrl: bannerImageUrl ?? this.bannerImageUrl,
       bio: bio ?? this.bio,
       isFollowing: isFollowing ?? this.isFollowing,
       isVerified: isVerified ?? this.isVerified,
@@ -69,6 +73,7 @@ class ProfileEntity extends Equatable {
     username,
     bio,
     profilePictureUrl,
+    bannerImageUrl,
     isFollowing,
     isVerified,
     privacySetting,

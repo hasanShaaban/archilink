@@ -26,7 +26,7 @@ class PersonalStoreProfileButtons extends StatelessWidget {
           Expanded(
             child: ProfileCustomButton(
               onPress: () {
-                // TODO: Navigate to Add Product view
+                // TODO: Navigate to Create Product screen (planned in a separate milestone)
               },
               icon: Assets.assetsIconsAdd,
               iconSize: 16,
@@ -43,7 +43,7 @@ class PersonalStoreProfileButtons extends StatelessWidget {
               onPress: () {
                 Navigator.of(context, rootNavigator: true).pushNamed(
                   EditProfileView.name,
-                  arguments: {'profileData': profileData},
+                  arguments: {'profileData': profileData, 'isStore': true},
                 );
               },
               icon: Assets.assetsIconsEditProfile,

@@ -4,6 +4,7 @@ import 'package:archilink/core/utils/constants.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/follow_cubit.dart';
+import 'package:archilink/features/Profile/presentation/manager/cubit/update_banner_cubit.dart';
 import 'package:archilink/features/Profile/presentation/manager/cubit/update_profile_image_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/personal_profile_buttons.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/personal_store_profile_buttons.dart';
@@ -39,18 +40,27 @@ class ProfielInfoHeader extends StatelessWidget {
     return SliverToBoxAdapter(
       child: Column(
         children: [
-          BlocProvider(
-            create: (context) =>
-                UpdateProfileImageCubit(sl<MediaPickerService>(instanceName: kProfileImagePicker)),
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) =>
+                    UpdateProfileImageCubit(sl<MediaPickerService>(instanceName: kProfileImagePicker)),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    UpdateBannerCubit(sl<MediaPickerService>(instanceName: kProfileImagePicker)),
+              ),
+            ],
             child: ProfileImageSection(
               type: type,
               width: width,
               image: profileData.profilePictureUrl,
+              bannerImageUrl: profileData.bannerImageUrl,
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           ProfileInfoSection(profileData: profileData),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           _buildButtons(
             type,
             width,
@@ -59,7 +69,7 @@ class ProfielInfoHeader extends StatelessWidget {
             isFollowing: profileData.isFollowing,
             profileData: profileData,
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           ProfileStatisticsRow(
             followers: profileData.followersCount,
             following: profileData.followingCount,
@@ -67,7 +77,7 @@ class ProfielInfoHeader extends StatelessWidget {
             projects: profileData.projectCount,
             isStore: isStore,
           ),
-          SizedBox(height: 19),
+          const SizedBox(height: 19),
         ],
       ),
     );

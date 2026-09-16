@@ -2,6 +2,7 @@ import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/core/widgets/main_appbar.dart';
+import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
@@ -70,6 +71,14 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
       },
       listener: (context, state) {
         if (state is ProfileSuccess) {
+          try {
+            final currentCubit = context.read<CurrentUserCubit>();
+            if ((currentCubit.state.role == null ||
+                    currentCubit.state.role!.isEmpty) &&
+                state.profileData.role.isNotEmpty) {
+              currentCubit.setRole(state.profileData.role);
+            }
+          } catch (_) {}
           _tryLoadPosts(context, state.profileData);
         }
       },
@@ -129,7 +138,11 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                       // Own profiles use the main app bar; others show a back-button AppBar.
                       (widget.type == ProfileType.personalProfile ||
                               widget.type == ProfileType.personalStoreProfile)
-                          ? MainAppBar(withTabbar: false)
+                          ? MainAppBar(
+                              withTabbar: false,
+                              showSearch: widget.type !=
+                                  ProfileType.personalStoreProfile,
+                            )
                           : SliverToBoxAdapter(
                               child: Skeleton.keep(
                                 child: AppBar(
@@ -176,7 +189,10 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                           height: height,
                           postsVisible: postsVisible,
                         ),
-                        ProfileDetailsPage(entity: profileData),
+                        ProfileDetailsPage(
+                          entity: profileData,
+                          type: widget.type,
+                        ),
                       ],
                     ),
                   ),

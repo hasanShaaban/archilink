@@ -74,7 +74,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case EditProfileView.name:
       final args = settings.arguments as Map<String, dynamic>;
       return MaterialPageRoute(
-        builder: (context) => EditProfileView(profileData: args['profileData']),
+        builder: (context) => EditProfileView(
+          profileData: args['profileData'],
+          isStore: args['isStore'] ?? false,
+        ),
       );
     case AboutMeView.name:
       return MaterialPageRoute(builder: (context) => const AboutMeView());
