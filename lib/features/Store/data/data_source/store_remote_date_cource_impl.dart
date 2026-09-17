@@ -1,9 +1,13 @@
 import 'package:archilink/core/error/exceptions.dart';
+import 'package:archilink/core/functions/product_form_data_builder.dart';
 import 'package:archilink/core/network/api_service.dart';
 import 'package:archilink/features/Store/data/models/category_feed_model.dart';
 import 'package:archilink/features/Store/data/models/product_feed_model.dart';
+import 'package:archilink/features/Store/data/models/product_model.dart';
 import 'package:archilink/features/Store/domain/data_source/store_remote_date_source.dart';
+import 'package:archilink/features/Store/domain/entity/add_product_params.dart';
 import 'package:archilink/features/Store/domain/entity/category_feed_entity.dart';
+import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_feed_entity.dart';
 import 'package:dio/dio.dart';
 
@@ -48,5 +52,24 @@ class StoreRemoteDataSourceImpl implements StoreRemoteDateSource {
       throw AppException.handelDioException(e);
     }
   }
+
+  @override
+  Future<ProductEntity> addProduct(AddProductParams params) async {
+    try {
+      final formData = await buildProductFormData(params);
+      final response = await _apiService.postForm(
+        'store/products',
+        formData: formData,
+      );
+      final dataField = response.data?['data'];
+      if (dataField == null || dataField is! Map<String, dynamic>) {
+        throw ServerException(message: 'Invalid add product response');
+      }
+      return ProductModel.fromJson(dataField).toEntity();
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }
+
 

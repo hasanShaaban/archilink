@@ -114,10 +114,25 @@ class _AddEditProductViewBodyState extends State<AddEditProductViewBody> {
 
             // Status Dropdown
             const ProductStatusDropdown(),
-            const SizedBox(height: 14),
 
-            // Quantity Stepper
-            const ProductQuantityStepper(),
+            // Quantity Stepper (conditionally displayed based on status)
+            BlocBuilder<AddEditProductCubit, AddEditProductState>(
+              buildWhen: (prev, curr) =>
+                  prev.status != curr.status ||
+                  prev.isQuantityVisible != curr.isQuantityVisible,
+              builder: (context, state) {
+                if (!state.isQuantityVisible) {
+                  return const SizedBox.shrink();
+                }
+                return const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 14),
+                    ProductQuantityStepper(),
+                  ],
+                );
+              },
+            ),
             const SizedBox(height: 14),
 
             // Category Field & Chips

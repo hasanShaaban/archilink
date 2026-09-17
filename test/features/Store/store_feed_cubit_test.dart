@@ -1,5 +1,6 @@
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Post/domain/entity/pagination_entity.dart';
+import 'package:archilink/features/Store/domain/entity/add_product_params.dart';
 import 'package:archilink/features/Store/domain/entity/category_feed_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_category_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
@@ -62,6 +63,11 @@ class MockStoreRepo implements StoreRepo {
         hasMore: false,
       ),
     ));
+  }
+
+  @override
+  Future<Either<Failure, ProductEntity>> addProduct(AddProductParams params) async {
+    return left(UnknownFailure());
   }
 }
 

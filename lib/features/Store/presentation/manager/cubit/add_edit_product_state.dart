@@ -62,6 +62,14 @@ class AddEditProductState extends Equatable {
         .toList();
   }
 
+  /// Whether the quantity field should be displayed based on status.
+  /// Displayed for 'coming_soon', 'available', 'pending', or initial unselected status.
+  /// Hidden when status is 'out_of_stock' (where quantity is 0).
+  bool get isQuantityVisible {
+    final s = status.trim().toLowerCase().replaceAll(' ', '_');
+    return s != 'out_of_stock';
+  }
+
   AddEditProductState copyWith({
     ProductEntity? initialProduct,
     bool? isEditMode,

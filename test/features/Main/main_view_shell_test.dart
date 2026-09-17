@@ -14,7 +14,9 @@ import 'package:archilink/features/Post/domain/repo/post_repo.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/views/profile_page_body.dart';
+import 'package:archilink/features/Store/domain/entity/add_product_params.dart';
 import 'package:archilink/features/Store/domain/entity/category_feed_entity.dart';
+import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_feed_entity.dart';
 import 'package:archilink/features/Store/domain/repo/store_repo.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_cubit.dart';
@@ -117,6 +119,11 @@ class FakeStoreRepo implements StoreRepo {
         ),
       ),
     );
+  }
+
+  @override
+  Future<Either<Failure, ProductEntity>> addProduct(AddProductParams params) async {
+    return left(UnknownFailure());
   }
 }
 

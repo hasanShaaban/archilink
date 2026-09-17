@@ -36,11 +36,23 @@ class _ProductImagesSectionState extends State<ProductImagesSection> {
 
   Future<void> _pickPhotos(BuildContext context) async {
     try {
+      final currentImages = context.read<AddEditProductCubit>().state.images;
+      final remainingSlots = 5 - currentImages.length;
+      if (remainingSlots <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Maximum 5 images allowed'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
       final List<AssetEntity>? assets = await AssetPicker.pickAssets(
         context,
         pickerConfig: AssetPickerConfig(
           requestType: RequestType.image,
-          maxAssets: 5,
+          maxAssets: remainingSlots,
           pickerTheme: AppTheme.darkMode,
         ),
       );

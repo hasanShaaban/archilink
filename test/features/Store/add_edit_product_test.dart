@@ -1,5 +1,6 @@
 import 'package:archilink/features/Post/domain/entity/pagination_entity.dart';
 import 'package:archilink/features/Store/data/models/category_feed_model.dart';
+import 'package:archilink/features/Store/domain/entity/add_product_params.dart';
 import 'package:archilink/features/Store/domain/entity/category_feed_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_category_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
@@ -11,14 +12,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/core/functions/product_form_data_builder.dart';
 import 'package:archilink/features/Store/data/models/product_category_model.dart';
+import 'package:archilink/features/Store/data/models/product_model.dart';
 import 'package:archilink/features/Store/domain/entity/product_feed_entity.dart';
 import 'package:archilink/features/Store/domain/repo/store_repo.dart';
 import 'package:dartz/dartz.dart';
 
+const dummyStore = ProductStoreEntity(
+  id: 1,
+  name: 'Architect Tools',
+  handle: 'architect_tools',
+  isActive: true,
+  city: 'Damascus',
+  country: 'Syria',
+);
+
+const sampleProduct = ProductEntity(
+  id: 10,
+  store: dummyStore,
+  name: 'Ruler',
+  description: '1. Durable wood with single metal edge.',
+  price: 10.0,
+  quantityInStock: 50,
+  sku: 'RUL-001',
+  status: 'available',
+  categories: [
+    ProductCategoryEntity(id: 1, name: 'Revit', slug: 'revit', productsCount: 12),
+    ProductCategoryEntity(id: 2, name: 'AutoCAD', slug: 'autocad', productsCount: 8),
+  ],
+);
+
 class MockStoreRepo implements StoreRepo {
   Either<Failure, ProductFeedEntity>? feedResponse;
   Either<Failure, CategoryFeedEntity>? categoriesResponse;
+  Either<Failure, ProductEntity>? addProductResponse;
+  AddProductParams? lastAddedParams;
   final List<int> requestedPages = [];
 
   @override
@@ -54,32 +83,15 @@ class MockStoreRepo implements StoreRepo {
           ),
         ));
   }
+
+  @override
+  Future<Either<Failure, ProductEntity>> addProduct(AddProductParams params) async {
+    lastAddedParams = params;
+    return addProductResponse ?? right(sampleProduct);
+  }
 }
 
 void main() {
-  const dummyStore = ProductStoreEntity(
-    id: 1,
-    name: 'Architect Tools',
-    handle: 'architect_tools',
-    isActive: true,
-    city: 'Damascus',
-    country: 'Syria',
-  );
-
-  const sampleProduct = ProductEntity(
-    id: 10,
-    store: dummyStore,
-    name: 'Ruler',
-    description: '1. Durable wood with single metal edge.',
-    price: 10.0,
-    quantityInStock: 50,
-    sku: 'RUL-001',
-    status: 'available',
-    categories: [
-      ProductCategoryEntity(id: 1, name: 'Revit', slug: 'revit', productsCount: 12),
-      ProductCategoryEntity(id: 2, name: 'AutoCAD', slug: 'autocad', productsCount: 8),
-    ],
-  );
 
   Widget createTestWidget(Widget child) {
     return MaterialApp(
@@ -170,6 +182,72 @@ void main() {
       expect(entity.categories.length, 2);
       expect(entity.pagination.currentPage, 3);
       expect(entity.pagination.hasMore, isTrue);
+    });
+  });
+
+  group('Add Product Response Parsing & FormData Builder', () {
+    test('ProductModel parses add product response data correctly', () {
+      final json = {
+        "status": "success",
+        "message": "Product created successfully",
+        "data": {
+          "id": 108,
+          "store": {
+            "id": 1,
+            "name": "Test User",
+            "handle": "testUser4",
+            "description": "You have no idea how high i can fly.",
+            "city": null,
+            "country": null,
+            "store_logo_url": "https://res.cloudinary.com/dnsnbfbad/image/upload/v1789614679/wrxjd9hk6snkhehtwizy.jpg",
+            "store_banner_url": "https://res.cloudinary.com/dnsnbfbad/image/upload/v1789612858/rmvmqm35btsgemv4rb2l.jpg",
+            "is_active": true,
+            "followers_count": 0
+          },
+          "name": "Wireless Mouse",
+          "description": null,
+          "price": 22,
+          "quantity_in_stock": 0,
+          "image_url": null,
+          "categories": [],
+          "media_items": [],
+          "sku": "SKU-714D71ED-F9F5-4F18-AA27-8EFDE3FA2864",
+          "status": "available",
+          "created_at": "2026-09-17",
+          "updated_at": "2026-09-17"
+        }
+      };
+
+      final model = ProductModel.fromJson(json['data'] as Map<String, dynamic>);
+      expect(model.id, 108);
+      expect(model.name, 'Wireless Mouse');
+      expect(model.price, 22.0);
+      expect(model.quantityInStock, 0);
+      expect(model.status, 'available');
+      expect(model.store.name, 'Test User');
+
+      final entity = model.toEntity();
+      expect(entity.id, 108);
+      expect(entity.name, 'Wireless Mouse');
+      expect(entity.price, 22.0);
+    });
+
+    test('buildProductFormData creates FormData with all expected fields', () async {
+      const params = AddProductParams(
+        name: 'Drafting Pen',
+        description: '0.5mm technical pen',
+        price: 15.50,
+        categoryIds: [2, 5],
+        quantityInStock: 10,
+        status: 'available',
+      );
+
+      final formData = await buildProductFormData(params);
+      expect(formData.fields.any((f) => f.key == 'name' && f.value == 'Drafting Pen'), isTrue);
+      expect(formData.fields.any((f) => f.key == 'description' && f.value == '0.5mm technical pen'), isTrue);
+      expect(formData.fields.any((f) => f.key == 'price' && f.value == '15.5'), isTrue);
+      expect(formData.fields.any((f) => f.key == 'quantity_in_stock' && f.value == '10'), isTrue);
+      expect(formData.fields.any((f) => f.key == 'status' && f.value == 'available'), isTrue);
     });
   });
 
@@ -273,6 +351,136 @@ void main() {
       cubit.setCategorySearchQuery('rev');
       expect(cubit.state.filteredCategories.any((c) => c.slug == 'revit'), isTrue);
       expect(cubit.state.filteredCategories.any((c) => c.slug == 'wood-tools'), isFalse);
+    });
+
+    test('status out_of_stock forces quantity to 0 and hides quantity field', () {
+      final cubit = AddEditProductCubit();
+      cubit.setQuantity(25);
+      expect(cubit.state.quantity, 25);
+      expect(cubit.state.isQuantityVisible, isTrue);
+
+      // Change status to out_of_stock
+      cubit.updateStatus('out_of_stock');
+      expect(cubit.state.status, 'out_of_stock');
+      expect(cubit.state.quantity, 0);
+      expect(cubit.state.isQuantityVisible, isFalse);
+
+      // Attempting to increment or set quantity while out_of_stock keeps it 0
+      cubit.incrementQuantity();
+      expect(cubit.state.quantity, 0);
+
+      cubit.setQuantity(50);
+      expect(cubit.state.quantity, 0);
+
+      // Changing to coming_soon makes quantity visible again
+      cubit.updateStatus('coming_soon');
+      expect(cubit.state.isQuantityVisible, isTrue);
+      cubit.setQuantity(10);
+      expect(cubit.state.quantity, 10);
+
+      // Changing to pending keeps quantity visible
+      cubit.updateStatus('pending');
+      expect(cubit.state.isQuantityVisible, isTrue);
+      expect(cubit.state.quantity, 10);
+
+      // Changing to available keeps quantity visible
+      cubit.updateStatus('available');
+      expect(cubit.state.isQuantityVisible, isTrue);
+      expect(cubit.state.quantity, 10);
+    });
+
+    test('initial product with out_of_stock sets quantity to 0 and isQuantityVisible to false', () {
+      const outOfStockProduct = ProductEntity(
+        id: 11,
+        store: dummyStore,
+        name: 'Drafting Board',
+        description: 'Large drawing board',
+        price: 99.0,
+        quantityInStock: 20,
+        sku: 'DFT-001',
+        status: 'out_of_stock',
+        categories: [],
+      );
+      final cubit = AddEditProductCubit(initialProduct: outOfStockProduct);
+      expect(cubit.state.status, 'out_of_stock');
+      expect(cubit.state.quantity, 0);
+      expect(cubit.state.isQuantityVisible, isFalse);
+    });
+
+    test('submit validates required fields: name, price >= 0.01', () async {
+      final repo = MockStoreRepo();
+      final cubit = AddEditProductCubit(storeRepo: repo);
+
+      // Name empty
+      await cubit.submit();
+      expect(cubit.state.errorMessage, 'Please enter a product name');
+      expect(repo.lastAddedParams, isNull);
+
+      // Price empty or invalid
+      cubit.updateName('Valid Name');
+      await cubit.submit();
+      expect(cubit.state.errorMessage, 'Price must be at least 0.01');
+      expect(repo.lastAddedParams, isNull);
+
+      cubit.updatePrice('0.00');
+      await cubit.submit();
+      expect(cubit.state.errorMessage, 'Price must be at least 0.01');
+      expect(repo.lastAddedParams, isNull);
+    });
+
+    test('submit successfully calls addProduct with correct parameters and formats', () async {
+      final repo = MockStoreRepo();
+      final cubit = AddEditProductCubit(storeRepo: repo);
+      const cat = ProductCategoryEntity(id: 7, name: 'Rulers', slug: 'rulers');
+
+      cubit.updateName('Architectural Scale Ruler');
+      cubit.updateDescription('High precision triangular ruler');
+      cubit.updatePrice('19.99');
+      cubit.updateStatus('available');
+      cubit.setQuantity(42);
+      cubit.toggleCategory(cat);
+
+      await cubit.submit();
+
+      expect(cubit.state.errorMessage, isNull);
+      expect(cubit.state.isSuccess, isTrue);
+      expect(repo.lastAddedParams, isNotNull);
+      expect(repo.lastAddedParams!.name, 'Architectural Scale Ruler');
+      expect(repo.lastAddedParams!.description, 'High precision triangular ruler');
+      expect(repo.lastAddedParams!.price, 19.99);
+      expect(repo.lastAddedParams!.quantityInStock, 42);
+      expect(repo.lastAddedParams!.status, 'available');
+      expect(repo.lastAddedParams!.categoryIds, [7]);
+    });
+
+    test('submit sends quantity 0 when status is out_of_stock and null when status is empty', () async {
+      final repo = MockStoreRepo();
+      final cubit = AddEditProductCubit(storeRepo: repo);
+
+      cubit.updateName('Out of Stock Item');
+      cubit.updatePrice('5.0');
+      // Status empty -> sends status null
+      await cubit.submit();
+      expect(repo.lastAddedParams!.status, isNull);
+
+      // Status out_of_stock -> sends quantity 0
+      cubit.updateStatus('out_of_stock');
+      await cubit.submit();
+      expect(repo.lastAddedParams!.status, 'out_of_stock');
+      expect(repo.lastAddedParams!.quantityInStock, 0);
+    });
+
+    test('submit handles failure response gracefully', () async {
+      final repo = MockStoreRepo();
+      repo.addProductResponse = left(const ServerFailure(message: 'Server error while creating product'));
+      final cubit = AddEditProductCubit(storeRepo: repo);
+
+      cubit.updateName('Item');
+      cubit.updatePrice('10');
+      await cubit.submit();
+
+      expect(cubit.state.isSuccess, isFalse);
+      expect(cubit.state.errorMessage, 'Server error while creating product');
     });
   });
 
@@ -384,6 +592,70 @@ void main() {
 
       // Chip is removed, only search placeholder remains
       expect(find.text('Search for Category'), findsOneWidget);
+    });
+
+    testWidgets('quantity can be edited via keyboard beside buttons', (tester) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        createTestWidget(const AddEditProductView(product: sampleProduct)),
+      );
+      await tester.pumpAndSettle();
+
+      // Find the quantity text field (initialized to 50 for sampleProduct)
+      final quantityField = find.widgetWithText(TextField, '50');
+      expect(quantityField, findsOneWidget);
+
+      // Type 75 using keyboard
+      await tester.enterText(quantityField, '75');
+      await tester.pumpAndSettle();
+      expect(find.text('75'), findsOneWidget);
+
+      // Tap + button after keyboard edit
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.pumpAndSettle();
+      expect(find.text('76'), findsOneWidget);
+
+      // Tap - button
+      await tester.tap(find.byIcon(Icons.remove));
+      await tester.pumpAndSettle();
+      expect(find.text('75'), findsOneWidget);
+    });
+
+    testWidgets('quantity field hides when status is out_of_stock and reappears for other statuses', (tester) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        createTestWidget(const AddEditProductView(product: sampleProduct)),
+      );
+      await tester.pumpAndSettle();
+
+      // Initially sampleProduct has status 'available' -> Quantity is visible
+      expect(find.text('Quantity'), findsOneWidget);
+
+      // Open status picker and select Out of Stock
+      await tester.tap(find.text('Available'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Out of Stock'));
+      await tester.pumpAndSettle();
+
+      // Quantity field is hidden
+      expect(find.text('Quantity'), findsNothing);
+
+      // Open status picker and select Coming Soon
+      await tester.tap(find.text('Out of Stock'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Coming Soon'));
+      await tester.pumpAndSettle();
+
+      // Quantity field is visible again
+      expect(find.text('Quantity'), findsOneWidget);
     });
   });
 }

@@ -1,3 +1,4 @@
+import 'package:archilink/features/Store/domain/entity/add_product_params.dart';
 import 'package:archilink/features/Store/domain/entity/product_category_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/domain/repo/store_repo.dart';
@@ -23,7 +24,9 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
                    ? initialProduct.price.toInt().toString()
                    : initialProduct.price.toStringAsFixed(2))
                : '',
-           quantity: initialProduct?.quantityInStock ?? 0,
+           quantity: (initialProduct?.status.trim().toLowerCase().replaceAll(' ', '_') == 'out_of_stock')
+               ? 0
+               : (initialProduct?.quantityInStock ?? 0),
            status: initialProduct?.status ?? '',
            images: initialProduct?.images ?? const [],
            selectedCategories: initialProduct?.categories ?? const [],
@@ -114,20 +117,32 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
   }
 
   void updateStatus(String status) {
-    emit(state.copyWith(status: status));
+    final isOutOfStock =
+        status.trim().toLowerCase().replaceAll(' ', '_') == 'out_of_stock';
+    if (isOutOfStock) {
+      emit(state.copyWith(status: status, quantity: 0));
+    } else {
+      emit(state.copyWith(status: status));
+    }
   }
 
   void incrementQuantity() {
+    if (!state.isQuantityVisible) return;
     emit(state.copyWith(quantity: state.quantity + 1));
   }
 
   void decrementQuantity() {
+    if (!state.isQuantityVisible) return;
     if (state.quantity > 0) {
       emit(state.copyWith(quantity: state.quantity - 1));
     }
   }
 
   void setQuantity(int quantity) {
+    if (!state.isQuantityVisible) {
+      emit(state.copyWith(quantity: 0));
+      return;
+    }
     emit(state.copyWith(quantity: quantity < 0 ? 0 : quantity));
   }
 
@@ -153,7 +168,10 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
   }
 
   void addImages(List<String> newImages) {
-    final updated = List<String>.from(state.images)..addAll(newImages);
+    var updated = List<String>.from(state.images)..addAll(newImages);
+    if (updated.length > 5) {
+      updated = updated.sublist(0, 5);
+    }
     emit(state.copyWith(images: updated));
   }
 
@@ -165,10 +183,75 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
   }
 
   Future<void> submit() async {
-    // Repository integration point (planned for next milestone)
+    final name = state.name.trim();
+    if (name.isEmpty) {
+      emit(state.copyWith(errorMessage: 'Please enter a product name'));
+      return;
+    }
+
+    final priceCleaned = state.price.replaceAll('\$', '').trim();
+    final parsedPrice = double.tryParse(priceCleaned);
+    if (parsedPrice == null || parsedPrice < 0.01) {
+      emit(state.copyWith(errorMessage: 'Price must be at least 0.01'));
+      return;
+    }
+
+    if (state.images.length > 5) {
+      emit(state.copyWith(errorMessage: 'Cannot upload more than 5 images'));
+      return;
+    }
+
+    if (state.isQuantityVisible && state.quantity < 0) {
+      emit(state.copyWith(errorMessage: 'Quantity cannot be negative'));
+      return;
+    }
+
+    final isOutOfStock =
+        state.status.trim().toLowerCase().replaceAll(' ', '_') == 'out_of_stock';
+    final int quantity = isOutOfStock
+        ? 0
+        : (state.isQuantityVisible ? state.quantity : 0);
+
+    final String? status =
+        state.status.trim().isEmpty ? null : state.status.trim();
+    final String? description =
+        state.description.trim().isEmpty ? null : state.description.trim();
+    final categoryIds = state.selectedCategories.map((c) => c.id).toList();
+
+    if (_storeRepo == null) {
+      emit(state.copyWith(isSubmitting: false, isSuccess: true));
+      return;
+    }
+
     emit(state.copyWith(isSubmitting: true, errorMessage: null));
-    await Future.delayed(const Duration(milliseconds: 300));
-    emit(state.copyWith(isSubmitting: false, isSuccess: true));
+
+    final params = AddProductParams(
+      name: name,
+      description: description,
+      price: parsedPrice,
+      categoryIds: categoryIds,
+      quantityInStock: quantity,
+      status: status,
+      imagePaths: state.images,
+    );
+
+    final result = await _storeRepo.addProduct(params);
+    if (isClosed) return;
+
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          isSubmitting: false,
+          errorMessage: failure.message,
+        ));
+      },
+      (product) {
+        emit(state.copyWith(
+          isSubmitting: false,
+          isSuccess: true,
+        ));
+      },
+    );
   }
 
   Future<void> delete() async {
