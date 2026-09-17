@@ -1,7 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:archilink/core/error/failure.dart';
+import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
+import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Profile/presentation/views/crop_image_view.dart';
+import 'package:dartz/dartz.dart' hide State;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -34,6 +40,59 @@ class FakeImageCropper extends ImageCropper {
   }
 }
 
+class FakeProfileRepo implements ProfileRepo {
+  File? lastProfilePictureFile;
+  File? lastStoreLogoFile;
+  File? lastStoreBannerFile;
+
+  Either<Failure, bool> updateProfilePictureResult = const Right(true);
+  Either<Failure, bool> updateStoreLogoResult = const Right(true);
+  Either<Failure, bool> updateStoreBannerResult = const Right(true);
+
+  Completer<Either<Failure, bool>>? delayedCompleter;
+
+  @override
+  Future<Either<Failure, bool>> updateProfilePicture(File imageFile) async {
+    lastProfilePictureFile = imageFile;
+    if (delayedCompleter != null) return delayedCompleter!.future;
+    return updateProfilePictureResult;
+  }
+
+  @override
+  Future<Either<Failure, bool>> updateStoreLogo(File imageFile) async {
+    lastStoreLogoFile = imageFile;
+    if (delayedCompleter != null) return delayedCompleter!.future;
+    return updateStoreLogoResult;
+  }
+
+  @override
+  Future<Either<Failure, bool>> updateStoreBanner(File imageFile) async {
+    lastStoreBannerFile = imageFile;
+    if (delayedCompleter != null) return delayedCompleter!.future;
+    return updateStoreBannerResult;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeProfileCubit extends ProfileCubit {
+  FakeProfileCubit(super.profileRepo);
+
+  bool calledPersonalProfile = false;
+  bool calledPersonalStoreProfile = false;
+
+  @override
+  Future<void> getPersonlProfile() async {
+    calledPersonalProfile = true;
+  }
+
+  @override
+  Future<void> getPersonalStoreProfile() async {
+    calledPersonalStoreProfile = true;
+  }
+}
+
 void main() {
   late File dummyFile;
   late File dummyCroppedFile;
@@ -55,10 +114,6 @@ void main() {
   });
 
   group('CropImageView', () {
-    setUp(() {
-      // Common setup if needed
-    });
-
     testWidgets('renders profile picture crop view with avatar preview and confirm button', (tester) async {
       tester.view.physicalSize = const Size(1080, 1920);
       tester.view.devicePixelRatio = 1.0;
@@ -142,7 +197,7 @@ void main() {
       expect(find.text('Reset'), findsNothing);
     });
 
-    testWidgets('tapping confirm button triggers onConfirm callback with image file', (tester) async {
+    testWidgets('tapping confirm button triggers onConfirm callback with image file if provided', (tester) async {
       tester.view.physicalSize = const Size(1080, 1920);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -165,6 +220,272 @@ void main() {
 
       expect(confirmedFile, isNotNull);
       expect(confirmedFile!.path, dummyFile.path);
+    });
+
+    testWidgets('calls updateProfilePicture for student/mentor, shows success and refreshes profile', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final fakeRepo = FakeProfileRepo();
+      final fakeCubit = FakeProfileCubit(fakeRepo);
+
+      await tester.pumpWidget(
+        BlocProvider<ProfileCubit>.value(
+          value: fakeCubit,
+          child: MaterialApp(
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () async {
+                    final updated = await Navigator.of(context).push<bool>(
+                      MaterialPageRoute(
+                        builder: (_) => CropImageView(
+                          imageFile: dummyFile,
+                          cropType: CropImageType.profileImage,
+                          isStore: false,
+                          profileRepo: fakeRepo,
+                        ),
+                      ),
+                    );
+                    if (updated == true && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Profile picture updated successfully'),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Open Cropper'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open Cropper'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Confirm Profile Picture'), findsOneWidget);
+
+      await tester.tap(find.text('Confirm Profile Picture'));
+      await tester.pumpAndSettle();
+
+      expect(fakeRepo.lastProfilePictureFile?.path, dummyFile.path);
+      expect(fakeCubit.calledPersonalProfile, isTrue);
+      expect(find.text('Open Cropper'), findsOneWidget);
+      expect(find.text('Profile picture updated successfully'), findsOneWidget);
+    });
+
+    testWidgets('calls updateStoreLogo for store profile picture, shows success and refreshes store profile', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final fakeRepo = FakeProfileRepo();
+      final fakeCubit = FakeProfileCubit(fakeRepo);
+
+      await tester.pumpWidget(
+        BlocProvider<ProfileCubit>.value(
+          value: fakeCubit,
+          child: MaterialApp(
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () async {
+                    final updated = await Navigator.of(context).push<bool>(
+                      MaterialPageRoute(
+                        builder: (_) => CropImageView(
+                          imageFile: dummyFile,
+                          cropType: CropImageType.profileImage,
+                          isStore: true,
+                          profileRepo: fakeRepo,
+                        ),
+                      ),
+                    );
+                    if (updated == true && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Store logo updated successfully'),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Open Cropper'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open Cropper'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Confirm Profile Picture'));
+      await tester.pumpAndSettle();
+
+      expect(fakeRepo.lastStoreLogoFile?.path, dummyFile.path);
+      expect(fakeCubit.calledPersonalStoreProfile, isTrue);
+      expect(find.text('Open Cropper'), findsOneWidget);
+      expect(find.text('Store logo updated successfully'), findsOneWidget);
+    });
+
+    testWidgets('calls updateStoreBanner for store banner, shows success', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final fakeRepo = FakeProfileRepo();
+      final fakeCubit = FakeProfileCubit(fakeRepo);
+
+      await tester.pumpWidget(
+        BlocProvider<ProfileCubit>.value(
+          value: fakeCubit,
+          child: MaterialApp(
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () async {
+                    final updated = await Navigator.of(context).push<bool>(
+                      MaterialPageRoute(
+                        builder: (_) => CropImageView(
+                          imageFile: dummyFile,
+                          cropType: CropImageType.bannerImage,
+                          isStore: true,
+                          profileRepo: fakeRepo,
+                        ),
+                      ),
+                    );
+                    if (updated == true && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Store banner image updated successfully'),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Open Cropper'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open Cropper'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Confirm Banner Image'));
+      await tester.pumpAndSettle();
+
+      expect(fakeRepo.lastStoreBannerFile?.path, dummyFile.path);
+      expect(fakeCubit.calledPersonalStoreProfile, isTrue);
+      expect(find.text('Store banner image updated successfully'), findsOneWidget);
+    });
+
+    testWidgets('displays loading spinner inside confirm button during upload', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final fakeRepo = FakeProfileRepo();
+      final completer = Completer<Either<Failure, bool>>();
+      fakeRepo.delayedCompleter = completer;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CropImageView(
+            imageFile: dummyFile,
+            cropType: CropImageType.profileImage,
+            profileRepo: fakeRepo,
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Confirm Profile Picture'));
+      await tester.pump(); // frame where upload started
+
+      // Progress indicator should be visible inside confirm button
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Confirm Profile Picture'), findsNothing);
+
+      // Complete upload
+      completer.complete(const Right(true));
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('displays error in appSnackBar when upload fails', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final fakeRepo = FakeProfileRepo();
+      fakeRepo.updateProfilePictureResult = const Left(
+        ServerFailure(message: 'Failed to update profile picture'),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CropImageView(
+            imageFile: dummyFile,
+            cropType: CropImageType.profileImage,
+            profileRepo: fakeRepo,
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Confirm Profile Picture'));
+      await tester.pumpAndSettle();
+
+      // View should still be open
+      expect(find.text('Edit Profile Picture'), findsOneWidget);
+      // SnackBar with error message
+      expect(find.text('Failed to update profile picture'), findsOneWidget);
+    });
+
+    testWidgets('triggers cropImage if file exceeds 2MB and user confirms without cropping', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final tempDir = Directory.systemTemp.createTempSync('large_crop_test');
+      final largeFile = File('${tempDir.path}/large_image.jpg')..createSync();
+      largeFile.writeAsBytesSync(List.filled(2500000, 42));
+      addTearDown(() {
+        try {
+          if (largeFile.existsSync()) largeFile.deleteSync();
+        } catch (_) {}
+      });
+
+      final fakeCropper = FakeImageCropper(
+        croppedResult: CroppedFile(dummyCroppedFile.path),
+      );
+      final fakeRepo = FakeProfileRepo();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CropImageView(
+            imageFile: largeFile,
+            cropType: CropImageType.bannerImage,
+            cropper: fakeCropper,
+            profileRepo: fakeRepo,
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Confirm Banner Image'));
+      await tester.pumpAndSettle();
+
+      expect(fakeCropper.calledCrop, isTrue);
+      expect(fakeRepo.lastStoreBannerFile?.path, dummyCroppedFile.path);
     });
   });
 }

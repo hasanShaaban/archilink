@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:archilink/core/error/exceptions.dart';
 import 'package:archilink/core/network/api_service.dart';
 import 'package:archilink/features/Post/data/models/posts_model.dart';
@@ -6,6 +8,8 @@ import 'package:archilink/features/Profile/domain/data_source/profile_remote_dat
 import 'package:archilink/features/Profile/domain/entity/follow_status.dart';
 import 'package:archilink/features/Store/data/models/product_feed_model.dart';
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -178,5 +182,75 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }
+  }
+
+  Future<bool> _uploadImage({
+    required String endpoint,
+    required String fieldName,
+    required File imageFile,
+  }) async {
+    try {
+      final mimeStr = lookupMimeType(imageFile.path) ?? 'image/jpeg';
+      final mime = mimeStr.split('/');
+      final mediaType = mime.length == 2
+          ? MediaType(mime[0], mime[1])
+          : MediaType('image', 'jpeg');
+
+      String fileName = imageFile.path.split(RegExp(r'[/\\]')).last;
+      if (!fileName.toLowerCase().endsWith('.jpg') &&
+          !fileName.toLowerCase().endsWith('.jpeg') &&
+          !fileName.toLowerCase().endsWith('.png')) {
+        fileName = '$fileName.jpg';
+      }
+
+      final formData = FormData.fromMap({
+        fieldName: await MultipartFile.fromFile(
+          imageFile.path,
+          filename: fileName,
+          contentType: mediaType,
+        ),
+      });
+
+      final response = await apiService.postForm<Map<String, dynamic>>(
+        endpoint,
+        formData: formData,
+      );
+
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'Invalid response from server');
+      }
+
+      return data['status'] == 'success';
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<bool> updateProfilePicture(File imageFile) async {
+    return _uploadImage(
+      endpoint: 'profile/update-profile-picture',
+      fieldName: 'picture',
+      imageFile: imageFile,
+    );
+  }
+
+  @override
+  Future<bool> updateStoreLogo(File imageFile) async {
+    return _uploadImage(
+      endpoint: 'store/profile/logo',
+      fieldName: 'logo',
+      imageFile: imageFile,
+    );
+  }
+
+  @override
+  Future<bool> updateStoreBanner(File imageFile) async {
+    return _uploadImage(
+      endpoint: 'store/profile/banner',
+      fieldName: 'banner',
+      imageFile: imageFile,
+    );
   }
 }

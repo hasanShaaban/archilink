@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:archilink/core/error/exception_to_faliure_mapper.dart';
 import 'package:archilink/core/error/exceptions.dart';
@@ -167,10 +168,46 @@ class ProfileRepoImpl implements ProfileRepo {
 
   
   @override
-  Future<Either<Failure, bool>> unfollow(String username) async{
+  Future<Either<Failure, bool>> unfollow(String username) async {
     try {
       final model = await remoteDataSource.unfollow(username);
       return right(model);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> updateProfilePicture(File imageFile) async {
+    try {
+      final success = await remoteDataSource.updateProfilePicture(imageFile);
+      return right(success);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> updateStoreLogo(File imageFile) async {
+    try {
+      final success = await remoteDataSource.updateStoreLogo(imageFile);
+      return right(success);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> updateStoreBanner(File imageFile) async {
+    try {
+      final success = await remoteDataSource.updateStoreBanner(imageFile);
+      return right(success);
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));
     } catch (_) {

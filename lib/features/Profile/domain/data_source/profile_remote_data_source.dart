@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:archilink/features/Post/data/models/posts_model.dart';
 import 'package:archilink/features/Profile/data/model/profile_model.dart';
 import 'package:archilink/features/Profile/domain/entity/follow_status.dart';
@@ -18,5 +20,8 @@ abstract class ProfileRemoteDataSource {
   });
   Future<FollowStatus> follow(String username);
   Future<bool> unfollow(String username);
+  Future<bool> updateProfilePicture(File imageFile);
+  Future<bool> updateStoreLogo(File imageFile);
+  Future<bool> updateStoreBanner(File imageFile);
 }
 

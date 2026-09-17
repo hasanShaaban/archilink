@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Post/domain/entity/posts_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/follow_status.dart';
@@ -26,5 +28,8 @@ abstract class ProfileRepo {
   });
   Future<Either<Failure, FollowStatus>> follow(String username);
   Future<Either<Failure, bool>> unfollow(String username);
+  Future<Either<Failure, bool>> updateProfilePicture(File imageFile);
+  Future<Either<Failure, bool>> updateStoreLogo(File imageFile);
+  Future<Either<Failure, bool>> updateStoreBanner(File imageFile);
 }
 

@@ -16,7 +16,32 @@ Failure mapExceptionToFailure(AppException exception) {
     return const CacheFailure();
   } else if (exception is ServerException) {
     return ServerFailure(message: exception.message);
-  }else {
+  } else if (exception is ValidationException) {
+    final data = exception.response?.data;
+    if (data is Map<String, dynamic>) {
+      final errors = data['errors'];
+      if (errors is Map<String, dynamic> && errors.isNotEmpty) {
+        final firstErrorList = errors.values.first;
+        if (firstErrorList is List && firstErrorList.isNotEmpty) {
+          return ValidationFailure(
+            message: firstErrorList.first.toString(),
+            fieldErrors: errors.map(
+              (key, value) => MapEntry(
+                key,
+                value is List
+                    ? value.map((e) => e.toString()).toList()
+                    : [value.toString()],
+              ),
+            ),
+          );
+        }
+      }
+      if (data['message'] != null) {
+        return ValidationFailure(message: data['message'].toString());
+      }
+    }
+    return const ValidationFailure(message: 'Validation Error');
+  } else {
     return const UnknownFailure();
   }
 }

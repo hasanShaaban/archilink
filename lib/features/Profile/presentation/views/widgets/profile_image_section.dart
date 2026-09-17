@@ -247,7 +247,12 @@ class ProfileImageSection extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            context.read<UpdateProfileImageCubit>().pickImage(context);
+            final bool isStore = type == ProfileType.personalStoreProfile ||
+                type == ProfileType.storeProfile;
+            context.read<UpdateProfileImageCubit>().pickImage(
+                  context,
+                  isStore: isStore,
+                );
           },
           child: SvgPicture.asset(
             Assets.assetsIconsEditProfileImage,

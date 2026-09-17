@@ -106,12 +106,14 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       final File file = rawFile is File ? rawFile : File(rawFile as String);
       final CropImageType cropType =
           args['cropType'] as CropImageType? ?? CropImageType.profileImage;
+      final bool isStore = args['isStore'] as bool? ?? false;
       final void Function(File)? onConfirm =
           args['onConfirm'] as void Function(File)?;
-      return MaterialPageRoute(
+      return MaterialPageRoute<bool>(
         builder: (context) => CropImageView(
           imageFile: file,
           cropType: cropType,
+          isStore: isStore,
           onConfirm: onConfirm,
         ),
       );

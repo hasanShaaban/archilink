@@ -1,4 +1,5 @@
 import 'package:archilink/core/services/media_picker_service.dart';
+import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/features/Profile/presentation/views/crop_image_view.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -32,13 +33,23 @@ class UpdateBannerCubit extends Cubit<UpdateBannerState> {
     );
 
     if (context.mounted) {
-      Navigator.of(context, rootNavigator: true).pushNamed(
+      final updated =
+          await Navigator.of(context, rootNavigator: true).pushNamed(
         CropImageView.name,
         arguments: {
           'imageFile': file,
           'cropType': CropImageType.bannerImage,
         },
       );
+
+      if (updated == true && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Store banner image updated successfully'),
+            backgroundColor: AppColors.tael,
+          ),
+        );
+      }
     }
   }
 }
