@@ -106,7 +106,6 @@ class _StoreShellState extends State<_StoreShell> {
       onItemSelected: (value) {
         if (value == 1) {
           BlocProvider.of<ProfileCubit>(context).getPersonlProfile();
-          BlocProvider.of<ProfileBloc>(context).add(LoadInitialProfilePosts());
         }
       },
       navBarStyle: NavBarStyle.style13,

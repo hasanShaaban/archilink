@@ -104,7 +104,7 @@ class ProfileDetailsPage extends StatelessWidget {
         details.aboutMe != null && details.aboutMe!.trim().isNotEmpty;
     final hasAcademic = !isStore && details.academicExperiences.isNotEmpty;
     final hasSkills = !isStore && details.skills.isNotEmpty;
-    final hasContactInfo = details.contactInfo.isNotEmpty;
+    final hasContactInfo = !isStore && details.contactInfo.isNotEmpty;
 
     final hasAnyDetails =
         hasAboutMe || hasAcademic || hasSkills || hasContactInfo;

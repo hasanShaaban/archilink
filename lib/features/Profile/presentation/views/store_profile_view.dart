@@ -14,9 +14,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// - Same username → [ProfileType.personalStoreProfile] (own store)
 /// - Different  → [ProfileType.storeProfile] (someone else's store)
 class StoreProfileView extends StatefulWidget {
-  const StoreProfileView({super.key, required this.username});
+  const StoreProfileView({
+    super.key,
+    required this.username,
+    this.storeId,
+  });
 
   final String username;
+  final int? storeId;
 
   static const String name = '/storeProfile';
 
@@ -39,8 +44,15 @@ class _StoreProfileViewState extends State<StoreProfileView> {
         ? ProfileType.personalStoreProfile
         : ProfileType.storeProfile;
 
-    // Fetch the store profile data. ProfileCubit is provided globally in main.dart.
-    context.read<ProfileCubit>().getUserProfile(widget.username);
+    if (isMyStore) {
+      context.read<ProfileCubit>().getPersonalStoreProfile();
+    } else {
+      final id = widget.storeId ?? int.tryParse(widget.username) ?? 0;
+      context.read<ProfileCubit>().getStoreProfile(
+            id: id,
+            handle: widget.username,
+          );
+    }
   }
 
   @override

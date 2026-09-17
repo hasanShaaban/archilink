@@ -12,21 +12,30 @@ import 'package:archilink/features/Profile/domain/data_source/profile_remote_dat
 import 'package:archilink/features/Profile/domain/entity/follow_status.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
+import 'package:archilink/features/Store/domain/entity/product_feed_entity.dart';
 import 'package:dartz/dartz.dart';
 
 
 class ProfileRepoImpl implements ProfileRepo {
   final ProfileRemoteDataSource remoteDataSource;
   final ProfileLocalDataSource localDataSource;
+  final AuthLocalDataSource? authLocalDataSource;
 
   ProfileRepoImpl({
     required this.remoteDataSource,
     required this.localDataSource,
+    this.authLocalDataSource,
   });
 
   @override
   Future<Either<Failure, ProfileEntity>> getPersonalProfile() async {
-    AuthLocalDataSource dataSource = sl<AuthLocalDataSource>();
+    AuthLocalDataSource dataSource =
+        authLocalDataSource ?? sl<AuthLocalDataSource>();
+    final role = dataSource.getRole()?.toLowerCase().trim();
+    if (role == 'store' || role == 'store account') {
+      return getPersonalStoreProfile();
+    }
+
     String username = dataSource.getUsername()!;
     try {
       final remoteModel = await remoteDataSource.getProfile(username: username);
@@ -46,12 +55,67 @@ class ProfileRepoImpl implements ProfileRepo {
   }
 
   @override
+  Future<Either<Failure, ProfileEntity>> getPersonalStoreProfile() async {
+    try {
+      final remoteModel = await remoteDataSource.getPersonalStoreProfile();
+      final localModel = localDataSource.getCachedProfile();
+
+      if (localModel == null || localModel != remoteModel) {
+        log('Store profile data updated, saving to local storage');
+        await localDataSource.saveProfileData(remoteModel.toJson());
+      }
+
+      return right(remoteModel);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, ProfileEntity>> getStoreProfile({
+    required int id,
+    String? handle,
+  }) async {
+    try {
+      final model = await remoteDataSource.getStoreProfile(
+        id: id,
+        handle: handle,
+      );
+      return right(model);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
   Future<Either<Failure, ProfileEntity>> getUserProfile({
     required String username,
   }) async {
     try {
       final model = await remoteDataSource.getProfile(username: username);
       return right(model);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, ProductFeedEntity>> getStoreProducts({
+    required int storeId,
+    int page = 1,
+  }) async {
+    try {
+      final model = await remoteDataSource.getStoreProducts(
+        storeId: storeId,
+        page: page,
+      );
+      return right(model.toEntity());
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));
     } catch (_) {

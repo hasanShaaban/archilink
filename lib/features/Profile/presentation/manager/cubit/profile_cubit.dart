@@ -27,4 +27,24 @@ class ProfileCubit extends Cubit<ProfileCubitState> {
       (failure) =>  emit(ProfileFailuer(failure.message)),
       (data) => emit(ProfileSuccess(data)));
   }
+
+  Future<void> getPersonalStoreProfile() async {
+    emit(ProfileLoading());
+    final result = await profileRepo.getPersonalStoreProfile();
+
+    result.fold(
+      (failure) => emit(ProfileFailuer(failure.message)),
+      (data) => emit(ProfileSuccess(data)),
+    );
+  }
+
+  Future<void> getStoreProfile({required int id, String? handle}) async {
+    emit(ProfileLoading());
+    final result = await profileRepo.getStoreProfile(id: id, handle: handle);
+
+    result.fold(
+      (failure) => emit(ProfileFailuer(failure.message)),
+      (data) => emit(ProfileSuccess(data)),
+    );
+  }
 }

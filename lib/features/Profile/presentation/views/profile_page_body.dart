@@ -41,20 +41,26 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
     return profile.isFollowing;
   }
 
-  /// Dispatches [LoadInitialProfilePosts] exactly once per profile fetch,
-  /// but only when the privacy settings allow it.
   void _tryLoadPosts(BuildContext context, ProfileEntity profile) {
     if (_postsLoaded) return;
     _postsLoaded = true;
     if (_canViewPosts(profile)) {
-      final bool isOwnProfile =
-          widget.type == ProfileType.personalProfile ||
-          widget.type == ProfileType.personalStoreProfile;
-      context.read<ProfileBloc>().add(
-        LoadInitialProfilePosts(
-          username: isOwnProfile ? null : profile.username,
-        ),
-      );
+      final bool isStore =
+          widget.type == ProfileType.personalStoreProfile ||
+          widget.type == ProfileType.storeProfile;
+      if (isStore) {
+        final storeId = profile.id ?? 0;
+        context.read<ProfileBloc>().add(
+              LoadInitialProfileProducts(storeId: storeId),
+            );
+      } else {
+        final bool isOwnProfile = widget.type == ProfileType.personalProfile;
+        context.read<ProfileBloc>().add(
+              LoadInitialProfilePosts(
+                username: isOwnProfile ? null : profile.username,
+              ),
+            );
+      }
     }
   }
 
@@ -116,19 +122,19 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                   backgroundColor: AppColorsFromTheme.grayForTheme(context),
                   displacement: 30,
                   onRefresh: () async {
-                    if (widget.type == ProfileType.personalProfile ||
-                        widget.type == ProfileType.personalStoreProfile) {
+                    if (widget.type == ProfileType.personalProfile) {
                       context.read<ProfileCubit>().getPersonlProfile();
-                      // LoadInitialProfilePosts is dispatched by the listener
-                      // once ProfileSuccess arrives.
-                    }
-                    if (widget.type == ProfileType.userProfile ||
-                        widget.type == ProfileType.storeProfile) {
+                    } else if (widget.type == ProfileType.personalStoreProfile) {
+                      context.read<ProfileCubit>().getPersonalStoreProfile();
+                    } else if (widget.type == ProfileType.storeProfile) {
+                      context.read<ProfileCubit>().getStoreProfile(
+                        id: profileData.id ?? 0,
+                        handle: profileData.username,
+                      );
+                    } else if (widget.type == ProfileType.userProfile) {
                       context.read<ProfileCubit>().getUserProfile(
                         profileData.username,
                       );
-                      // LoadInitialProfilePosts is dispatched by the listener
-                      // once ProfileSuccess arrives (privacy re-evaluated then).
                     }
                   },
                   notificationPredicate: (notification) =>
@@ -188,6 +194,7 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                           width: width,
                           height: height,
                           postsVisible: postsVisible,
+                          type: widget.type,
                         ),
                         ProfileDetailsPage(
                           entity: profileData,

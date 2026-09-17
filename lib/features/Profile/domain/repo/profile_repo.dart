@@ -2,12 +2,22 @@ import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Post/domain/entity/posts_entity.dart';
 import 'package:archilink/features/Profile/domain/entity/follow_status.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
+import 'package:archilink/features/Store/domain/entity/product_feed_entity.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class ProfileRepo {
   Future<Either<Failure, ProfileEntity>> getPersonalProfile();
+  Future<Either<Failure, ProfileEntity>> getPersonalStoreProfile();
+  Future<Either<Failure, ProfileEntity>> getStoreProfile({
+    required int id,
+    String? handle,
+  });
   Future<Either<Failure, ProfileEntity>> getUserProfile({
     required String username,
+  });
+  Future<Either<Failure, ProductFeedEntity>> getStoreProducts({
+    required int storeId,
+    int page = 1,
   });
   Future<Either<Failure, PostsEntity>> getMyPosts(int page);
   Future<Either<Failure, PostsEntity>> getProfilePosts({

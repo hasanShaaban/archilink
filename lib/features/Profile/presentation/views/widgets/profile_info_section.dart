@@ -17,12 +17,11 @@ class ProfileInfoSection extends StatelessWidget {
   String _accountTypeLabel() {
     final role = profileData?.role ?? '';
     if (role.isEmpty) return 'Account';
-    // Capitalize first letter of each word.
-    return role
+    final formattedRole = role
         .split('_')
         .map((w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1)}')
-        .join(' ') +
-        ' Account';
+        .join(' ');
+    return '$formattedRole Account';
   }
 
   @override
@@ -47,15 +46,17 @@ class ProfileInfoSection extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 8),
-        Text(
-          profileData != null
-              ? profileData!.bio ?? 'No bio yet'
-              : 'No bio yet',
-          style: AppTextStyle.interRegular12.copyWith(
-            color: Theme.of(context).colorScheme.onSurface,
+        if (profileData?.role.toLowerCase().trim() != 'store') ...[
+          SizedBox(height: 8),
+          Text(
+            profileData != null
+                ? profileData!.bio ?? 'No bio yet'
+                : 'No bio yet',
+            style: AppTextStyle.interRegular12.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
-        ),
+        ],
         SizedBox(height: 8),
         if (profileData!.details.city != null ||
             profileData!.details.country != null)

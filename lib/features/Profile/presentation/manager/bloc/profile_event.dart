@@ -26,4 +26,28 @@ class UpdateProfilePostLike extends ProfileEvent {
   final bool liked;
   final int likesCount;
   const UpdateProfilePostLike(this.postId, this.liked, this.likesCount);
+
+  @override
+  List<Object> get props => [postId, liked, likesCount];
 }
+
+class LoadInitialProfileProducts extends ProfileEvent {
+  final int storeId;
+  const LoadInitialProfileProducts({required this.storeId});
+
+  @override
+  List<Object> get props => [storeId];
+}
+
+class LoadMoreProfileProducts extends ProfileEvent {
+  const LoadMoreProfileProducts();
+}
+
+class DeleteProfileProduct extends ProfileEvent {
+  final int productId;
+  const DeleteProfileProduct({required this.productId});
+
+  @override
+  List<Object> get props => [productId];
+}
+

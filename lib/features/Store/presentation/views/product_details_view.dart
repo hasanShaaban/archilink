@@ -145,12 +145,9 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
           StoreHeaderTile(
             store: product.store,
             onTap: () {
-              final username = product.store.handle.isNotEmpty
-                  ? product.store.handle
-                  : product.store.name;
               Navigator.of(context, rootNavigator: true).pushNamed(
                 StoreProfileView.name,
-                arguments: username,
+                arguments: product.store,
               );
             },
           ),

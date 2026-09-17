@@ -2,6 +2,7 @@ import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 
 class ProfileModel extends ProfileEntity {
   const ProfileModel({
+    super.id,
     required super.name,
     required super.username,
     required super.bio,
@@ -20,6 +21,7 @@ class ProfileModel extends ProfileEntity {
 
   factory ProfileModel.fromJson(Map<String, dynamic> data) {
     return ProfileModel(
+      id: (data['id'] as num?)?.toInt(),
       name: data['name'] as String,
       username: data['username'] as String,
       bio: data['bio'] as String?,
@@ -35,6 +37,44 @@ class ProfileModel extends ProfileEntity {
       role: data['role'] as String? ?? '',
       details: ProfileDetailsModel.fromJson(
         data['details'] as Map<String, dynamic>,
+      ),
+    );
+  }
+
+  factory ProfileModel.fromStoreJson(
+    Map<String, dynamic> data, {
+    bool isFollowing = false,
+    int? followCount,
+  }) {
+    final description = data['description'] as String?;
+    return ProfileModel(
+      id: (data['id'] as num?)?.toInt(),
+      name: (data['name'] as String?) ?? '',
+      username: (data['handle'] ?? data['username'] ?? '') as String,
+      bio: description,
+      profilePictureUrl:
+          (data['store_logo_url'] ?? data['profile_picture_url']) as String?,
+      bannerImageUrl: (data['store_banner_url'] ??
+          data['banner_image_url'] ??
+          data['banner']) as String?,
+      isFollowing: isFollowing,
+      isVerified: (data['is_verified'] as bool?) ?? false,
+      privacySetting: 'public',
+      followersCount:
+          followCount ?? (data['followers_count'] as num?)?.toInt() ?? 0,
+      followingCount: 0,
+      postsCount:
+          (data['products_count'] ?? data['posts_count'] as num?)?.toInt() ?? 0,
+      projectCount: 0,
+      role: 'store',
+      details: ProfileDetailsModel(
+        aboutMe: description,
+        academicExperiences: const [],
+        contactInfo: const [],
+        skills: const [],
+        joinedAt: DateTime.now(),
+        city: data['city'] as String?,
+        country: data['country'] as String?,
       ),
     );
   }

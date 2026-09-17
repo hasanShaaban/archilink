@@ -16,6 +16,10 @@ import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cu
 import 'package:archilink/features/Profile/presentation/views/profile_page_body.dart';
 import 'package:archilink/features/Profile/presentation/views/store_profile_view.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/store_profile_buttons.dart';
+import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
+import 'package:archilink/features/Profile/presentation/views/widgets/profile_info_section.dart';
+import 'package:archilink/features/Profile/presentation/views/widgets/profile_posts_page.dart';
+import 'package:archilink/features/Store/presentation/views/widgets/product_card.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_store_entity.dart';
 import 'package:archilink/features/Store/presentation/views/product_details_view.dart';
@@ -74,6 +78,8 @@ class FakeProfileCubit extends Cubit<ProfileCubitState> implements ProfileCubit 
   FakeProfileCubit() : super(ProfileInitial());
 
   String? requestedUsername;
+  int? requestedStoreId;
+  bool calledGetPersonalStoreProfile = false;
 
   @override
   Future<void> getUserProfile(String username) async {
@@ -84,11 +90,24 @@ class FakeProfileCubit extends Cubit<ProfileCubitState> implements ProfileCubit 
   Future<void> getPersonlProfile() async {}
 
   @override
+  Future<void> getPersonalStoreProfile() async {
+    calledGetPersonalStoreProfile = true;
+  }
+
+  @override
+  Future<void> getStoreProfile({required int id, String? handle}) async {
+    requestedStoreId = id;
+    requestedUsername = handle;
+  }
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class FakeProfileBloc extends Bloc<ProfileEvent, ProfileState> implements ProfileBloc {
-  FakeProfileBloc() : super(const ProfileState());
+  FakeProfileBloc([ProfileState? initial]) : super(initial ?? const ProfileState());
+
+  void emitState(ProfileState newState) => emit(newState);
 
   @override
   ProfileRepo get repo => throw UnimplementedError();
@@ -302,12 +321,12 @@ void main() {
       expect(profilePageFinder, findsOneWidget);
       final profilePage = tester.widget<ProfilePageBody>(profilePageFinder);
       expect(profilePage.type, ProfileType.personalStoreProfile);
-      expect(fakeProfileCubit.requestedUsername, 'my_store');
+      expect(fakeProfileCubit.calledGetPersonalStoreProfile, isTrue);
     });
   });
 
   group('ProductDetailsView navigation to StoreProfileView', () {
-    testWidgets('tapping store in ProductDetailsView navigates to StoreProfileView with store handle', (tester) async {
+    testWidgets('tapping store in ProductDetailsView navigates to StoreProfileView with store entity', (tester) async {
       tester.view.physicalSize = const Size(1080, 1920);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -349,7 +368,244 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(pushedRoute, StoreProfileView.name);
-      expect(pushedArgs, 'urban_arch');
+      expect(pushedArgs, isA<ProductStoreEntity>());
+      expect((pushedArgs as ProductStoreEntity).handle, 'urban_arch');
+      expect((pushedArgs as ProductStoreEntity).id, 10);
+    });
+  });
+
+  group('ProfileInfoSection bio visibility', () {
+    final storeProfileEntity = ProfileEntity(
+      name: 'Store Name',
+      username: 'store_user',
+      bio: 'Hidden store bio text',
+      profilePictureUrl: null,
+      followersCount: 10,
+      followingCount: 0,
+      postsCount: 5,
+      projectCount: 0,
+      role: 'store',
+      isFollowing: false,
+      details: ProfileDetailsEntity(
+        academicExperiences: const [],
+        contactInfo: const [],
+        skills: const [],
+        joinedAt: DateTime(2024, 1, 1),
+      ),
+    );
+
+    final studentProfileEntity = ProfileEntity(
+      name: 'Student Name',
+      username: 'student_user',
+      bio: 'Visible student bio text',
+      profilePictureUrl: null,
+      followersCount: 10,
+      followingCount: 5,
+      postsCount: 3,
+      projectCount: 2,
+      role: 'student',
+      isFollowing: false,
+      details: ProfileDetailsEntity(
+        academicExperiences: const [],
+        contactInfo: const [],
+        skills: const [],
+        joinedAt: DateTime(2024, 1, 1),
+      ),
+    );
+
+    testWidgets('hides bio for store role', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ProfileInfoSection(profileData: storeProfileEntity),
+          ),
+        ),
+      );
+
+      expect(find.text('Hidden store bio text'), findsNothing);
+      expect(find.text('No bio yet'), findsNothing);
+      expect(find.text('Store Name'), findsOneWidget);
+    });
+
+    testWidgets('shows bio for student role', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ProfileInfoSection(profileData: studentProfileEntity),
+          ),
+        ),
+      );
+
+      expect(find.text('Visible student bio text'), findsOneWidget);
+    });
+  });
+
+  const sampleProduct = ProductEntity(
+    id: 99,
+    store: ProductStoreEntity(
+      id: 1,
+      name: 'My Store',
+      handle: 'my_store',
+      isActive: true,
+      followersCount: 10,
+    ),
+    name: 'Sample Item',
+    description: 'Item description',
+    price: 99.0,
+    quantityInStock: 5,
+    categories: [],
+    mediaItems: [],
+    sku: 'SKU-99',
+    status: 'available',
+  );
+
+  group('ProductCard 3-dots menu', () {
+    testWidgets('renders 3-dots menu when showMenu is true and triggers callbacks', (tester) async {
+      bool editCalled = false;
+      bool deleteCalled = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 200,
+                height: 400,
+                child: ProductCard(
+                  product: sampleProduct,
+                  showMenu: true,
+                  onEdit: () => editCalled = true,
+                  onDelete: () => deleteCalled = true,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.more_vert), findsOneWidget);
+
+      // Tap 3-dots button to open menu
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Edit'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+
+      // Tap Edit
+      await tester.tap(find.text('Edit'));
+      await tester.pumpAndSettle();
+      expect(editCalled, isTrue);
+
+      // Open menu again and tap Delete
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+      expect(deleteCalled, isTrue);
+    });
+
+    testWidgets('hides 3-dots menu when showMenu is false', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 200,
+                height: 400,
+                child: ProductCard(
+                  product: sampleProduct,
+                  showMenu: false,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.more_vert), findsNothing);
+    });
+  });
+
+  group('ProfilePostsPage store products rendering', () {
+    testWidgets('renders products grid with 3-dots menu for personalStoreProfile', (tester) async {
+      final fakeBloc = FakeProfileBloc(
+        const ProfileState(
+          profileProducts: [sampleProduct],
+          isInitialLoading: false,
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: S.delegate.supportedLocales,
+          home: Scaffold(
+            body: BlocProvider<ProfileBloc>.value(
+              value: fakeBloc,
+              child: const SizedBox(
+                width: 400,
+                height: 800,
+                child: ProfilePostsPage(
+                  width: 400,
+                  height: 800,
+                  type: ProfileType.personalStoreProfile,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Sample Item'), findsOneWidget);
+      expect(find.byIcon(Icons.more_vert), findsOneWidget);
+
+      await fakeBloc.close();
+    });
+
+    testWidgets('hides 3-dots menu for visitor storeProfile', (tester) async {
+      final fakeBloc = FakeProfileBloc(
+        const ProfileState(
+          profileProducts: [sampleProduct],
+          isInitialLoading: false,
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: S.delegate.supportedLocales,
+          home: Scaffold(
+            body: BlocProvider<ProfileBloc>.value(
+              value: fakeBloc,
+              child: const SizedBox(
+                width: 400,
+                height: 800,
+                child: ProfilePostsPage(
+                  width: 400,
+                  height: 800,
+                  type: ProfileType.storeProfile,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Sample Item'), findsOneWidget);
+      expect(find.byIcon(Icons.more_vert), findsNothing);
+
+      await fakeBloc.close();
     });
   });
 }

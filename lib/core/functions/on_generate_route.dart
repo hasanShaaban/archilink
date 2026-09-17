@@ -33,6 +33,7 @@ import 'package:archilink/features/settings/presentation/views/followers_and_fol
 import 'package:archilink/features/settings/presentation/views/my_activity_view.dart';
 import 'package:archilink/features/settings/presentation/views/saved_collecation_view.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
+import 'package:archilink/features/Store/domain/entity/product_store_entity.dart';
 import 'package:archilink/features/Store/presentation/views/product_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -67,9 +68,26 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case UserProfileView.name:
       return MaterialPageRoute(builder: (context) => const UserProfileView());
     case StoreProfileView.name:
-      final username = settings.arguments as String;
+      int? storeId;
+      String username = '';
+      if (settings.arguments is ProductStoreEntity) {
+        final store = settings.arguments as ProductStoreEntity;
+        storeId = store.id;
+        username = store.handle.isNotEmpty ? store.handle : store.name;
+      } else if (settings.arguments is Map<String, dynamic>) {
+        final map = settings.arguments as Map<String, dynamic>;
+        storeId = map['id'] as int? ?? map['storeId'] as int?;
+        username = (map['username'] ?? map['handle'] ?? map['name'] ?? '') as String;
+      } else if (settings.arguments is int) {
+        storeId = settings.arguments as int;
+      } else if (settings.arguments is String) {
+        username = settings.arguments as String;
+      }
       return MaterialPageRoute(
-        builder: (context) => StoreProfileView(username: username),
+        builder: (context) => StoreProfileView(
+          username: username,
+          storeId: storeId,
+        ),
       );
     case EditProfileView.name:
       final args = settings.arguments as Map<String, dynamic>;

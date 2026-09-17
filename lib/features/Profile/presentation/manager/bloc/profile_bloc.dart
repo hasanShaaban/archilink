@@ -5,6 +5,7 @@ import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/domain/entity/posts_entity.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
+import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
@@ -24,6 +25,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<UpdateProfilePostLike>(_onUpdateProfilePostLike);
     on<LoadInitialProfilePosts>(_onLoadInitialPosts);
     on<LoadMoreProfilePosts>(_onLoadMorePosts);
+    on<LoadInitialProfileProducts>(_onLoadInitialProducts);
+    on<LoadMoreProfileProducts>(_onLoadMoreProducts);
+    on<DeleteProfileProduct>(_onDeleteProduct);
   }
 
   Future<void> _onLoadInitialPosts(
@@ -94,6 +98,78 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
       );
     });
+  }
+
+  Future<void> _onLoadInitialProducts(
+    LoadInitialProfileProducts event,
+    Emitter<ProfileState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        profileProducts: const [],
+        isInitialLoading: true,
+        isLoadingMore: false,
+        hasReachedMax: false,
+        failure: null,
+        currentPage: 1,
+        activeStoreId: event.storeId,
+      ),
+    );
+    final result = await repo.getStoreProducts(
+      storeId: event.storeId,
+      page: 1,
+    );
+    result.fold(
+      (failure) =>
+          emit(state.copyWith(isInitialLoading: false, failure: failure)),
+      (data) => emit(
+        state.copyWith(
+          profileProducts: data.products,
+          isInitialLoading: false,
+          currentPage: 1,
+          hasReachedMax: !data.pagination.hasMore,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onLoadMoreProducts(
+    LoadMoreProfileProducts event,
+    Emitter<ProfileState> emit,
+  ) async {
+    if (state.isLoadingMore || state.hasReachedMax || state.activeStoreId == null) {
+      return;
+    }
+    emit(state.copyWith(isLoadingMore: true));
+    final nextPage = state.currentPage + 1;
+    final result = await repo.getStoreProducts(
+      storeId: state.activeStoreId!,
+      page: nextPage,
+    );
+    result.fold(
+      (failure) => emit(state.copyWith(isLoadingMore: false)),
+      (data) {
+        final products = List<ProductEntity>.from(state.profileProducts)
+          ..addAll(data.products);
+        emit(
+          state.copyWith(
+            profileProducts: products,
+            isLoadingMore: false,
+            currentPage: nextPage,
+            hasReachedMax: !data.pagination.hasMore,
+          ),
+        );
+      },
+    );
+  }
+
+  void _onDeleteProduct(
+    DeleteProfileProduct event,
+    Emitter<ProfileState> emit,
+  ) {
+    final updated =
+        state.profileProducts.where((p) => p.id != event.productId).toList();
+    emit(state.copyWith(profileProducts: updated));
   }
 
   void _onUpdateProfilePostLike(

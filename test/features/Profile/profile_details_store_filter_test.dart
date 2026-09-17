@@ -60,7 +60,7 @@ void main() {
   }
 
   group('ProfileDetailsPage store role filtering', () {
-    testWidgets('personalStoreProfile shows About Us and Contact Info, hides Academic Experience and Skills', (tester) async {
+    testWidgets('personalStoreProfile shows only About Us, hides Academic Experience, Skills, and Contact Info', (tester) async {
       await tester.pumpWidget(
         buildTestApp(
           ProfileDetailsPage(
@@ -70,10 +70,10 @@ void main() {
         ),
       );
 
-      // Verify title is "About Us" and contact info is visible
+      // Verify title is "About Us" and it is the only section visible
       expect(find.text('About Us'), findsOneWidget);
-      expect(find.text('Contact Info'), findsOneWidget);
-      expect(find.text('contact@archistore.com'), findsOneWidget);
+      expect(find.text('Contact Info'), findsNothing);
+      expect(find.text('contact@archistore.com'), findsNothing);
 
       // Verify Academic Experience and Skills are hidden for store
       expect(find.text('Academic Experience'), findsNothing);
@@ -82,7 +82,7 @@ void main() {
       expect(find.text('About me'), findsNothing);
     });
 
-    testWidgets('storeProfile (visitor) shows About Us and Contact Info, hides Academic Experience and Skills', (tester) async {
+    testWidgets('storeProfile (visitor) shows only About Us, hides Academic Experience, Skills, and Contact Info', (tester) async {
       await tester.pumpWidget(
         buildTestApp(
           ProfileDetailsPage(
@@ -93,7 +93,7 @@ void main() {
       );
 
       expect(find.text('About Us'), findsOneWidget);
-      expect(find.text('Contact Info'), findsOneWidget);
+      expect(find.text('Contact Info'), findsNothing);
       expect(find.text('Academic Experience'), findsNothing);
       expect(find.text('Skills'), findsNothing);
       expect(find.text('About me'), findsNothing);
