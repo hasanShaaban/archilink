@@ -1,4 +1,5 @@
 import 'package:archilink/core/services/media_picker_service.dart';
+import 'package:archilink/features/Profile/presentation/views/crop_image_view.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,10 @@ class UpdateBannerCubit extends Cubit<UpdateBannerState> {
       previouslySelected: null,
       maxcount: 1,
     );
-    if (picked == null) return;
+    if (picked == null || picked.isEmpty) return;
+    final file = await picked.first.file;
+    if (file == null) return;
+
     emit(
       state.copyWith(
         isBannerChanged: true,
@@ -26,6 +30,15 @@ class UpdateBannerCubit extends Cubit<UpdateBannerState> {
         status: BannerUploadStatus.success,
       ),
     );
-    // TODO: Call updateBanner API (planned in a dedicated future plan)
+
+    if (context.mounted) {
+      Navigator.of(context, rootNavigator: true).pushNamed(
+        CropImageView.name,
+        arguments: {
+          'imageFile': file,
+          'cropType': CropImageType.bannerImage,
+        },
+      );
+    }
   }
 }

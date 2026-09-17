@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
 import 'package:archilink/features/Chat/domain/entity/chat_args.dart';
 import 'package:archilink/features/Create_Post/presentation/views/create_post_view.dart';
@@ -9,6 +11,7 @@ import 'package:archilink/features/Edit_Profile/presentation/view/contact_info_v
 import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/location_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/skills_view.dart';
+import 'package:archilink/features/Profile/presentation/views/crop_image_view.dart';
 import 'package:archilink/features/Profile/presentation/views/store_profile_view.dart';
 import 'package:archilink/features/Profile/presentation/views/user_profile_view.dart';
 import 'package:archilink/features/Search/presentation/views/search_results_view.dart';
@@ -95,6 +98,21 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         builder: (context) => EditProfileView(
           profileData: args['profileData'],
           isStore: args['isStore'] ?? false,
+        ),
+      );
+    case CropImageView.name:
+      final args = settings.arguments as Map<String, dynamic>;
+      final dynamic rawFile = args['imageFile'];
+      final File file = rawFile is File ? rawFile : File(rawFile as String);
+      final CropImageType cropType =
+          args['cropType'] as CropImageType? ?? CropImageType.profileImage;
+      final void Function(File)? onConfirm =
+          args['onConfirm'] as void Function(File)?;
+      return MaterialPageRoute(
+        builder: (context) => CropImageView(
+          imageFile: file,
+          cropType: cropType,
+          onConfirm: onConfirm,
         ),
       );
     case AboutMeView.name:
