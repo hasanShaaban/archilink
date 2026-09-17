@@ -30,8 +30,14 @@ void main() {
 
   group('PersonalStoreProfileButtons', () {
     testWidgets('renders Add Product, Edit Profile, and Share buttons', (tester) async {
+      String? pushedRouteName;
+
       await tester.pumpWidget(
         MaterialApp(
+          onGenerateRoute: (settings) {
+            pushedRouteName = settings.name;
+            return MaterialPageRoute(builder: (_) => const Scaffold());
+          },
           home: Scaffold(
             body: PersonalStoreProfileButtons(
               width: 400,
@@ -44,9 +50,10 @@ void main() {
       expect(find.text('Add Product'), findsOneWidget);
       expect(find.text('Edit Profile'), findsOneWidget);
 
-      // Tapping Add Product does not throw (safe TODO)
+      // Tapping Add Product triggers navigation to AddEditProductView
       await tester.tap(find.text('Add Product'));
-      await tester.pump();
+      await tester.pumpAndSettle();
+      expect(pushedRouteName, '/addEditProduct');
     });
 
     testWidgets('Edit Profile triggers navigation with profileData', (tester) async {

@@ -4,6 +4,7 @@ import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_custom_button.dart';
+import 'package:archilink/features/Store/presentation/views/add_edit_product_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -12,10 +13,12 @@ class PersonalStoreProfileButtons extends StatelessWidget {
     super.key,
     required this.width,
     required this.profileData,
+    this.onAddProduct,
   });
 
   final double width;
   final ProfileEntity profileData;
+  final VoidCallback? onAddProduct;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +29,13 @@ class PersonalStoreProfileButtons extends StatelessWidget {
           Expanded(
             child: ProfileCustomButton(
               onPress: () {
-                // TODO: Navigate to Create Product screen (planned in a separate milestone)
+                if (onAddProduct != null) {
+                  onAddProduct!();
+                } else {
+                  Navigator.of(context, rootNavigator: true).pushNamed(
+                    AddEditProductView.name,
+                  );
+                }
               },
               icon: Assets.assetsIconsAdd,
               iconSize: 16,

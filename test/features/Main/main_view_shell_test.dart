@@ -14,6 +14,7 @@ import 'package:archilink/features/Post/domain/repo/post_repo.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/views/profile_page_body.dart';
+import 'package:archilink/features/Store/domain/entity/category_feed_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_feed_entity.dart';
 import 'package:archilink/features/Store/domain/repo/store_repo.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_cubit.dart';
@@ -91,6 +92,22 @@ class FakeStoreRepo implements StoreRepo {
     return right(
       const ProductFeedEntity(
         products: [],
+        pagination: PaginationEntity(
+          currentPage: 1,
+          perPage: 20,
+          lastPage: 1,
+          total: 0,
+          hasMore: false,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, CategoryFeedEntity>> getCategories({int page = 1}) async {
+    return right(
+      const CategoryFeedEntity(
+        categories: [],
         pagination: PaginationEntity(
           currentPage: 1,
           perPage: 20,

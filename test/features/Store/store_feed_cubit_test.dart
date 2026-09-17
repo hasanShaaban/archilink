@@ -1,5 +1,7 @@
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Post/domain/entity/pagination_entity.dart';
+import 'package:archilink/features/Store/domain/entity/category_feed_entity.dart';
+import 'package:archilink/features/Store/domain/entity/product_category_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_feed_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_store_entity.dart';
@@ -44,6 +46,22 @@ class MockStoreRepo implements StoreRepo {
             ),
           ),
         );
+  }
+
+  @override
+  Future<Either<Failure, CategoryFeedEntity>> getCategories({int page = 1}) async {
+    return right(const CategoryFeedEntity(
+      categories: [
+        ProductCategoryEntity(id: 1, name: 'Revit', slug: 'revit', productsCount: 5),
+      ],
+      pagination: PaginationEntity(
+        currentPage: 1,
+        perPage: 20,
+        lastPage: 1,
+        total: 1,
+        hasMore: false,
+      ),
+    ));
   }
 }
 

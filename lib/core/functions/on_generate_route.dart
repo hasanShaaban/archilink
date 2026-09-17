@@ -37,6 +37,7 @@ import 'package:archilink/features/settings/presentation/views/my_activity_view.
 import 'package:archilink/features/settings/presentation/views/saved_collecation_view.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_store_entity.dart';
+import 'package:archilink/features/Store/presentation/views/add_edit_product_view.dart';
 import 'package:archilink/features/Store/presentation/views/product_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -65,6 +66,17 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
               as ProductEntity;
       return MaterialPageRoute(
         builder: (context) => ProductDetailsView(product: product),
+      );
+    case AddEditProductView.name:
+      ProductEntity? product;
+      if (settings.arguments is ProductEntity) {
+        product = settings.arguments as ProductEntity;
+      } else if (settings.arguments is Map<String, dynamic>) {
+        product = (settings.arguments as Map<String, dynamic>)['product']
+            as ProductEntity?;
+      }
+      return MaterialPageRoute<bool>(
+        builder: (context) => AddEditProductView(product: product),
       );
     case MainView.name:
       return MaterialPageRoute(builder: (context) => const MainView());
