@@ -20,7 +20,10 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   List<AcademicExperience> _initialAcademicExperiences = const [];
   List<ContactInfo> _initialContactInfos = const [];
 
-  void initializeFromProfile(ProfileEntity profile) {
+  void initializeFromProfile(ProfileEntity profile, {bool isStore = false}) {
+    final isStoreAccount = isStore ||
+        profile.role.toLowerCase().trim() == 'store' ||
+        profile.role.toLowerCase().trim() == 'store account';
     final details = profile.details;
     final accountType = _normalizeAccountType(profile.role);
     final location = _buildLocation(details.city, details.country);
@@ -75,6 +78,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
         hasSkillsChanges: false,
         hasAcademicChanges: false,
         hasContactInfoChanges: false,
+        isStore: isStoreAccount,
       ),
     );
   }
@@ -245,19 +249,23 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     required String bio,
     required String location,
   }) {
+    if (state.isStore) {
+      return _isTextChanged(location, _initialLocation);
+    }
     return _isTextChanged(fullName, _initialFullName) ||
         _isTextChanged(bio, _initialBio) ||
         _isTextChanged(location, _initialLocation);
   }
 
   EditProfileState _withOverallHasChanges(EditProfileState next) {
-    final hasChanges =
-        next.hasBasicInfoChanges ||
-        next.hasAccountTypeChanges ||
-        next.hasAboutMeChanges ||
-        next.hasSkillsChanges ||
-        next.hasAcademicChanges ||
-        next.hasContactInfoChanges;
+    final hasChanges = next.isStore
+        ? (next.hasAboutMeChanges || next.hasBasicInfoChanges)
+        : (next.hasBasicInfoChanges ||
+            next.hasAccountTypeChanges ||
+            next.hasAboutMeChanges ||
+            next.hasSkillsChanges ||
+            next.hasAcademicChanges ||
+            next.hasContactInfoChanges);
     return next.copyWith(hasChanges: hasChanges);
   }
 
@@ -265,6 +273,40 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     if (!state.hasChanges) return;
 
     emit(state.copyWith(status: EditProfileStatus.loading));
+
+    if (state.isStore) {
+      final (city, country) = _parseLocation(state.location);
+      final result = await repo.updateStoreProfile(
+        description: state.aboutMe.trim(),
+        city: city ?? '',
+        country: country ?? '',
+      );
+
+      result.fold(
+        (failure) => emit(
+          state.copyWith(
+            status: EditProfileStatus.failure,
+            errorMessage: failure.message,
+          ),
+        ),
+        (_) {
+          _rebaseInitialValues();
+          emit(
+            state.copyWith(
+              status: EditProfileStatus.success,
+              hasChanges: false,
+              hasBasicInfoChanges: false,
+              hasAccountTypeChanges: false,
+              hasAboutMeChanges: false,
+              hasSkillsChanges: false,
+              hasAcademicChanges: false,
+              hasContactInfoChanges: false,
+            ),
+          );
+        },
+      );
+      return;
+    }
 
     final requestBody = _buildRequestBody();
 

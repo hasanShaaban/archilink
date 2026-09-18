@@ -25,33 +25,35 @@ class AddEditProductView extends StatelessWidget {
         storeRepo: sl.isRegistered<StoreRepo>() ? sl<StoreRepo>() : null,
         initialProduct: product,
       )..fetchCategories(),
-      child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: theme.colorScheme.onSurface,
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text(
-            title,
-            style: AppTextStyle.interSemiBold16.copyWith(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-          titleSpacing: 0,
-          centerTitle: false,
+      child: ScaffoldMessenger(
+        child: Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-        ),
-        body: const SafeArea(
-          child: AddEditProductViewBody(),
+          resizeToAvoidBottomInset: true,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: theme.colorScheme.onSurface,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            title: Text(
+              title,
+              style: AppTextStyle.interSemiBold16.copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            titleSpacing: 0,
+            centerTitle: false,
+            backgroundColor: theme.scaffoldBackgroundColor,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+          ),
+          body: const SafeArea(
+            child: AddEditProductViewBody(),
+          ),
         ),
       ),
     );

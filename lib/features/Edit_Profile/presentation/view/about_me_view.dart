@@ -35,6 +35,7 @@ class _AboutMeViewState extends State<AboutMeView> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<EditProfileCubit>();
+    final isStore = cubit.state.isStore;
     return Scaffold(
       body: SafeArea(
         child: BlocListener<EditProfileCubit, EditProfileState>(
@@ -48,7 +49,7 @@ class _AboutMeViewState extends State<AboutMeView> {
             children: [
               EditProfileAppBar(
                 withDoneButton: true,
-                titel: 'About me',
+                titel: isStore ? 'About Us' : 'About me',
                 onDone: () {
                   cubit.updateAboutMe(aboutController.text);
                   Navigator.pop(context);
@@ -73,7 +74,9 @@ class _AboutMeViewState extends State<AboutMeView> {
                   textInputAction: TextInputAction.newline,
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
-                    hintText: 'Enter a small overview',
+                    hintText: isStore
+                        ? 'Enter a small overview about your store'
+                        : 'Enter a small overview',
                     hintStyle: AppTextStyle.interRegular14.copyWith(
                       color: AppColorsFromTheme.grayForText(context),
                     ),

@@ -15,35 +15,37 @@ class HomePageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        body: NestedScrollView(
-          physics: BouncingScrollPhysics(),
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            MainAppBar(withTabbar: true),
-          ],
-          body: TabBarView(
+    return ScaffoldMessenger(
+      child: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          body: NestedScrollView(
             physics: BouncingScrollPhysics(),
-            children: [
-              BlocProvider(
-                create: (context) => ForYouBloc(
-                  sl<HomeRepo>(),
-                  sl<PostLikeCubit>(),
-                  FeedType.forYou,
-                ),
-                child: ForYouPage(),
-              ),
-              BlocProvider(
-                create: (context) => ForYouBloc(
-                  sl<HomeRepo>(),
-                  sl<PostLikeCubit>(),
-                  FeedType.following,
-                ),
-                child: FollowingPostsPage(),
-              ),
-              Center(child: Text('saved')),
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              MainAppBar(withTabbar: true),
             ],
+            body: TabBarView(
+              physics: BouncingScrollPhysics(),
+              children: [
+                BlocProvider(
+                  create: (context) => ForYouBloc(
+                    sl<HomeRepo>(),
+                    sl<PostLikeCubit>(),
+                    FeedType.forYou,
+                  ),
+                  child: ForYouPage(),
+                ),
+                BlocProvider(
+                  create: (context) => ForYouBloc(
+                    sl<HomeRepo>(),
+                    sl<PostLikeCubit>(),
+                    FeedType.following,
+                  ),
+                  child: FollowingPostsPage(),
+                ),
+                Center(child: Text('saved')),
+              ],
+            ),
           ),
         ),
       ),

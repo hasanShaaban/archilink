@@ -4,6 +4,7 @@ import 'package:archilink/features/Home/presentation/views/widgets/post_list_vie
 import 'package:archilink/features/Profile/domain/entity/profile_type.dart';
 import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
+import 'package:archilink/features/Store/presentation/views/add_edit_product_view.dart';
 import 'package:archilink/features/Store/presentation/views/product_details_view.dart';
 import 'package:archilink/features/Store/presentation/views/widgets/product_card.dart';
 import 'package:archilink/generated/l10n.dart';
@@ -203,10 +204,26 @@ class _StoreProductsGridState extends State<_StoreProductsGrid> {
                                     arguments: product,
                                   );
                                 },
-                          onEdit: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Edit ${product.name}')),
+                          onEdit: () async {
+                            final result = await Navigator.of(
+                              context,
+                              rootNavigator: true,
+                            ).pushNamed(
+                              AddEditProductView.name,
+                              arguments: product,
                             );
+                            if (result == true && context.mounted) {
+                              final storeId = context
+                                      .read<ProfileBloc>()
+                                      .state
+                                      .activeStoreId ??
+                                  product.store.id;
+                              context.read<ProfileBloc>().add(
+                                    LoadInitialProfileProducts(
+                                      storeId: storeId,
+                                    ),
+                                  );
+                            }
                           },
                           onDelete: () => _showDeleteDialog(context, product),
                         );

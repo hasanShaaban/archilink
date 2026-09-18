@@ -20,7 +20,8 @@ class SettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
+    return ScaffoldMessenger(
+      child: BlocProvider(
       create: (_) => sl<SettingsSessionCubit>(),
       child: BlocConsumer<SettingsSessionCubit, SettingsSessionState>(
         listener: (context, state) {
@@ -281,8 +282,9 @@ class SettingPage extends StatelessWidget {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   Future<bool> _showLogoutDialog(BuildContext context) async {
     final result = await showDialog<bool>(

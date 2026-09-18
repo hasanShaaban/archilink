@@ -36,4 +36,24 @@ class EditProfileRepoImpl extends EditProfileRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> updateStoreProfile({
+    required String description,
+    required String city,
+    required String country,
+  }) async {
+    try {
+      final result = await remoteDataSource.updateStoreProfile(
+        description: description,
+        city: city,
+        country: country,
+      );
+      return right(result);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

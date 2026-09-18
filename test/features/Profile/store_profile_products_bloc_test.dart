@@ -49,6 +49,14 @@ class MockProfileRepo implements ProfileRepo {
     );
   }
 
+  int? lastDeletedProductId;
+
+  @override
+  Future<Either<Failure, bool>> deleteProduct(int productId) async {
+    lastDeletedProductId = productId;
+    return right(true);
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

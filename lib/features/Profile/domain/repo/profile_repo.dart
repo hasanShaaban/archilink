@@ -31,5 +31,6 @@ abstract class ProfileRepo {
   Future<Either<Failure, bool>> updateProfilePicture(File imageFile);
   Future<Either<Failure, bool>> updateStoreLogo(File imageFile);
   Future<Either<Failure, bool>> updateStoreBanner(File imageFile);
+  Future<Either<Failure, bool>> deleteProduct(int productId);
 }
 

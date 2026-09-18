@@ -8,4 +8,9 @@ abstract class EditProfileRepo {
   Future<Either<Failure, bool>> updateProfile(
     EditProfileRequestBody requestBody,
   );
+  Future<Either<Failure, bool>> updateStoreProfile({
+    required String description,
+    required String city,
+    required String country,
+  });
 }

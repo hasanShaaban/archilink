@@ -4,4 +4,9 @@ import 'package:archilink/features/Edit_Profile/domain/entity/universities_respo
 abstract class EditProfileRemoteDataSource {
   Future<UniversitiesResponseEntity> getUniversities();
   Future<bool> updateProfile(EditProfileRequestBody requestBody);
+  Future<bool> updateStoreProfile({
+    required String description,
+    required String city,
+    required String country,
+  });
 }

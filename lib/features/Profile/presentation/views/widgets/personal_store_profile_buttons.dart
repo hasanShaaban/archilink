@@ -4,8 +4,10 @@ import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/edit_profile_view.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
 import 'package:archilink/features/Profile/presentation/views/widgets/profile_custom_button.dart';
+import 'package:archilink/features/Profile/presentation/manager/cubit/profile_cubit.dart';
 import 'package:archilink/features/Store/presentation/views/add_edit_product_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PersonalStoreProfileButtons extends StatelessWidget {
@@ -28,13 +30,25 @@ class PersonalStoreProfileButtons extends StatelessWidget {
         children: [
           Expanded(
             child: ProfileCustomButton(
-              onPress: () {
+              onPress: () async {
                 if (onAddProduct != null) {
                   onAddProduct!();
                 } else {
-                  Navigator.of(context, rootNavigator: true).pushNamed(
-                    AddEditProductView.name,
-                  );
+                  final result = await Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pushNamed(AddEditProductView.name);
+                  if (result == true && context.mounted) {
+                    try {
+                      context.read<ProfileCubit>().getPersonalStoreProfile();
+                    } catch (_) {}
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Product added successfully'),
+                        backgroundColor: Color(0xFF008080),
+                      ),
+                    );
+                  }
                 }
               },
               icon: Assets.assetsIconsAdd,
@@ -49,11 +63,19 @@ class PersonalStoreProfileButtons extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: ProfileCustomButton(
-              onPress: () {
-                Navigator.of(context, rootNavigator: true).pushNamed(
+              onPress: () async {
+                final result = await Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pushNamed(
                   EditProfileView.name,
                   arguments: {'profileData': profileData, 'isStore': true},
                 );
+                if (result == true && context.mounted) {
+                  try {
+                    context.read<ProfileCubit>().getPersonalStoreProfile();
+                  } catch (_) {}
+                }
               },
               icon: Assets.assetsIconsEditProfile,
               iconSize: 16,

@@ -2,6 +2,7 @@ import 'package:archilink/features/Post/domain/entity/pagination_entity.dart';
 import 'package:archilink/features/Store/data/models/category_feed_model.dart';
 import 'package:archilink/features/Store/domain/entity/add_product_params.dart';
 import 'package:archilink/features/Store/domain/entity/category_feed_entity.dart';
+import 'package:archilink/features/Store/domain/entity/edit_product_params.dart';
 import 'package:archilink/features/Store/domain/entity/product_category_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_store_entity.dart';
@@ -84,10 +85,37 @@ class MockStoreRepo implements StoreRepo {
         ));
   }
 
+  Either<Failure, ProductEntity>? editProductResponse;
+  EditProductParams? lastEditedParams;
+  Either<Failure, bool>? deleteProductResponse;
+  int? lastDeletedProductId;
+
   @override
   Future<Either<Failure, ProductEntity>> addProduct(AddProductParams params) async {
     lastAddedParams = params;
     return addProductResponse ?? right(sampleProduct);
+  }
+
+  @override
+  Future<Either<Failure, ProductEntity>> editProduct(EditProductParams params) async {
+    lastEditedParams = params;
+    return editProductResponse ?? right(sampleProduct);
+  }
+
+  @override
+  Future<Either<Failure, bool>> deleteProduct(int id) async {
+    lastDeletedProductId = id;
+    return deleteProductResponse ?? right(true);
+  }
+
+  @override
+  Future<Either<Failure, ProductFeedEntity>> searchProducts({
+    String? query,
+    String? minPrice,
+    String? maxPrice,
+    int page = 1,
+  }) async {
+    return feedResponse ?? left(UnknownFailure());
   }
 }
 
@@ -482,6 +510,107 @@ void main() {
       expect(cubit.state.isSuccess, isFalse);
       expect(cubit.state.errorMessage, 'Server error while creating product');
     });
+
+    test('delete successfully calls deleteProduct on repo when initialProduct has id', () async {
+      final repo = MockStoreRepo();
+      final cubit = AddEditProductCubit(
+        storeRepo: repo,
+        initialProduct: sampleProduct,
+      );
+
+      await cubit.delete();
+
+      expect(repo.lastDeletedProductId, sampleProduct.id);
+      expect(cubit.state.isDeleting, isFalse);
+      expect(cubit.state.isSuccess, isTrue);
+      expect(cubit.state.errorMessage, isNull);
+    });
+
+    test('delete handles failure from repo', () async {
+      final repo = MockStoreRepo();
+      repo.deleteProductResponse = left(const ServerFailure(message: 'Cannot delete product'));
+      final cubit = AddEditProductCubit(
+        storeRepo: repo,
+        initialProduct: sampleProduct,
+      );
+
+      await cubit.delete();
+
+      expect(cubit.state.isDeleting, isFalse);
+      expect(cubit.state.isSuccess, isFalse);
+      expect(cubit.state.errorMessage, 'Cannot delete product');
+    });
+
+    test('delete without initialProduct sets error message', () async {
+      final repo = MockStoreRepo();
+      final cubit = AddEditProductCubit(storeRepo: repo);
+
+      await cubit.delete();
+
+      expect(cubit.state.errorMessage, 'Cannot delete a product without an ID');
+      expect(repo.lastDeletedProductId, isNull);
+    });
+
+    test('submit in edit mode calls editProduct with EditProductParams and nullable fields', () async {
+      final repo = MockStoreRepo();
+      final cubit = AddEditProductCubit(
+        storeRepo: repo,
+        initialProduct: sampleProduct,
+      );
+
+      cubit.updateName('Updated Ruler');
+      cubit.updatePrice('15.5');
+      cubit.updateDescription('Updated description');
+      cubit.updateStatus('available');
+      cubit.setQuantity(10);
+
+      await cubit.submit();
+
+      expect(cubit.state.errorMessage, isNull);
+      expect(cubit.state.isSuccess, isTrue);
+      expect(repo.lastEditedParams, isNotNull);
+      expect(repo.lastEditedParams!.id, sampleProduct.id);
+      expect(repo.lastEditedParams!.name, 'Updated Ruler');
+      expect(repo.lastEditedParams!.price, 15.5);
+      expect(repo.lastEditedParams!.description, 'Updated description');
+      expect(repo.lastEditedParams!.quantityInStock, 10);
+      expect(repo.lastEditedParams!.status, 'available');
+      expect(repo.lastEditedParams!.imagePaths, isNull);
+    });
+
+    test('addImages and removeImage are no-ops in edit mode', () {
+      const productWithMedia = ProductEntity(
+        id: 10,
+        store: dummyStore,
+        name: 'Ruler',
+        description: 'Durable',
+        price: 10.0,
+        quantityInStock: 50,
+        sku: 'RUL-001',
+        status: 'available',
+        imageUrl: 'https://example.com/photo.jpg',
+      );
+      final cubit = AddEditProductCubit(initialProduct: productWithMedia);
+      expect(cubit.state.images.length, 1);
+      cubit.addImages(['/some/path/image.jpg']);
+      expect(cubit.state.images.length, 1);
+      cubit.removeImage(0);
+      expect(cubit.state.images.length, 1);
+    });
+
+    test('submit in edit mode handles failure gracefully', () async {
+      final repo = MockStoreRepo();
+      repo.editProductResponse = left(const ServerFailure(message: 'Failed to update product'));
+      final cubit = AddEditProductCubit(
+        storeRepo: repo,
+        initialProduct: sampleProduct,
+      );
+
+      await cubit.submit();
+
+      expect(cubit.state.isSuccess, isFalse);
+      expect(cubit.state.errorMessage, 'Failed to update product');
+    });
   });
 
   group('AddEditProductView Widget Tests', () {
@@ -530,6 +659,16 @@ void main() {
       expect(find.widgetWithText(ElevatedButton, 'Delete Product'), findsOneWidget);
       expect(find.widgetWithText(ElevatedButton, 'Save Updates'), findsOneWidget);
       expect(find.widgetWithText(ElevatedButton, 'Add Product'), findsNothing);
+
+      // Media editing hidden in edit mode
+      expect(find.text('Add Photos'), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(ProductImagesSection),
+          matching: find.byIcon(Icons.close),
+        ),
+        findsNothing,
+      );
     });
 
     testWidgets('stepper increments and decrements quantity on screen', (tester) async {

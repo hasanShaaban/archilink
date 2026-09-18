@@ -5,6 +5,7 @@ import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_cubit.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_state.dart';
 import 'package:archilink/features/Store/presentation/views/product_details_view.dart';
+import 'package:archilink/features/Store/presentation/views/widgets/category_search_bottom_sheet.dart';
 import 'package:archilink/features/Store/presentation/views/widgets/product_card.dart';
 import 'package:archilink/features/Store/presentation/views/widgets/store_search_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +18,11 @@ class StoreFeedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<StoreFeedCubit>()..fetchProducts(),
-      child: const _StoreFeedBody(),
+    return ScaffoldMessenger(
+      child: BlocProvider(
+        create: (_) => sl<StoreFeedCubit>()..fetchProducts(),
+        child: const _StoreFeedBody(),
+      ),
     );
   }
 }
@@ -83,16 +86,33 @@ class _StoreFeedBodyState extends State<_StoreFeedBody> {
         child: Column(
           children: [
             // Replaced MainAppBar with StoreSearchAppBar and expandable filter options
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
-              child: StoreSearchAppBar(
-                onSearchChanged: (query) {
-                  // Ready for search integration
-                },
-                onFilterChanged: ({category, status, minPrice, maxPrice}) {
-                  // Ready for filter integration
-                },
-              ),
+            BlocBuilder<StoreFeedCubit, StoreFeedState>(
+              buildWhen: (prev, curr) =>
+                  prev.selectedCategories != curr.selectedCategories,
+              builder: (context, state) {
+                final cubit = context.read<StoreFeedCubit>();
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
+                  child: StoreSearchAppBar(
+                    selectedCategories: state.selectedCategories,
+                    onCategoryRemoved: (category) {
+                      cubit.removeCategory(category);
+                    },
+                    onCategoryOptionTap: () {
+                      CategorySearchBottomSheet.showForStoreFeed(context);
+                    },
+                    onSearchChanged: (query) {
+                      cubit.setSearchQuery(query);
+                    },
+                    onFilterChanged: ({category, categories, status, minPrice, maxPrice}) {
+                      cubit.setPriceFilters(
+                        minPrice: minPrice,
+                        maxPrice: maxPrice,
+                      );
+                    },
+                  ),
+                );
+              },
             ),
             Expanded(
               child: RefreshIndicator(
@@ -108,7 +128,7 @@ class _StoreFeedBodyState extends State<_StoreFeedBody> {
                     }
 
                     if (!state.isLoading && !state.hasProducts) {
-                      return const _StoreFeedEmptyView();
+                      return _StoreFeedEmptyView(isSearch: state.isSearchActive);
                     }
 
                     final isSkeleton = state.isLoading && !state.hasProducts;
@@ -252,7 +272,9 @@ class _StoreFeedErrorView extends StatelessWidget {
 }
 
 class _StoreFeedEmptyView extends StatelessWidget {
-  const _StoreFeedEmptyView();
+  const _StoreFeedEmptyView({this.isSearch = false});
+
+  final bool isSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -268,13 +290,15 @@ class _StoreFeedEmptyView extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.storefront_outlined,
+                  isSearch ? Icons.search_off_rounded : Icons.storefront_outlined,
                   size: 56,
                   color: AppColorsFromTheme.grayForText(context),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'No products available yet',
+                  isSearch
+                      ? 'No products found'
+                      : 'No products available yet',
                   style: AppTextStyle.interMedium14.copyWith(
                     color: AppColorsFromTheme.grayForText(context),
                   ),

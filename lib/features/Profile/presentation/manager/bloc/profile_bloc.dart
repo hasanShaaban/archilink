@@ -163,13 +163,25 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     );
   }
 
-  void _onDeleteProduct(
+  Future<void> _onDeleteProduct(
     DeleteProfileProduct event,
     Emitter<ProfileState> emit,
-  ) {
+  ) async {
+    final previousProducts = state.profileProducts;
     final updated =
         state.profileProducts.where((p) => p.id != event.productId).toList();
     emit(state.copyWith(profileProducts: updated));
+
+    final result = await repo.deleteProduct(event.productId);
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          profileProducts: previousProducts,
+          failure: failure,
+        ));
+      },
+      (_) {},
+    );
   }
 
   void _onUpdateProfilePostLike(

@@ -83,6 +83,12 @@ class _ProductImagesSectionState extends State<ProductImagesSection> {
       builder: (context, state) {
         final cubit = context.read<AddEditProductCubit>();
         final images = state.images;
+
+        // If in edit mode and there are no images, hide the section entirely
+        if (state.isEditMode && images.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
         final itemCount = images.isNotEmpty ? images.length : 3;
 
         return Column(
@@ -106,6 +112,7 @@ class _ProductImagesSectionState extends State<ProductImagesSection> {
                       images: images,
                       index: index,
                       isDark: isDark,
+                      isEditMode: state.isEditMode,
                       onDelete: () => cubit.removeImage(index),
                     ),
                   );
@@ -123,10 +130,11 @@ class _ProductImagesSectionState extends State<ProductImagesSection> {
                 spacing: 3.5,
               ),
             ),
-            const SizedBox(height: 14),
-
-            // "Add Photos" Button
-            _buildAddPhotosButton(context, isDark),
+            // Hide "Add Photos" button in edit mode
+            if (!state.isEditMode) ...[
+              const SizedBox(height: 14),
+              _buildAddPhotosButton(context, isDark),
+            ],
           ],
         );
       },
@@ -138,6 +146,7 @@ class _ProductImagesSectionState extends State<ProductImagesSection> {
     required List<String> images,
     required int index,
     required bool isDark,
+    required bool isEditMode,
     required VoidCallback onDelete,
   }) {
     final placeholderBg = isDark
@@ -177,26 +186,27 @@ class _ProductImagesSectionState extends State<ProductImagesSection> {
           ),
         ),
 
-        // Delete photo button
-        Positioned(
-          top: 6,
-          right: 6,
-          child: GestureDetector(
-            onTap: onDelete,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Colors.black54,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.close,
-                size: 14,
-                color: Colors.white,
+        // Delete photo button - only visible when NOT in edit mode
+        if (!isEditMode)
+          Positioned(
+            top: 6,
+            right: 6,
+            child: GestureDetector(
+              onTap: onDelete,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.close,
+                  size: 14,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

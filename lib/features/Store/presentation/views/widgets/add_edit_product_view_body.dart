@@ -56,16 +56,6 @@ class _AddEditProductViewBodyState extends State<AddEditProductViewBody> {
             ),
           );
         } else if (state.isSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.isEditMode
-                    ? 'Product updated successfully'
-                    : 'Product added successfully',
-              ),
-              backgroundColor: const Color(0xFF008080),
-            ),
-          );
           Navigator.of(context).pop(true);
         }
       },
@@ -77,7 +67,17 @@ class _AddEditProductViewBodyState extends State<AddEditProductViewBody> {
           children: [
             // Top Image Carousel Section
             const ProductImagesSection(),
-            const SizedBox(height: 16),
+            BlocBuilder<AddEditProductCubit, AddEditProductState>(
+              buildWhen: (prev, curr) =>
+                  prev.isEditMode != curr.isEditMode ||
+                  prev.images.isEmpty != curr.images.isEmpty,
+              builder: (context, state) {
+                if (state.isEditMode && state.images.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return const SizedBox(height: 16);
+              },
+            ),
 
             // Product Name
             ProductFormField(

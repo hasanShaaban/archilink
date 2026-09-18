@@ -125,6 +125,9 @@ class FakeStoreRepo implements StoreRepo {
   Future<Either<Failure, ProductEntity>> addProduct(AddProductParams params) async {
     return left(UnknownFailure());
   }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {

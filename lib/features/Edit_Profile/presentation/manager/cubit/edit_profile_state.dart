@@ -61,7 +61,8 @@ class EditProfileState extends Equatable {
     this.hasAcademicChanges = false,
     this.hasContactInfoChanges = false,
     this.status = EditProfileStatus.initial,
-     this.errorMessage,
+    this.errorMessage,
+    this.isStore = false,
   });
   final EditProfileStatus status;
   final String? errorMessage;
@@ -80,6 +81,7 @@ class EditProfileState extends Equatable {
   final bool hasSkillsChanges;
   final bool hasAcademicChanges;
   final bool hasContactInfoChanges;
+  final bool isStore;
 
   EditProfileState copyWith({
     String? fullName,
@@ -99,6 +101,7 @@ class EditProfileState extends Equatable {
     bool? hasContactInfoChanges,
     EditProfileStatus? status,
     String? errorMessage,
+    bool? isStore,
   }) {
     return EditProfileState(
       status: status ?? this.status,
@@ -120,6 +123,7 @@ class EditProfileState extends Equatable {
       hasAcademicChanges: hasAcademicChanges ?? this.hasAcademicChanges,
       hasContactInfoChanges:
           hasContactInfoChanges ?? this.hasContactInfoChanges,
+      isStore: isStore ?? this.isStore,
     );
   }
 
@@ -142,5 +146,6 @@ class EditProfileState extends Equatable {
     hasContactInfoChanges,
     status,
     errorMessage,
+    isStore,
   ];
 }

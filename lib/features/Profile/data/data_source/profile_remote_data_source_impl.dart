@@ -253,4 +253,22 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       imageFile: imageFile,
     );
   }
+
+  @override
+  Future<bool> deleteProduct(int productId) async {
+    try {
+      final response = await apiService.delete<Map<String, dynamic>>(
+        'store/products/$productId',
+      );
+      final status = response.data?['status'];
+      if (status != null && status != 'success') {
+        throw ServerException(
+          message: response.data?['message'] ?? 'Failed to delete product',
+        );
+      }
+      return true;
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }

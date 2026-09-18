@@ -12,6 +12,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class FakeEditProfileRepo implements EditProfileRepo {
+  String? updatedDescription;
+  String? updatedCity;
+  String? updatedCountry;
+  EditProfileRequestBody? updatedProfileBody;
+
   @override
   Future<Either<Failure, UniversitiesResponseEntity>> getUniversities() async {
     return right(
@@ -25,11 +30,25 @@ class FakeEditProfileRepo implements EditProfileRepo {
 
   @override
   Future<Either<Failure, bool>> updateProfile(EditProfileRequestBody requestBody) async {
+    updatedProfileBody = requestBody;
+    return right(true);
+  }
+
+  @override
+  Future<Either<Failure, bool>> updateStoreProfile({
+    required String description,
+    required String city,
+    required String country,
+  }) async {
+    updatedDescription = description;
+    updatedCity = city;
+    updatedCountry = country;
     return right(true);
   }
 }
 
 void main() {
+  late FakeEditProfileRepo fakeRepo;
   late EditProfileCubit editProfileCubit;
 
   final storeProfile = ProfileEntity(
@@ -77,7 +96,8 @@ void main() {
   );
 
   setUp(() {
-    editProfileCubit = EditProfileCubit(FakeEditProfileRepo());
+    fakeRepo = FakeEditProfileRepo();
+    editProfileCubit = EditProfileCubit(fakeRepo);
   });
 
   tearDown(() async {
@@ -97,7 +117,7 @@ void main() {
   }
 
   group('EditProfileView role-based field filtering', () {
-    testWidgets('shows store-specific fields and hides non-store fields when isStore is true', (tester) async {
+    testWidgets('shows only About Us and Location for store account', (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -107,15 +127,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Fields that MUST be present for store:
-      expect(find.text('Full Name'), findsOneWidget);
-      expect(find.text('Bio'), findsOneWidget);
+      expect(find.text('About Us'), findsOneWidget);
       expect(find.text('Location'), findsOneWidget);
-      expect(find.text('About Me'), findsOneWidget);
-      expect(find.text('Contact Information'), findsOneWidget);
 
       // Fields that MUST be hidden for store:
+      expect(find.text('Full Name'), findsNothing);
+      expect(find.text('Bio'), findsNothing);
       expect(find.byType(EditProfileAccountTypeButton), findsNothing);
+      expect(find.text('About Me'), findsNothing);
       expect(find.text('Academic Experience'), findsNothing);
+      expect(find.text('Contact Information'), findsNothing);
       expect(find.text('Skills'), findsNothing);
     });
 
@@ -137,6 +158,22 @@ void main() {
       expect(find.text('Academic Experience'), findsOneWidget);
       expect(find.text('Contact Information'), findsOneWidget);
       expect(find.text('Skills'), findsOneWidget);
+    });
+
+    testWidgets('EditProfileCubit.saveProfile calls updateStoreProfile when isStore is true', (tester) async {
+      editProfileCubit.initializeFromProfile(storeProfile, isStore: true);
+
+      editProfileCubit.updateAboutMe('You have no idea how high i can fly.');
+      editProfileCubit.updateLocation('tartous, syria');
+
+      expect(editProfileCubit.state.hasChanges, isTrue);
+
+      await editProfileCubit.saveProfile();
+
+      expect(fakeRepo.updatedDescription, 'You have no idea how high i can fly.');
+      expect(fakeRepo.updatedCity, 'tartous');
+      expect(fakeRepo.updatedCountry, 'syria');
+      expect(fakeRepo.updatedProfileBody, isNull);
     });
   });
 }

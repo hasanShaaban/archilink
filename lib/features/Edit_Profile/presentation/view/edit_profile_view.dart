@@ -41,6 +41,9 @@ class _EditProfileViewState extends State<EditProfileView> {
 
   Future<bool> _confirmExit(EditProfileCubit cubit) async {
     if (!cubit.state.hasChanges) return true;
+    final bool isStore = widget.isStore ||
+        widget.profileData.role.toLowerCase().trim() == 'store' ||
+        widget.profileData.role.toLowerCase().trim() == 'store account';
     final action = await showDialog<_ExitAction>(
       context: context,
       builder: (context) => AlertDialog(
@@ -71,10 +74,13 @@ class _EditProfileViewState extends State<EditProfileView> {
     if (!mounted) return false;
     switch (action) {
       case _ExitAction.save:
-        _applyChanges(cubit);
+        if (!isStore) {
+          _applyChanges(cubit);
+        }
+        cubit.saveProfile();
         return true;
       case _ExitAction.discard:
-        cubit.initializeFromProfile(widget.profileData);
+        cubit.initializeFromProfile(widget.profileData, isStore: widget.isStore);
         return true;
       case _ExitAction.cancel:
       default:
@@ -94,7 +100,7 @@ class _EditProfileViewState extends State<EditProfileView> {
   void initState() {
     super.initState();
     final cubit = context.read<EditProfileCubit>();
-    cubit.initializeFromProfile(widget.profileData);
+    cubit.initializeFromProfile(widget.profileData, isStore: widget.isStore);
     final state = cubit.state;
     fullNameController = TextEditingController(text: state.fullName);
     bioController = TextEditingController(text: state.bio);
@@ -140,80 +146,90 @@ class _EditProfileViewState extends State<EditProfileView> {
                     titel: 'Edit Profile',
                     withDoneButton: true,
                     onDone: () {
-                      _applyChanges(cubit);
+                      if (!isStore) {
+                        _applyChanges(cubit);
+                      }
 
                       context.read<EditProfileCubit>().saveProfile();
-                      Navigator.pop(context);
+                      Navigator.pop(context, true);
                     },
                     onBack: () => _handleBack(cubit),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
                         color: AppColorsFromTheme.editProfileContainer(context),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Column(
                         children: [
-                          EditProfileTextField(
-                            hintText: 'Enter your full name',
-                            title: 'Full Name',
-                            initialValue: fullNameController.text,
-                            controller: fullNameController,
-                            onChanged: cubit.updateFullName,
-                          ),
-                          Divider(height: 1),
-                          EditProfileTextField(
-                            hintText: 'Enter a bio',
-                            title: 'Bio',
-                            initialValue: bioController.text,
-                            controller: bioController,
-                            onChanged: cubit.updateBio,
-                          ),
-                          Divider(height: 1),
-                          BlocBuilder<EditProfileCubit, EditProfileState>(
-                            buildWhen: (prev, next) =>
-                                prev.location != next.location,
-                            builder: (context, state) {
-                              return LocationRoutedRow(
-                                title: 'Location',
-                                value: state.location,
-                                route: LocationView.name,
-                              );
-                            },
-                          ),
-
-                          if (!isStore) ...[
-                            Divider(height: 1),
-                            EditProfileAccountTypeButton(),
-                          ],
-
-                          Divider(height: 1),
-                          RoutedViewRow(
-                            title: 'About Me',
-                            route: AboutMeView.name,
-                          ),
-
-                          if (!isStore) ...[
-                            Divider(height: 1),
-                            RoutedViewRow(
+                          if (isStore) ...[
+                            const RoutedViewRow(
+                              title: 'About Us',
+                              route: AboutMeView.name,
+                            ),
+                            const Divider(height: 1),
+                            BlocBuilder<EditProfileCubit, EditProfileState>(
+                              buildWhen: (prev, next) =>
+                                  prev.location != next.location,
+                              builder: (context, state) {
+                                return LocationRoutedRow(
+                                  title: 'Location',
+                                  value: state.location,
+                                  route: LocationView.name,
+                                );
+                              },
+                            ),
+                          ] else ...[
+                            EditProfileTextField(
+                              hintText: 'Enter your full name',
+                              title: 'Full Name',
+                              initialValue: fullNameController.text,
+                              controller: fullNameController,
+                              onChanged: cubit.updateFullName,
+                            ),
+                            const Divider(height: 1),
+                            EditProfileTextField(
+                              hintText: 'Enter a bio',
+                              title: 'Bio',
+                              initialValue: bioController.text,
+                              controller: bioController,
+                              onChanged: cubit.updateBio,
+                            ),
+                            const Divider(height: 1),
+                            BlocBuilder<EditProfileCubit, EditProfileState>(
+                              buildWhen: (prev, next) =>
+                                  prev.location != next.location,
+                              builder: (context, state) {
+                                return LocationRoutedRow(
+                                  title: 'Location',
+                                  value: state.location,
+                                  route: LocationView.name,
+                                );
+                              },
+                            ),
+                            const Divider(height: 1),
+                            const EditProfileAccountTypeButton(),
+                            const Divider(height: 1),
+                            const RoutedViewRow(
+                              title: 'About Me',
+                              route: AboutMeView.name,
+                            ),
+                            const Divider(height: 1),
+                            const RoutedViewRow(
                               title: 'Academic Experience',
                               route: AcademicExperianceView.name,
                             ),
-                          ],
-
-                          Divider(height: 1),
-                          RoutedViewRow(
-                            title: 'Contact Information',
-                            route: ContactInfoView.name,
-                          ),
-
-                          if (!isStore) ...[
-                            Divider(height: 1),
-                            RoutedViewRow(
+                            const Divider(height: 1),
+                            const RoutedViewRow(
+                              title: 'Contact Information',
+                              route: ContactInfoView.name,
+                            ),
+                            const Divider(height: 1),
+                            const RoutedViewRow(
                               title: 'Skills',
                               route: SkillsView.name,
                             ),

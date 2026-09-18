@@ -1,4 +1,5 @@
 import 'package:archilink/features/Store/domain/entity/add_product_params.dart';
+import 'package:archilink/features/Store/domain/entity/edit_product_params.dart';
 import 'package:archilink/features/Store/domain/entity/product_category_entity.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:archilink/features/Store/domain/repo/store_repo.dart';
@@ -168,6 +169,7 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
   }
 
   void addImages(List<String> newImages) {
+    if (state.isEditMode) return;
     var updated = List<String>.from(state.images)..addAll(newImages);
     if (updated.length > 5) {
       updated = updated.sublist(0, 5);
@@ -176,6 +178,7 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
   }
 
   void removeImage(int index) {
+    if (state.isEditMode) return;
     if (index >= 0 && index < state.images.length) {
       final updated = List<String>.from(state.images)..removeAt(index);
       emit(state.copyWith(images: updated));
@@ -183,6 +186,88 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
   }
 
   Future<void> submit() async {
+    if (state.isEditMode) {
+      await _submitEdit();
+    } else {
+      await _submitAdd();
+    }
+  }
+
+  Future<void> _submitEdit() async {
+    if (state.images.length > 5) {
+      emit(state.copyWith(errorMessage: 'Cannot upload more than 5 images'));
+      return;
+    }
+
+    if (state.isQuantityVisible && state.quantity < 0) {
+      emit(state.copyWith(errorMessage: 'Quantity cannot be negative'));
+      return;
+    }
+
+    final name = state.name.trim();
+    final String? nameParam = name.isEmpty ? null : name;
+
+    final priceCleaned = state.price.replaceAll('\$', '').trim();
+    final parsedPrice = double.tryParse(priceCleaned);
+
+    final isOutOfStock =
+        state.status.trim().toLowerCase().replaceAll(' ', '_') == 'out_of_stock';
+    final int? quantity = isOutOfStock
+        ? 0
+        : (state.isQuantityVisible ? state.quantity : null);
+
+    final String? status =
+        state.status.trim().isEmpty ? null : state.status.trim();
+    final String? description =
+        state.description.trim().isEmpty ? null : state.description.trim();
+    final categoryIds = state.selectedCategories.isNotEmpty
+        ? state.selectedCategories.map((c) => c.id).toList()
+        : null;
+
+    if (_storeRepo == null) {
+      emit(state.copyWith(isSubmitting: false, isSuccess: true));
+      return;
+    }
+
+    final productId = state.initialProduct?.id;
+    if (productId == null) {
+      emit(state.copyWith(errorMessage: 'Cannot edit a product without an ID'));
+      return;
+    }
+
+    emit(state.copyWith(isSubmitting: true, errorMessage: null));
+
+    final params = EditProductParams(
+      id: productId,
+      name: nameParam,
+      description: description,
+      price: parsedPrice,
+      categoryIds: categoryIds,
+      quantityInStock: quantity,
+      status: status,
+      imagePaths: null, // Note: backend does not support editing media items for now
+    );
+
+    final result = await _storeRepo.editProduct(params);
+    if (isClosed) return;
+
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          isSubmitting: false,
+          errorMessage: failure.message,
+        ));
+      },
+      (product) {
+        emit(state.copyWith(
+          isSubmitting: false,
+          isSuccess: true,
+        ));
+      },
+    );
+  }
+
+  Future<void> _submitAdd() async {
     final name = state.name.trim();
     if (name.isEmpty) {
       emit(state.copyWith(errorMessage: 'Please enter a product name'));
@@ -255,9 +340,35 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
   }
 
   Future<void> delete() async {
-    // Repository integration point (planned for next milestone)
+    final productId = state.initialProduct?.id;
+    if (productId == null) {
+      emit(state.copyWith(errorMessage: 'Cannot delete a product without an ID'));
+      return;
+    }
+
+    if (_storeRepo == null) {
+      emit(state.copyWith(isDeleting: false, isSuccess: true));
+      return;
+    }
+
     emit(state.copyWith(isDeleting: true, errorMessage: null));
-    await Future.delayed(const Duration(milliseconds: 300));
-    emit(state.copyWith(isDeleting: false, isSuccess: true));
+
+    final result = await _storeRepo.deleteProduct(productId);
+    if (isClosed) return;
+
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          isDeleting: false,
+          errorMessage: failure.message,
+        ));
+      },
+      (_) {
+        emit(state.copyWith(
+          isDeleting: false,
+          isSuccess: true,
+        ));
+      },
+    );
   }
 }

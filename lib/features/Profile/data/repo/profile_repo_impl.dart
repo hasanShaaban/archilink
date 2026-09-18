@@ -214,4 +214,16 @@ class ProfileRepoImpl implements ProfileRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> deleteProduct(int productId) async {
+    try {
+      final success = await remoteDataSource.deleteProduct(productId);
+      return right(success);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

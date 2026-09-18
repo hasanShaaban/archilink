@@ -76,4 +76,29 @@ class EditProfileRemoteDataSourceImpl extends EditProfileRemoteDataSource {
       throw AppException.handelDioException(e);
     }
   }
+
+  @override
+  Future<bool> updateStoreProfile({
+    required String description,
+    required String city,
+    required String country,
+  }) async {
+    try {
+      final response = await apiService.patch(
+        'store/profile',
+        body: {
+          'description': description,
+          'city': city,
+          'country': country,
+        },
+      );
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: "Invalid data response");
+      }
+      return data['status'] == 'success';
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }

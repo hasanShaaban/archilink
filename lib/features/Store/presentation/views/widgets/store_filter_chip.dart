@@ -7,10 +7,11 @@ class StoreFilterChip extends StatelessWidget {
     super.key,
     required this.label,
     required this.icon,
-    required this.options,
+    this.options = const [],
     this.selectedValue,
     this.onSelected,
     this.isHighlighted = false,
+    this.onTap,
   });
 
   final String label;
@@ -19,6 +20,7 @@ class StoreFilterChip extends StatelessWidget {
   final String? selectedValue;
   final ValueChanged<String>? onSelected;
   final bool isHighlighted;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,49 @@ class StoreFilterChip extends StatelessWidget {
           );
 
     final displayLabel = selectedValue ?? label;
+
+    final chipContent = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.04)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: borderColor,
+          width: isSelected ? 1.2 : 1.0,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            displayLabel,
+            style: AppTextStyle.interMedium12.copyWith(
+              color: isSelected ? primaryColor : theme.colorScheme.onSurface,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            ),
+          ),
+          const SizedBox(width: 5),
+          Icon(
+            icon,
+            size: 15,
+            color: isSelected ? primaryColor : AppColorsFromTheme.grayForText(context),
+          ),
+        ],
+      ),
+    );
+
+    if (onTap != null) {
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: chipContent,
+        ),
+      );
+    }
 
     return PopupMenuButton<String>(
       tooltip: label,
@@ -76,37 +121,7 @@ class StoreFilterChip extends StatelessWidget {
           );
         }).toList();
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-        decoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.04)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: borderColor,
-            width: isSelected ? 1.2 : 1.0,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              displayLabel,
-              style: AppTextStyle.interMedium12.copyWith(
-                color: theme.colorScheme.onSurface,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              ),
-            ),
-            const SizedBox(width: 5),
-            Icon(
-              icon,
-              size: 15,
-              color: primaryColor,
-            ),
-          ],
-        ),
-      ),
+      child: chipContent,
     );
   }
 }

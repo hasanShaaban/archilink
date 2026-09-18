@@ -1,15 +1,26 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
+import 'package:archilink/features/Store/domain/entity/product_category_entity.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/add_edit_product_cubit.dart';
 import 'package:archilink/features/Store/presentation/manager/cubit/add_edit_product_state.dart';
+import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_cubit.dart';
+import 'package:archilink/features/Store/presentation/manager/cubit/store_feed_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CategorySearchBottomSheet extends StatefulWidget {
-  const CategorySearchBottomSheet({super.key});
+  const CategorySearchBottomSheet({
+    super.key,
+    this.useStoreFeed = false,
+  });
+
+  final bool useStoreFeed;
 
   static Future<void> show(BuildContext context) {
     final cubit = context.read<AddEditProductCubit>();
+    if (cubit.state.availableCategories.isEmpty && !cubit.state.isLoadingCategories) {
+      cubit.fetchCategories();
+    }
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -17,6 +28,22 @@ class CategorySearchBottomSheet extends StatefulWidget {
       builder: (bottomSheetContext) => BlocProvider.value(
         value: cubit,
         child: const CategorySearchBottomSheet(),
+      ),
+    );
+  }
+
+  static Future<void> showForStoreFeed(BuildContext context) {
+    final cubit = context.read<StoreFeedCubit>();
+    if (cubit.state.availableCategories.isEmpty && !cubit.state.isLoadingCategories) {
+      cubit.fetchCategories();
+    }
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) => BlocProvider.value(
+        value: cubit,
+        child: const CategorySearchBottomSheet(useStoreFeed: true),
       ),
     );
   }
@@ -39,21 +66,37 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    final cubit = context.read<AddEditProductCubit>();
-    final state = cubit.state;
 
-    // When actively searching locally, don't trigger pagination fetch
-    if (state.categorySearchQuery.trim().isNotEmpty) return;
+    final String searchQuery;
+    final bool hasMore;
+    final bool isLoading;
+    final bool isLoadingMore;
+    final VoidCallback fetchCallback;
 
-    if (!state.categoriesHasMore ||
-        state.isLoadingCategories ||
-        state.isLoadingMoreCategories) {
-      return;
+    if (widget.useStoreFeed) {
+      final cubit = context.read<StoreFeedCubit>();
+      final state = cubit.state;
+      searchQuery = state.categorySearchQuery;
+      hasMore = state.categoriesHasMore;
+      isLoading = state.isLoadingCategories;
+      isLoadingMore = state.isLoadingMoreCategories;
+      fetchCallback = cubit.fetchCategories;
+    } else {
+      final cubit = context.read<AddEditProductCubit>();
+      final state = cubit.state;
+      searchQuery = state.categorySearchQuery;
+      hasMore = state.categoriesHasMore;
+      isLoading = state.isLoadingCategories;
+      isLoadingMore = state.isLoadingMoreCategories;
+      fetchCallback = cubit.fetchCategories;
     }
+
+    if (searchQuery.trim().isNotEmpty) return;
+    if (!hasMore || isLoading || isLoadingMore) return;
 
     final threshold = _scrollController.position.maxScrollExtent - 150;
     if (_scrollController.position.pixels >= threshold) {
-      cubit.fetchCategories();
+      fetchCallback();
     }
   }
 
@@ -66,6 +109,63 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.useStoreFeed) {
+      return BlocBuilder<StoreFeedCubit, StoreFeedState>(
+        builder: (context, state) {
+          final cubit = context.read<StoreFeedCubit>();
+          return _buildContent(
+            context,
+            isLoadingCategories: state.isLoadingCategories,
+            isLoadingMoreCategories: state.isLoadingMoreCategories,
+            categoriesErrorMessage: state.categoriesErrorMessage,
+            availableCategories: state.availableCategories,
+            filteredCategories: state.filteredCategories,
+            selectedCategories: state.selectedCategories,
+            categorySearchQuery: state.categorySearchQuery,
+            onSearchChanged: cubit.setCategorySearchQuery,
+            onSearchClear: () => cubit.setCategorySearchQuery(''),
+            onRetry: cubit.fetchCategories,
+            onToggleCategory: cubit.toggleCategory,
+          );
+        },
+      );
+    }
+
+    return BlocBuilder<AddEditProductCubit, AddEditProductState>(
+      builder: (context, state) {
+        final cubit = context.read<AddEditProductCubit>();
+        return _buildContent(
+          context,
+          isLoadingCategories: state.isLoadingCategories,
+          isLoadingMoreCategories: state.isLoadingMoreCategories,
+          categoriesErrorMessage: state.categoriesErrorMessage,
+          availableCategories: state.availableCategories,
+          filteredCategories: state.filteredCategories,
+          selectedCategories: state.selectedCategories,
+          categorySearchQuery: state.categorySearchQuery,
+          onSearchChanged: cubit.setCategorySearchQuery,
+          onSearchClear: () => cubit.setCategorySearchQuery(''),
+          onRetry: cubit.fetchCategories,
+          onToggleCategory: cubit.toggleCategory,
+        );
+      },
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context, {
+    required bool isLoadingCategories,
+    required bool isLoadingMoreCategories,
+    required String? categoriesErrorMessage,
+    required List<ProductCategoryEntity> availableCategories,
+    required List<ProductCategoryEntity> filteredCategories,
+    required List<ProductCategoryEntity> selectedCategories,
+    required String categorySearchQuery,
+    required ValueChanged<String> onSearchChanged,
+    required VoidCallback onSearchClear,
+    required VoidCallback onRetry,
+    required ValueChanged<ProductCategoryEntity> onToggleCategory,
+  }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final mediaQuery = MediaQuery.of(context);
@@ -141,9 +241,7 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
               controller: _searchController,
-              onChanged: (query) {
-                context.read<AddEditProductCubit>().setCategorySearchQuery(query);
-              },
+              onChanged: onSearchChanged,
               style: AppTextStyle.interRegular14.copyWith(
                 color: theme.colorScheme.onSurface,
               ),
@@ -162,9 +260,7 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
                         icon: const Icon(Icons.clear, size: 18),
                         onPressed: () {
                           _searchController.clear();
-                          context
-                              .read<AddEditProductCubit>()
-                              .setCategorySearchQuery('');
+                          onSearchClear();
                         },
                       )
                     : null,
@@ -200,9 +296,9 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
 
           // Categories List
           Expanded(
-            child: BlocBuilder<AddEditProductCubit, AddEditProductState>(
-              builder: (context, state) {
-                if (state.isLoadingCategories) {
+            child: Builder(
+              builder: (context) {
+                if (isLoadingCategories) {
                   return const Center(
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6BBBAE)),
@@ -210,7 +306,7 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
                   );
                 }
 
-                if (state.categoriesErrorMessage != null && state.availableCategories.isEmpty) {
+                if (categoriesErrorMessage != null && availableCategories.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -218,7 +314,7 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
                         const Icon(Icons.error_outline, size: 36, color: Colors.red),
                         const SizedBox(height: 8),
                         Text(
-                          state.categoriesErrorMessage!,
+                          categoriesErrorMessage,
                           style: AppTextStyle.interRegular14.copyWith(
                             color: isDark ? const Color(0xFF8E8E93) : const Color(0xFFA0A0A0),
                           ),
@@ -226,7 +322,7 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
                         ),
                         const SizedBox(height: 12),
                         TextButton(
-                          onPressed: () => context.read<AddEditProductCubit>().fetchCategories(),
+                          onPressed: onRetry,
                           child: const Text('Retry'),
                         ),
                       ],
@@ -234,9 +330,7 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
                   );
                 }
 
-                final filtered = state.filteredCategories;
-
-                if (filtered.isEmpty) {
+                if (filteredCategories.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -262,19 +356,19 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
                   );
                 }
 
-                final showLoadingMore = state.isLoadingMoreCategories &&
-                    state.categorySearchQuery.trim().isEmpty;
+                final showLoadingMore = isLoadingMoreCategories &&
+                    categorySearchQuery.trim().isEmpty;
 
                 return ListView.separated(
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  itemCount: filtered.length + (showLoadingMore ? 1 : 0),
+                  itemCount: filteredCategories.length + (showLoadingMore ? 1 : 0),
                   separatorBuilder: (_, __) => Divider(
                     height: 1,
                     color: AppColorsFromTheme.borderColor(context).withValues(alpha: 0.4),
                   ),
                   itemBuilder: (context, index) {
-                    if (index == filtered.length) {
+                    if (index == filteredCategories.length) {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
                         child: Center(
@@ -292,16 +386,14 @@ class _CategorySearchBottomSheetState extends State<CategorySearchBottomSheet> {
                       );
                     }
 
-                    final category = filtered[index];
-                    final isSelected = state.selectedCategories
+                    final category = filteredCategories[index];
+                    final isSelected = selectedCategories
                         .any((c) => c.id == category.id);
 
                     return InkWell(
                       borderRadius: BorderRadius.circular(10),
                       onTap: () {
-                        context
-                            .read<AddEditProductCubit>()
-                            .toggleCategory(category);
+                        onToggleCategory(category);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(

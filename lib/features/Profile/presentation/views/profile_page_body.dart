@@ -102,9 +102,10 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
         // Once real data arrives we check privacy.
         final bool postsVisible = isSkeleton || _canViewPosts(profileData);
 
-        return DefaultTabController(
-          length: 2,
-          child: Scaffold(
+        return ScaffoldMessenger(
+          child: DefaultTabController(
+            length: 2,
+            child: Scaffold(
             body: SafeArea(
               child: Skeletonizer(
                 ignoreContainers: false,
@@ -207,8 +208,9 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
               ),
             ),
           ),
-        );
-      },
+        ),
+      );
+    },
     );
   }
 }

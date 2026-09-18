@@ -23,5 +23,6 @@ abstract class ProfileRemoteDataSource {
   Future<bool> updateProfilePicture(File imageFile);
   Future<bool> updateStoreLogo(File imageFile);
   Future<bool> updateStoreBanner(File imageFile);
+  Future<bool> deleteProduct(int productId);
 }
 

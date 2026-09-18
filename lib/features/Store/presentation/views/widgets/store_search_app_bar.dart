@@ -1,5 +1,6 @@
 import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
+import 'package:archilink/features/Store/domain/entity/product_category_entity.dart';
 import 'package:archilink/features/Store/presentation/views/widgets/store_filter_chip.dart';
 import 'package:flutter/material.dart';
 
@@ -8,15 +9,22 @@ class StoreSearchAppBar extends StatefulWidget {
     super.key,
     this.onSearchChanged,
     this.onFilterChanged,
+    this.selectedCategories = const [],
+    this.onCategoryRemoved,
+    this.onCategoryOptionTap,
   });
 
   final ValueChanged<String>? onSearchChanged;
   final void Function({
     String? category,
+    List<ProductCategoryEntity>? categories,
     String? status,
     String? minPrice,
     String? maxPrice,
   })? onFilterChanged;
+  final List<ProductCategoryEntity> selectedCategories;
+  final ValueChanged<ProductCategoryEntity>? onCategoryRemoved;
+  final VoidCallback? onCategoryOptionTap;
 
   @override
   State<StoreSearchAppBar> createState() => _StoreSearchAppBarState();
@@ -26,7 +34,6 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
   late final TextEditingController _searchController;
   bool _isFiltersOpen = false;
 
-  String? _selectedCategory;
   String? _selectedStatus;
   String? _selectedMinPrice;
   String? _selectedMaxPrice;
@@ -45,7 +52,7 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
 
   void _notifyFiltersChanged() {
     widget.onFilterChanged?.call(
-      category: _selectedCategory,
+      categories: widget.selectedCategories,
       status: _selectedStatus,
       minPrice: _selectedMinPrice,
       maxPrice: _selectedMaxPrice,
@@ -61,6 +68,15 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
     final searchBgColor = isDark
         ? const Color(0xFF242527)
         : const Color(0xFFE8E8E8);
+
+    final String categoryLabel;
+    if (widget.selectedCategories.isEmpty) {
+      categoryLabel = 'Category';
+    } else if (widget.selectedCategories.length == 1) {
+      categoryLabel = widget.selectedCategories.first.name;
+    } else {
+      categoryLabel = 'Categories (${widget.selectedCategories.length})';
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -81,7 +97,10 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: TextField(
                   controller: _searchController,
-                  onChanged: widget.onSearchChanged,
+                  onChanged: (val) {
+                    setState(() {});
+                    widget.onSearchChanged?.call(val);
+                  },
                   style: AppTextStyle.interRegular14.copyWith(
                     color: theme.colorScheme.onSurface,
                   ),
@@ -93,6 +112,24 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? GestureDetector(
+                            onTap: () {
+                              _searchController.clear();
+                              setState(() {});
+                              widget.onSearchChanged?.call('');
+                            },
+                            child: Icon(
+                              Icons.close_rounded,
+                              size: 18,
+                              color: AppColorsFromTheme.grayForText(context),
+                            ),
+                          )
+                        : null,
+                    suffixIconConstraints: const BoxConstraints(
+                      minWidth: 24,
+                      minHeight: 24,
+                    ),
                   ),
                 ),
               ),
@@ -184,22 +221,12 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
 
                   const SizedBox(width: 8),
 
-                  // Category Filter Chip
+                  // Category Filter Chip (opens CategorySearchBottomSheet)
                   StoreFilterChip(
-                    label: 'Category',
+                    label: categoryLabel,
                     icon: Icons.keyboard_arrow_down_rounded,
-                    options: const [
-                      'Architecture',
-                      'Drawing Tools',
-                      'Materials',
-                    ],
-                    selectedValue: _selectedCategory,
-                    onSelected: (val) {
-                      setState(() {
-                        _selectedCategory = val;
-                      });
-                      _notifyFiltersChanged();
-                    },
+                    isHighlighted: widget.selectedCategories.isNotEmpty,
+                    onTap: widget.onCategoryOptionTap,
                   ),
 
                   const SizedBox(width: 8),
@@ -237,7 +264,7 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
                     selectedValue: _selectedMinPrice,
                     onSelected: (val) {
                       setState(() {
-                        _selectedMinPrice = val;
+                        _selectedMinPrice = _selectedMinPrice == val ? null : val;
                       });
                       _notifyFiltersChanged();
                     },
@@ -257,7 +284,7 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
                     selectedValue: _selectedMaxPrice,
                     onSelected: (val) {
                       setState(() {
-                        _selectedMaxPrice = val;
+                        _selectedMaxPrice = _selectedMaxPrice == val ? null : val;
                       });
                       _notifyFiltersChanged();
                     },
@@ -271,6 +298,65 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
               : CrossFadeState.showFirst,
           duration: const Duration(milliseconds: 200),
         ),
+
+        // Chosen Categories Chips under the filters row
+        if (widget.selectedCategories.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: widget.selectedCategories.map((category) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(10, 5, 6, 5),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF2E3033)
+                            : const Color(0xFFEAEAEA),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: primaryColor.withValues(
+                            alpha: isDark ? 0.4 : 0.6,
+                          ),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            category.name,
+                            style: AppTextStyle.interMedium12.copyWith(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          InkWell(
+                            onTap: () => widget.onCategoryRemoved?.call(category),
+                            borderRadius: BorderRadius.circular(10),
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Icon(
+                                Icons.close_rounded,
+                                size: 14,
+                                color: isDark
+                                    ? const Color(0xFF9E9E9E)
+                                    : const Color(0xFF666666),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
       ],
     );
   }
