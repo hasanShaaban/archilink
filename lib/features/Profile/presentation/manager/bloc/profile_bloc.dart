@@ -38,6 +38,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     on<UpdateProfilePostLike>(_onUpdateProfilePostLike);
     on<DeleteProfilePost>(_onDeleteProfilePost);
+    on<UpdateProfilePostContent>(_onUpdateProfilePostContent);
     on<LoadInitialProfilePosts>(_onLoadInitialPosts);
     on<LoadMoreProfilePosts>(_onLoadMorePosts);
     on<LoadInitialProfileProducts>(_onLoadInitialProducts);
@@ -221,6 +222,22 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) {
     final updated =
         state.profilePosts.where((p) => p.id != event.postId).toList();
+    emit(state.copyWith(profilePosts: updated));
+  }
+
+  void _onUpdateProfilePostContent(
+    UpdateProfilePostContent event,
+    Emitter<ProfileState> emit,
+  ) {
+    final updated = state.profilePosts.map((post) {
+      if (post.id == event.postId) {
+        return post.copyWith(
+          body: event.body,
+          privacy: event.privacy ?? post.privacy,
+        );
+      }
+      return post;
+    }).toList();
     emit(state.copyWith(profilePosts: updated));
   }
 

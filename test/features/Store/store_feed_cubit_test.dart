@@ -84,21 +84,27 @@ class MockStoreRepo implements StoreRepo {
   }
 
   String? lastSearchQuery;
+  String? lastSearchStatus;
   String? lastMinPrice;
   String? lastMaxPrice;
+  List<int>? lastCategories;
   int? lastSearchPage;
   Either<Failure, ProductFeedEntity>? searchResponse;
 
   @override
   Future<Either<Failure, ProductFeedEntity>> searchProducts({
     String? query,
+    String? status,
     String? minPrice,
     String? maxPrice,
+    List<int>? categories,
     int page = 1,
   }) async {
     lastSearchQuery = query;
+    lastSearchStatus = status;
     lastMinPrice = minPrice;
     lastMaxPrice = maxPrice;
+    lastCategories = categories;
     lastSearchPage = page;
     return searchResponse ?? response ?? right(
       ProductFeedEntity(
@@ -413,6 +419,7 @@ void main() {
 
     testWidgets('StoreSearchAppBar search input, clear button, and filter callbacks work as expected', (tester) async {
       String? changedQuery;
+      String? changedStatus;
       String? changedMinPrice;
       String? changedMaxPrice;
 
@@ -422,6 +429,7 @@ void main() {
             body: StoreSearchAppBar(
               onSearchChanged: (q) => changedQuery = q,
               onFilterChanged: ({categories, category, maxPrice, minPrice, status}) {
+                changedStatus = status;
                 changedMinPrice = minPrice;
                 changedMaxPrice = maxPrice;
               },
@@ -467,6 +475,32 @@ void main() {
       await tester.tap(find.text('200').last);
       await tester.pumpAndSettle();
       expect(changedMaxPrice, '200');
+
+      // Tap Status filter chip
+      await tester.tap(find.text('Status'));
+      await tester.pumpAndSettle();
+
+      // Select 'Available'
+      await tester.tap(find.text('Available').last);
+      await tester.pumpAndSettle();
+      expect(changedStatus, 'Available');
+    });
+
+    test('StoreFeedCubit setFilters updates status and triggers searchProducts', () async {
+      final mockRepo = MockStoreRepo();
+      final cubit = StoreFeedCubit(mockRepo);
+
+      cubit.setFilters(status: 'available', minPrice: '20.00', maxPrice: '120');
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      expect(cubit.state.status, 'available');
+      expect(cubit.state.minPrice, '20.00');
+      expect(cubit.state.maxPrice, '120');
+      expect(mockRepo.lastSearchStatus, 'available');
+      expect(mockRepo.lastMinPrice, '20.00');
+      expect(mockRepo.lastMaxPrice, '120');
+
+      await cubit.close();
     });
   });
 }

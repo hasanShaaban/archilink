@@ -52,8 +52,10 @@ class MockApiServiceForSearch implements ApiService {
 
 class FakeStoreRemoteDataSourceForSearch implements StoreRemoteDateSource {
   String? lastQuery;
+  String? lastStatus;
   String? lastMinPrice;
   String? lastMaxPrice;
+  List<int>? lastCategories;
   int? lastPage;
   bool shouldThrow = false;
 
@@ -61,8 +63,8 @@ class FakeStoreRemoteDataSourceForSearch implements StoreRemoteDateSource {
     id: 53,
     store: ProductStoreEntity(
       id: 1,
-      name: 'Test User',
-      username: 'testUser4',
+      name: 'Test Store',
+      username: 'testStore',
     ),
     name: 'Wireless Keyboard',
     description: 'Ergonomic wireless Keyboard with USB receiver',
@@ -75,13 +77,17 @@ class FakeStoreRemoteDataSourceForSearch implements StoreRemoteDateSource {
   @override
   Future<ProductFeedEntity> searchProducts({
     String? query,
+    String? status,
     String? minPrice,
     String? maxPrice,
+    List<int>? categories,
     int page = 1,
   }) async {
     lastQuery = query;
+    lastStatus = status;
     lastMinPrice = minPrice;
     lastMaxPrice = maxPrice;
+    lastCategories = categories;
     lastPage = page;
 
     if (shouldThrow) {
@@ -222,6 +228,30 @@ void main() {
       expect(result.pagination.currentPage, 1);
       expect(result.pagination.total, 10);
       expect(result.pagination.hasMore, false);
+    });
+
+    test('sends POST to home/search/products with status normalized, q, min_price, max_price', () async {
+      mockApiService.postResponse = Response(
+        requestOptions: RequestOptions(path: 'home/search/products?page=1'),
+        statusCode: 200,
+        data: sampleSearchResponseData,
+      );
+
+      final result = await dataSource.searchProducts(
+        query: 'n',
+        status: 'Available',
+        minPrice: '20.00',
+        maxPrice: '120',
+        page: 1,
+      );
+
+      expect(mockApiService.lastPath, 'home/search/products?page=1');
+      final body = mockApiService.lastBody as Map<String, dynamic>;
+      expect(body['q'], 'n');
+      expect(body['status'], 'available');
+      expect(body['min_price'], '20.00');
+      expect(body['max_price'], '120');
+      expect(result.products.length, 2);
     });
 
     test('throws ServerException on null or invalid response data', () async {

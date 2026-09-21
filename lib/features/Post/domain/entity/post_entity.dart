@@ -12,6 +12,7 @@ class PostEntity {
   final int likesCount;
   final int commentsCount;
   final bool likedByMe;
+  final String privacy;
   const PostEntity({
     required this.id,
     required this.body,
@@ -22,6 +23,7 @@ class PostEntity {
     required this.commentsCount,
     required this.likedByMe,
     required this.mediaItems,
+    this.privacy = 'public',
   });
 
   PostEntity copyWith({
@@ -33,7 +35,8 @@ class PostEntity {
     int? likesCount,
     int? commentsCount,
     bool? likedByMe,
-    List<MediaItemEntity>? mediaItems
+    List<MediaItemEntity>? mediaItems,
+    String? privacy,
   }) {
     return PostEntity(
       id: id ?? this.id,
@@ -44,7 +47,8 @@ class PostEntity {
       likesCount: likesCount ?? this.likesCount,
       commentsCount: commentsCount ?? this.commentsCount,
       likedByMe: likedByMe ?? this.likedByMe,
-      mediaItems: mediaItems ?? this.mediaItems
+      mediaItems: mediaItems ?? this.mediaItems,
+      privacy: privacy ?? this.privacy,
     );
   }
 }

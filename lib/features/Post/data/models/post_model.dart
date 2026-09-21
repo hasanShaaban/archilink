@@ -13,6 +13,7 @@ class PostModel {
   final int likesCount;
   final int commentsCount;
   final bool likedByMe;
+  final String privacy;
 
   PostModel({
     required this.id,
@@ -24,6 +25,7 @@ class PostModel {
     required this.commentsCount,
     required this.likedByMe,
     required this.mediaItems,
+    this.privacy = 'public',
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -39,6 +41,7 @@ class PostModel {
       likesCount: json['likes_count'],
       commentsCount: json['comments_count'],
       likedByMe: json['liked_by_me'],
+      privacy: json['privacy'] as String? ?? 'public',
     );
   }
 
@@ -53,6 +56,7 @@ class PostModel {
       likesCount: likesCount,
       commentsCount: commentsCount,
       likedByMe: likedByMe,
+      privacy: privacy,
     );
   }
 }

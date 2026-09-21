@@ -28,4 +28,30 @@ class CreatePostRemoteDateSourceImpl extends CreatePostRemoteDataSource {
       throw AppException.handelDioException(e);
     }
   }
+
+  @override
+  Future<bool> updatePost({
+    required int postId,
+    required String body,
+    required String privacy,
+  }) async {
+    try {
+      final response = await apiService.patch(
+        'post-center/update-post/$postId',
+        body: {
+          'body': body,
+          'privacy': privacy,
+        },
+      );
+      final status = response.data?['status'];
+      if (status == 'success') {
+        return true;
+      }
+      throw ServerException(
+        message: response.data?['message']?.toString() ?? 'Failed to update post',
+      );
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }

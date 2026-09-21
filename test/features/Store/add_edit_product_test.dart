@@ -110,8 +110,10 @@ class MockStoreRepo implements StoreRepo {
   @override
   Future<Either<Failure, ProductFeedEntity>> searchProducts({
     String? query,
+    String? status,
     String? minPrice,
     String? maxPrice,
+    List<int>? categories,
     int page = 1,
   }) async {
     return feedResponse ?? left(UnknownFailure());

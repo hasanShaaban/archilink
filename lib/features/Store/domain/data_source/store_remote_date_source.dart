@@ -12,10 +12,10 @@ abstract class StoreRemoteDateSource {
   Future<bool> deleteProduct(int id);
   Future<ProductFeedEntity> searchProducts({
     String? query,
+    String? status,
     String? minPrice,
     String? maxPrice,
+    List<int>? categories,
     int page = 1,
   });
 }
-
-

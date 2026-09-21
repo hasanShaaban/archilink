@@ -1,10 +1,10 @@
-import 'dart:developer';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Create_Post/presentation/manager/cubit/create_post_cubit.dart';
 import 'package:archilink/features/Create_Post/presentation/views/widgets/create_post_action_buttons.dart';
 import 'package:archilink/features/Create_Post/presentation/views/widgets/create_post_tags_section.dart';
 import 'package:archilink/features/Create_Post/presentation/views/widgets/create_post_text_field.dart';
 import 'package:archilink/features/Create_Post/presentation/views/widgets/post_header_row.dart';
+import 'package:archilink/features/Create_Post/presentation/views/widgets/existing_images_list_view.dart';
 import 'package:archilink/features/Create_Post/presentation/views/widgets/selected_images_list_view.dart';
 import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
 import 'package:archilink/features/Post/presentation/view/widgets/exapndable_tags.dart';
@@ -40,13 +40,22 @@ class CreatePostViewBody extends StatelessWidget {
               PostHeaderRow(width: width, owner: owner, state: state),
               SizedBox(height: 12),
               CreatePostTextFiled(width: width),
-              if (state.showTagsInPost && state.tags.isNotEmpty)
+              if (state.tags.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   child: ExpandableTags(tags: state.tags),
                 ),
               SizedBox(height: 12),
-              if (state.selectedAssets.isNotEmpty)
+              if (state.isEditMode && state.existingMediaItems.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: ExistingImagesListView(
+                    height: height,
+                    images: state.existingMediaItems,
+                    width: width,
+                  ),
+                )
+              else if (state.selectedAssets.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: SelectedImagesListView(
@@ -59,12 +68,14 @@ class CreatePostViewBody extends StatelessWidget {
               Divider(height: 0),
               SizedBox(height: 12),
               CreatePostActionButtons(state: state),
-              SizedBox(height: 8),
-              CreatePostTagsSection(
-                height: height,
-                focusNode: focusNode,
-                state: state,
-              ),
+              if (!state.isEditMode) ...[
+                SizedBox(height: 8),
+                CreatePostTagsSection(
+                  height: height,
+                  focusNode: focusNode,
+                  state: state,
+                ),
+              ],
             ],
           ),
         );

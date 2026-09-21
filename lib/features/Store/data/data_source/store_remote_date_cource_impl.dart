@@ -126,26 +126,44 @@ class StoreRemoteDataSourceImpl implements StoreRemoteDateSource {
     }
   }
 
+  String _normalizeStatus(String status) {
+    return status.trim().toLowerCase().replaceAll(' ', '_');
+  }
+
   @override
   Future<ProductFeedEntity> searchProducts({
     String? query,
+    String? status,
     String? minPrice,
     String? maxPrice,
+    List<int>? categories,
     int page = 1,
   }) async {
     try {
-      if (query == null || query.trim().isEmpty) {
+      final hasQuery = query != null && query.trim().isNotEmpty;
+      final hasStatus = status != null && status.trim().isNotEmpty;
+      final hasMinPrice = minPrice != null && minPrice.trim().isNotEmpty;
+      final hasMaxPrice = maxPrice != null && maxPrice.trim().isNotEmpty;
+      final hasCategories = categories != null && categories.isNotEmpty;
+
+      if (!hasQuery && !hasStatus && !hasMinPrice && !hasMaxPrice && !hasCategories) {
         return getProducts(page);
       }
 
       final body = <String, dynamic>{
-        'q': query.trim(),
+        'q': (query != null && query.trim().isNotEmpty) ? query.trim() : '',
       };
+      if (status != null && status.trim().isNotEmpty) {
+        body['status'] = _normalizeStatus(status);
+      }
       if (minPrice != null && minPrice.trim().isNotEmpty) {
         body['min_price'] = minPrice.trim();
       }
       if (maxPrice != null && maxPrice.trim().isNotEmpty) {
         body['max_price'] = maxPrice.trim();
+      }
+      if (categories != null) {
+        body['categories'] = categories;
       }
 
       final response = await _apiService.post(

@@ -21,6 +21,7 @@ class StoreFeedState extends Equatable {
     this.categorySearchQuery = '',
     this.categoriesErrorMessage,
     this.searchQuery = '',
+    this.status,
     this.minPrice,
     this.maxPrice,
   });
@@ -44,12 +45,17 @@ class StoreFeedState extends Equatable {
 
   // Search & Filter state
   final String searchQuery;
+  final String? status;
   final String? minPrice;
   final String? maxPrice;
 
   bool get hasProducts => products.isNotEmpty;
 
-  bool get isSearchActive => searchQuery.trim().isNotEmpty;
+  bool get isSearchActive =>
+      searchQuery.trim().isNotEmpty ||
+      (status != null && status!.trim().isNotEmpty) ||
+      (minPrice != null && minPrice!.trim().isNotEmpty) ||
+      (maxPrice != null && maxPrice!.trim().isNotEmpty);
 
   List<ProductCategoryEntity> get filteredCategories {
     if (categorySearchQuery.trim().isEmpty) {
@@ -78,6 +84,7 @@ class StoreFeedState extends Equatable {
     String? categorySearchQuery,
     Object? categoriesErrorMessage = _noChange,
     Object? searchQuery = _noChange,
+    Object? status = _noChange,
     Object? minPrice = _noChange,
     Object? maxPrice = _noChange,
   }) {
@@ -105,6 +112,7 @@ class StoreFeedState extends Equatable {
       searchQuery: searchQuery == _noChange
           ? this.searchQuery
           : (searchQuery as String? ?? ''),
+      status: status == _noChange ? this.status : status as String?,
       minPrice: minPrice == _noChange ? this.minPrice : minPrice as String?,
       maxPrice: maxPrice == _noChange ? this.maxPrice : maxPrice as String?,
     );
@@ -127,6 +135,7 @@ class StoreFeedState extends Equatable {
     categorySearchQuery,
     categoriesErrorMessage,
     searchQuery,
+    status,
     minPrice,
     maxPrice,
   ];

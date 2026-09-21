@@ -59,3 +59,17 @@ class DeleteProfilePost extends ProfileEvent {
   List<Object> get props => [postId];
 }
 
+class UpdateProfilePostContent extends ProfileEvent {
+  final int postId;
+  final String body;
+  final String? privacy;
+  const UpdateProfilePostContent({
+    required this.postId,
+    required this.body,
+    this.privacy,
+  });
+
+  @override
+  List<Object> get props => [postId, body, privacy ?? ''];
+}
+

@@ -7,4 +7,9 @@ import 'package:dartz/dartz.dart';
 abstract class CreatePostRepo {
   ProfileEntity? getPosterProfileData();
   Future<Either<Failure, CreatePostResponseEntity>> createPost(CreatePostParms parms);
+  Future<Either<Failure, bool>> updatePost({
+    required int postId,
+    required String body,
+    required String privacy,
+  });
 }

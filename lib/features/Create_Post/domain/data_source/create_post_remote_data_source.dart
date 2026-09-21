@@ -3,4 +3,9 @@ import 'package:archilink/features/Create_Post/domain/entity/create_post_respons
 
 abstract class CreatePostRemoteDataSource {
   Future<CreatePostResponseEntity> createPost(CreatePostParms parms);
+  Future<bool> updatePost({
+    required int postId,
+    required String body,
+    required String privacy,
+  });
 }

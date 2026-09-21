@@ -10,6 +10,11 @@ class CreatePostState extends Equatable {
   final bool showTagsInPost;
   final String privacy;
   final Failure? failure;
+  final bool isEditMode;
+  final int? editingPostId;
+  final List<MediaItemEntity> existingMediaItems;
+  final bool updateSuccess;
+
   const CreatePostState({
     this.postText = '',
     this.selectedAssets = const [],
@@ -20,6 +25,10 @@ class CreatePostState extends Equatable {
     this.showTagsInPost = false,
     this.privacy = 'public',
     this.failure,
+    this.isEditMode = false,
+    this.editingPostId,
+    this.existingMediaItems = const [],
+    this.updateSuccess = false,
   });
 
   bool get canPost => postText.trim().isNotEmpty;
@@ -34,6 +43,10 @@ class CreatePostState extends Equatable {
     bool? showTagsInPost,
     String? privacy,
     Failure? failure,
+    bool? isEditMode,
+    int? editingPostId,
+    List<MediaItemEntity>? existingMediaItems,
+    bool? updateSuccess,
   }) {
     return CreatePostState(
       postText: postText ?? this.postText,
@@ -44,7 +57,11 @@ class CreatePostState extends Equatable {
       isAddingTag: isAddingTag ?? this.isAddingTag,
       showTagsInPost: showTagsInPost ?? this.showTagsInPost,
       privacy: privacy ?? this.privacy,
-      failure: failure ?? this.failure,
+      failure: failure,
+      isEditMode: isEditMode ?? this.isEditMode,
+      editingPostId: editingPostId ?? this.editingPostId,
+      existingMediaItems: existingMediaItems ?? this.existingMediaItems,
+      updateSuccess: updateSuccess ?? this.updateSuccess,
     );
   }
 
@@ -59,5 +76,9 @@ class CreatePostState extends Equatable {
     showTagsInPost,
     privacy,
     failure,
+    isEditMode,
+    editingPostId,
+    existingMediaItems,
+    updateSuccess,
   ];
 }

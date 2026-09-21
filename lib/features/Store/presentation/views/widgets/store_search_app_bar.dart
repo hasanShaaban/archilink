@@ -235,7 +235,7 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
                   StoreFilterChip(
                     label: 'Status',
                     icon: Icons.keyboard_arrow_down_rounded,
-                    isHighlighted: true,
+                    isHighlighted: _selectedStatus != null,
                     options: const [
                       'Available',
                       'Coming Soon',
@@ -244,7 +244,7 @@ class _StoreSearchAppBarState extends State<StoreSearchAppBar> {
                     selectedValue: _selectedStatus,
                     onSelected: (val) {
                       setState(() {
-                        _selectedStatus = val;
+                        _selectedStatus = _selectedStatus == val ? null : val;
                       });
                       _notifyFiltersChanged();
                     },

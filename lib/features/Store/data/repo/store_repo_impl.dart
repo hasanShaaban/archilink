@@ -78,15 +78,19 @@ class StoreRepoImpl implements StoreRepo {
   @override
   Future<Either<Failure, ProductFeedEntity>> searchProducts({
     String? query,
+    String? status,
     String? minPrice,
     String? maxPrice,
+    List<int>? categories,
     int page = 1,
   }) async {
     try {
       final result = await _storeRemoteDataSource.searchProducts(
         query: query,
+        status: status,
         minPrice: minPrice,
         maxPrice: maxPrice,
+        categories: categories,
         page: page,
       );
       return right(result);

@@ -2,10 +2,13 @@ import 'dart:developer';
 
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/core/services/media_picker_service.dart';
+import 'package:archilink/core/services/service_locator.dart';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Create_Post/domain/entity/create_post_parms.dart';
 import 'package:archilink/features/Create_Post/domain/repo/create_post_repo.dart';
 import 'package:archilink/features/Profile/domain/entity/profile_entity.dart';
+import 'package:archilink/features/Profile/presentation/manager/bloc/profile_bloc.dart';
+import 'package:archilink/features/Post/domain/entity/media_item_entity.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/domain/entity/post_owner_entity.dart';
 import 'package:archilink/features/Post/domain/entity/tag_entity.dart';
@@ -82,6 +85,29 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     emit(state.copyWith(privacy: next));
   }
 
+  void initForEdit(PostEntity post) {
+    emit(
+      state.copyWith(
+        isEditMode: true,
+        editingPostId: post.id,
+        postText: post.body,
+        tags: post.tags.map((t) => t.name).toList(),
+        existingMediaItems: post.mediaItems,
+        selectedAssets: const [],
+        privacy: post.privacy,
+        isAddingTag: false,
+        showTagsInPost: post.tags.isNotEmpty,
+        failure: null,
+        isSubmitting: false,
+        updateSuccess: false,
+      ),
+    );
+  }
+
+  void initForCreate() {
+    resetDraft();
+  }
+
   PostEntity buildPreviewPost() {
     final fallbackOwner = fakePostEntity(id: 0).owner;
     final owner = state.profileData == null
@@ -99,7 +125,7 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     );
 
     return PostEntity(
-      id: 0,
+      id: state.editingPostId ?? 0,
       body: state.postText,
       createdAt: DateTime.now(),
       owner: owner,
@@ -107,7 +133,8 @@ class CreatePostCubit extends Cubit<CreatePostState> {
       likesCount: 0,
       commentsCount: 0,
       likedByMe: false,
-      mediaItems: const [],
+      mediaItems: state.isEditMode ? state.existingMediaItems : const [],
+      privacy: state.privacy,
     );
   }
 
@@ -134,6 +161,37 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     );
   }
 
+  Future<void> updatePost() async {
+    final postId = state.editingPostId;
+    if (postId == null || !state.canPost) return;
+    emit(state.copyWith(isSubmitting: true, failure: null, updateSuccess: false));
+    final result = await createPostRepo.updatePost(
+      postId: postId,
+      body: state.postText,
+      privacy: state.privacy,
+    );
+    result.fold(
+      (failure) {
+        log('Failed to update post: ${failure.message}');
+        emit(state.copyWith(isSubmitting: false, failure: failure));
+      },
+      (success) {
+        log('Post updated successfully');
+        if (sl.isRegistered<ProfileBloc>()) {
+          sl<ProfileBloc>().add(
+            UpdateProfilePostContent(
+              postId: postId,
+              body: state.postText,
+              privacy: state.privacy,
+            ),
+          );
+          sl<ProfileBloc>().add(const LoadInitialProfilePosts());
+        }
+        emit(state.copyWith(isSubmitting: false, updateSuccess: true, failure: null));
+      },
+    );
+  }
+
   void resetDraft() {
     emit(
       state.copyWith(
@@ -143,6 +201,11 @@ class CreatePostCubit extends Cubit<CreatePostState> {
         isAddingTag: false,
         showTagsInPost: false,
         privacy: 'public',
+        isEditMode: false,
+        editingPostId: null,
+        existingMediaItems: const [],
+        updateSuccess: false,
+        isSubmitting: false,
       ),
     );
   }

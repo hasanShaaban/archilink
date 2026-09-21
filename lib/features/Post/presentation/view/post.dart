@@ -186,6 +186,7 @@ class _PostState extends State<Post> {
                                 PostMenuButton(
                                   username: widget.entity.owner.username,
                                   postId: widget.entity.id,
+                                  post: widget.entity,
                                 ),
                               ],
                             ),

@@ -24,14 +24,16 @@ class CreatePostActionButtons extends StatelessWidget {
               AudienceToggle(privacy: state.privacy),
             ],
           ),
-          SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Post elements', style: AppTextStyle.interMedium14),
-              PostElementsButtons(state: state),
-            ],
-          ),
+          if (!state.isEditMode) ...[
+            SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Post elements', style: AppTextStyle.interMedium14),
+                PostElementsButtons(state: state),
+              ],
+            ),
+          ],
         ],
       ),
     );

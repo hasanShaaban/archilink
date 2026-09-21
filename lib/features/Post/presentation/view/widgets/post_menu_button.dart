@@ -3,8 +3,11 @@ import 'dart:developer';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
+import 'package:archilink/features/Create_Post/presentation/views/create_post_view.dart';
+import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_menu_cubit.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
+import 'package:archilink/features/Post_Details/presentation/manager/bloc/post_details_bloc.dart';
 import 'package:archilink/features/Post_Details/presentation/view/post_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,9 +18,11 @@ class PostMenuButton extends StatelessWidget {
     super.key,
     required this.username,
     required this.postId,
+    this.post,
   });
   final String username;
   final int postId;
+  final PostEntity? post;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +79,18 @@ class PostMenuButton extends StatelessWidget {
         onSelected: (value) {
           switch (value) {
             case PostMenuAction.edit:
-              // TODO: wire edit action.
+              if (post != null) {
+                Navigator.of(context, rootNavigator: true).pushNamed(
+                  CreatePostView.name,
+                  arguments: {'post': post},
+                ).then((result) {
+                  if (result == true && context.mounted) {
+                    try {
+                      context.read<PostDetailsBloc>().add(RefreshPostDetails());
+                    } catch (_) {}
+                  }
+                });
+              }
               break;
             case PostMenuAction.delete:
               _showDeleteDialog(context);

@@ -14,19 +14,26 @@ class PostButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CreatePostCubit, CreatePostState, bool>(
-      selector: (state) => state.canPost,
-      builder: (context, canPost) {
+    return BlocBuilder<CreatePostCubit, CreatePostState>(
+      builder: (context, state) {
+        final canPost = state.canPost;
+        final isEditMode = state.isEditMode;
+        final isSubmitting = state.isSubmitting;
+
         return Center(
           child: SizedBox(
             width: width * 83 / 402,
             height: height * 44 / 874,
             child: TextButton(
-              onPressed: () {
-                postPreviewBuilder(context);
-
-                // context.read<CreatePostCubit>().submitPost();
-              },
+              onPressed: !canPost || isSubmitting
+                  ? null
+                  : () {
+                      if (isEditMode) {
+                        context.read<CreatePostCubit>().updatePost();
+                      } else {
+                        postPreviewBuilder(context);
+                      }
+                    },
               style: TextButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadiusGeometry.circular(10),
@@ -34,12 +41,24 @@ class PostButton extends StatelessWidget {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 padding: EdgeInsets.zero,
-                backgroundColor: canPost
+                backgroundColor: canPost && !isSubmitting
                     ? Theme.of(context).colorScheme.primary
                     : AppColorsFromTheme.grayForTheme(context),
                 foregroundColor: Theme.of(context).colorScheme.onSurface,
               ),
-              child: Text('Post', style: AppTextStyle.interMedium16),
+              child: isSubmitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      isEditMode ? 'Update' : 'Post',
+                      style: AppTextStyle.interMedium16,
+                    ),
             ),
           ),
         );
@@ -114,7 +133,12 @@ class PostButton extends StatelessWidget {
                         ).colorScheme.onSurface,
                       ),
                       onPressed: () {
-                        context.read<CreatePostCubit>().submitPost();
+                        final cubit = context.read<CreatePostCubit>();
+                        if (cubit.state.isEditMode) {
+                          cubit.updatePost();
+                        } else {
+                          cubit.submitPost();
+                        }
                         Navigator.pop(context);
                         Navigator.pop(context);
                       },

@@ -35,4 +35,24 @@ class CreatePostRepoImpl extends CreatePostRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> updatePost({
+    required int postId,
+    required String body,
+    required String privacy,
+  }) async {
+    try {
+      final response = await remoteDataSource.updatePost(
+        postId: postId,
+        body: body,
+        privacy: privacy,
+      );
+      return right(response);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

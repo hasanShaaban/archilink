@@ -37,6 +37,7 @@ class StoreFeedCubit extends Cubit<StoreFeedState> {
     final result = state.isSearchActive
         ? await _storeRepo.searchProducts(
             query: state.searchQuery,
+            status: state.status,
             minPrice: state.minPrice,
             maxPrice: state.maxPrice,
             page: nextPage,
@@ -192,11 +193,20 @@ class StoreFeedCubit extends Cubit<StoreFeedState> {
     }
   }
 
-  void setPriceFilters({String? minPrice, String? maxPrice}) {
-    if (state.minPrice == minPrice && state.maxPrice == maxPrice) return;
+  void setFilters({
+    String? status,
+    String? minPrice,
+    String? maxPrice,
+  }) {
+    if (state.status == status &&
+        state.minPrice == minPrice &&
+        state.maxPrice == maxPrice) {
+      return;
+    }
     _debounceTimer?.cancel();
 
     emit(state.copyWith(
+      status: status,
       minPrice: minPrice,
       maxPrice: maxPrice,
     ));
@@ -204,10 +214,27 @@ class StoreFeedCubit extends Cubit<StoreFeedState> {
     fetchProducts(refresh: true);
   }
 
+  void setPriceFilters({String? minPrice, String? maxPrice}) {
+    setFilters(
+      status: state.status,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+    );
+  }
+
+  void setStatusFilter(String? status) {
+    setFilters(
+      status: status,
+      minPrice: state.minPrice,
+      maxPrice: state.maxPrice,
+    );
+  }
+
   void clearSearchAndFilters() {
     _debounceTimer?.cancel();
     emit(state.copyWith(
       searchQuery: '',
+      status: null,
       minPrice: null,
       maxPrice: null,
     ));

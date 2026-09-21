@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:archilink/features/Auth/presentation/views/auth_view.dart';
 import 'package:archilink/features/Chat/domain/entity/chat_args.dart';
 import 'package:archilink/features/Create_Post/presentation/views/create_post_view.dart';
+import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/about_me_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/academic_experiance_view.dart';
 import 'package:archilink/features/Edit_Profile/presentation/view/add_academic_experiance_view.dart';
@@ -158,7 +159,15 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case SkillsView.name:
       return MaterialPageRoute(builder: (context) => const SkillsView());
     case CreatePostView.name:
-      return MaterialPageRoute(builder: (context) => const CreatePostView());
+      PostEntity? postToEdit;
+      if (settings.arguments is PostEntity) {
+        postToEdit = settings.arguments as PostEntity;
+      } else if (settings.arguments is Map<String, dynamic>) {
+        postToEdit = (settings.arguments as Map<String, dynamic>)['post'] as PostEntity?;
+      }
+      return MaterialPageRoute<bool>(
+        builder: (context) => CreatePostView(postToEdit: postToEdit),
+      );
     case SearchView.name:
       return MaterialPageRoute(builder: (context) => const SearchView());
     case SearchResultsView.name:

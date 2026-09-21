@@ -105,7 +105,8 @@ class _StoreFeedBodyState extends State<_StoreFeedBody> {
                       cubit.setSearchQuery(query);
                     },
                     onFilterChanged: ({category, categories, status, minPrice, maxPrice}) {
-                      cubit.setPriceFilters(
+                      cubit.setFilters(
+                        status: status,
                         minPrice: minPrice,
                         maxPrice: maxPrice,
                       );
