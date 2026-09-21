@@ -4,6 +4,8 @@ import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
 import 'package:archilink/features/Post/domain/entity/posts_entity.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_like_cubit.dart';
+import 'package:archilink/features/Post/presentation/manager/cubit/post_menu_cubit.dart';
+import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Profile/domain/repo/profile_repo.dart';
 import 'package:archilink/features/Store/domain/entity/product_entity.dart';
 import 'package:bloc/bloc.dart';
@@ -16,13 +18,26 @@ part 'profile_state.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final ProfileRepo repo;
   late final StreamSubscription _postLikeSubscription;
-  ProfileBloc(this.repo, PostLikeCubit postLikeCubit) : super(ProfileState()) {
+  StreamSubscription? _postMenuSubscription;
+
+  ProfileBloc(
+    this.repo,
+    PostLikeCubit postLikeCubit, [
+    PostMenuCubit? postMenuCubit,
+  ]) : super(ProfileState()) {
     _postLikeSubscription = postLikeCubit.stream.listen((event) {
       if (event == null) return;
       add(UpdateProfilePostLike(event.postId, event.liked, event.likeCount));
     });
 
+    _postMenuSubscription = postMenuCubit?.stream.listen((event) {
+      if (event is PostMenuSuccess && event.action == PostMenuAction.delete) {
+        add(DeleteProfilePost(postId: event.postId));
+      }
+    });
+
     on<UpdateProfilePostLike>(_onUpdateProfilePostLike);
+    on<DeleteProfilePost>(_onDeleteProfilePost);
     on<LoadInitialProfilePosts>(_onLoadInitialPosts);
     on<LoadMoreProfilePosts>(_onLoadMorePosts);
     on<LoadInitialProfileProducts>(_onLoadInitialProducts);
@@ -200,9 +215,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     emit(state.copyWith(profilePosts: updatePost));
   }
 
+  void _onDeleteProfilePost(
+    DeleteProfilePost event,
+    Emitter<ProfileState> emit,
+  ) {
+    final updated =
+        state.profilePosts.where((p) => p.id != event.postId).toList();
+    emit(state.copyWith(profilePosts: updated));
+  }
+
   @override
   Future<void> close() {
     _postLikeSubscription.cancel();
+    _postMenuSubscription?.cancel();
     return super.close();
   }
 }

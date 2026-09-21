@@ -52,8 +52,11 @@ class _PostState extends State<Post> {
     final isClosed = context.select<PostMenuCubit, bool>(
       (cubit) => cubit.closedPostIds.contains(widget.entity.id),
     );
+    final isDeleted = context.select<PostMenuCubit, bool>(
+      (cubit) => cubit.deletedPostIds.contains(widget.entity.id),
+    );
 
-    if (isClosed) {
+    if (isClosed || isDeleted) {
       return const SizedBox.shrink();
     }
 

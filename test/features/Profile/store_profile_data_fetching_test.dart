@@ -17,8 +17,13 @@ class FakeApiService implements ApiService {
   @override
   Future<Response<T>> get<T>(String path, {Map<String, dynamic>? query}) async {
     if (responses.containsKey(path)) {
+      final raw = responses[path];
+      final dynamic body =
+          (raw is Map<String, dynamic> && (raw.containsKey('data') || raw.containsKey('status')))
+              ? raw
+              : {'status': 'success', 'data': raw};
       return Response<T>(
-        data: responses[path] as T,
+        data: body as T,
         statusCode: 200,
         requestOptions: RequestOptions(path: path),
       );

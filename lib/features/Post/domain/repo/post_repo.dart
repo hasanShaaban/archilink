@@ -9,4 +9,5 @@ abstract class PostRepo {
     required int postId,
     required int collectionId,
   });
+  Future<Either<Failure, bool>> deletePost({required int postId});
 }

@@ -11,6 +11,7 @@ class PostMenuCubit extends Cubit<PostMenuState> {
   final PostRepo repo;
   final Set<int> hiddenPostIds = {};
   final Set<int> closedPostIds = {};
+  final Set<int> deletedPostIds = {};
 
   PostMenuCubit(this.repo) : super(const PostMenuInitial());
 
@@ -77,9 +78,35 @@ class PostMenuCubit extends Cubit<PostMenuState> {
     ));
   }
 
+  /// Delete a post.
+  Future<void> deletePost({required int postId}) async {
+    emit(PostMenuLoading(action: PostMenuAction.delete, postId: postId));
+
+    final result = await repo.deletePost(postId: postId);
+
+    result.fold(
+      (failure) {
+        log('PostMenuCubit: delete failed – $failure');
+        emit(PostMenuFailure(
+          action: PostMenuAction.delete,
+          postId: postId,
+          message: failure.message,
+        ));
+      },
+      (success) {
+        log('PostMenuCubit: delete success – $success');
+        deletedPostIds.add(postId);
+        emit(PostMenuSuccess(
+          action: PostMenuAction.delete,
+          postId: postId,
+          message: 'Post deleted successfully',
+        ));
+      },
+    );
+  }
+
   // ─── Add future menu actions below ───────────────────────────
   //
   // Future<void> reportPost({required int postId}) async { ... }
   // Future<void> editPost({required int postId}) async { ... }
-  // Future<void> deletePost({required int postId}) async { ... }
 }

@@ -51,3 +51,11 @@ class DeleteProfileProduct extends ProfileEvent {
   List<Object> get props => [productId];
 }
 
+class DeleteProfilePost extends ProfileEvent {
+  final int postId;
+  const DeleteProfilePost({required this.postId});
+
+  @override
+  List<Object> get props => [postId];
+}
+

@@ -68,4 +68,26 @@ class PostRemoteDataSourceImpl implements PostRemoteDataSource {
       throw AppException.handelDioException(e);
     }
   }
+
+  @override
+  Future<bool> deletePost({required int postId}) async {
+    try {
+      final response = await apiService.delete('post-center/delete-post/$postId');
+      final data = response.data;
+      if (data == null) {
+        throw ServerException(message: 'something went wrong');
+      }
+      if (data is Map && data['status'] != null) {
+        if (data['status'] == 'success') {
+          return true;
+        }
+        throw ServerException(
+          message: data['message'] ?? data['data'] ?? 'Failed to delete post',
+        );
+      }
+      return true;
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }

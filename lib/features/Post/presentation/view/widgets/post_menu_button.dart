@@ -5,6 +5,7 @@ import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Post/presentation/manager/cubit/post_menu_cubit.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
+import 'package:archilink/features/Post_Details/presentation/view/post_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -34,6 +35,10 @@ class PostMenuButton extends StatelessWidget {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.message)));
+          if (state.action == PostMenuAction.delete &&
+              ModalRoute.of(context)?.settings.name == PostDetailsView.name) {
+            Navigator.of(context).pop();
+          }
         } else if (state is PostMenuFailure) {
           ScaffoldMessenger.of(
             context,
@@ -72,7 +77,7 @@ class PostMenuButton extends StatelessWidget {
               // TODO: wire edit action.
               break;
             case PostMenuAction.delete:
-              // TODO: wire delete action.
+              _showDeleteDialog(context);
               break;
             case PostMenuAction.hide:
               context.read<PostMenuCubit>().hidePost(postId: postId);
@@ -155,5 +160,32 @@ class PostMenuButton extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<void> _showDeleteDialog(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Post'),
+        content: const Text(
+          'Are you sure you want to delete this post? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      context.read<PostMenuCubit>().deletePost(postId: postId);
+    }
   }
 }

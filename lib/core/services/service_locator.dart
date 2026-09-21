@@ -292,7 +292,11 @@ Future<void> initServiceLocator({
     ),
   );
   sl.registerLazySingleton(
-    () => ProfileBloc(sl<ProfileRepo>(), sl<PostLikeCubit>()),
+    () => ProfileBloc(
+      sl<ProfileRepo>(),
+      sl<PostLikeCubit>(),
+      sl<PostMenuCubit>(),
+    ),
   );
   sl.registerLazySingleton(
     () => AuthCubit(

@@ -2,10 +2,12 @@ import 'package:archilink/core/utils/app_colors.dart';
 import 'package:archilink/core/utils/app_text_style.dart';
 import 'package:archilink/core/utils/fakers.dart';
 import 'package:archilink/features/Post/domain/entity/post_entity.dart';
+import 'package:archilink/features/Post/presentation/manager/cubit/post_menu_cubit.dart';
 import 'package:archilink/features/Post/presentation/view/post.dart';
 import 'package:archilink/features/Post_Details/presentation/view/post_details_view.dart';
 import 'package:archilink/generated/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class PostListView extends StatefulWidget {
@@ -65,11 +67,14 @@ class _PostListViewState extends State<PostListView> {
     if (widget.failureMessage != null) {
       return Center(child: Text(widget.failureMessage!));
     }
+    final deletedPostIds = context.select<PostMenuCubit, Set<int>>(
+      (c) => c.deletedPostIds,
+    );
     final bool isSkeleton = widget.isInitialLoading && widget.posts.isEmpty;
     final List<PostEntity> posts = isSkeleton
         ? List<PostEntity>.generate(5, (index) => fakePostEntity(id: index))
-        : widget.posts;
-    if (!isSkeleton && widget.posts.isEmpty) {
+        : widget.posts.where((p) => !deletedPostIds.contains(p.id)).toList();
+    if (!isSkeleton && posts.isEmpty) {
       return Center(
         child: Text('No posts yet.', style: AppTextStyle.interMedium16),
       );
