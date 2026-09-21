@@ -31,9 +31,7 @@ class MockStoreRepo implements StoreRepo {
                 store: const ProductStoreEntity(
                   id: 1,
                   name: 'Test Store',
-                  handle: 'testStore',
-                  isActive: true,
-                  followersCount: 0,
+                  username: 'testStore',
                 ),
                 name: 'Product $page',
                 description: 'Description $page',
@@ -110,9 +108,7 @@ class MockStoreRepo implements StoreRepo {
             store: const ProductStoreEntity(
               id: 1,
               name: 'Test Store',
-              handle: 'testStore',
-              isActive: true,
-              followersCount: 0,
+              username: 'testStore',
             ),
             name: 'Search Result $page',
             description: 'Description $page',

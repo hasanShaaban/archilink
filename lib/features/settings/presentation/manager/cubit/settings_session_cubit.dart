@@ -35,6 +35,7 @@ class SettingsSessionCubit extends Cubit<SettingsSessionState> {
         return;
       }
 
+      await _authLocalDataSource.clearUserId();
       await _authLocalDataSource.clearToken();
       await _authLocalDataSource.clearUsername();
       await _authLocalDataSource.clearRole();

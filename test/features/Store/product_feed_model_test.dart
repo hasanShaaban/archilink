@@ -13,7 +13,7 @@ void main() {
 				"store": {
 					"id": 1,
 					"name": "Test User",
-					"handle": "testUser4",
+					"username": "testUser4",
 					"description": null,
 					"city": null,
 					"country": null,
@@ -73,7 +73,7 @@ void main() {
     expect(model.products.first.id, 92);
     expect(model.products.first.name, 'facere modi vel');
     expect(model.products.first.price, 310.46);
-    expect(model.products.first.store.handle, 'testUser4');
+    expect(model.products.first.store.username, 'testUser4');
     expect(model.products.first.categories.length, 3);
     expect(model.pagination.currentPage, 1);
     expect(model.pagination.hasMore, true);

@@ -173,9 +173,7 @@ void main() {
       store: ProductStoreEntity(
         id: 1,
         name: 'Store',
-        handle: 'store',
-        isActive: true,
-        followersCount: 0,
+        username: 'store',
       ),
       name: 'Item to delete',
       description: 'Desc',

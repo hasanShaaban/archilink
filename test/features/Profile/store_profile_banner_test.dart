@@ -51,7 +51,7 @@ void main() {
       final model = ProfileModel.fromJson(baseJson);
       expect(model.bannerImageUrl, 'https://example.com/banner.jpg');
       expect(model.role, 'store');
-      expect(model.toJson()['data']['banner_image_url'], 'https://example.com/banner.jpg');
+      expect(model.toJson()['data']['details']['banner_image_url'], 'https://example.com/banner.jpg');
     });
 
     test('ProfileModel parses banner fallback key when banner_image_url is null', () {
@@ -68,6 +68,105 @@ void main() {
       final updated = model.copyWith(bannerImageUrl: 'https://example.com/new_banner.png');
       expect(updated.bannerImageUrl, 'https://example.com/new_banner.png');
       expect(updated.username, 'test_store');
+    });
+
+    test('ProfileModel correctly parses new profile response format', () {
+      final newJson = {
+        "status": "success",
+        "message": "User profile retrieved successfully",
+        "data": {
+          "name": "akikon",
+          "username": "testUser1",
+          "role": "mentor",
+          "is_verified": false,
+          "is_following": false,
+          "details": {
+            "profile_picture_url": null,
+            "followers_count": 0,
+            "following_count": 0,
+            "bio": "This is a test user.",
+            "privacy_setting": "public",
+            "posts_count": 100,
+            "project_count": 0,
+            "about_me": "I am a test user created for seeding the database.",
+            "academic_experiences": [],
+            "contact_info": [],
+            "skills": [],
+            "country": "Testland",
+            "city": "Testville",
+            "joined_at": "2026-09-20"
+          }
+        }
+      };
+
+      final model = ProfileModel.fromJson(newJson);
+      expect(model.name, 'akikon');
+      expect(model.username, 'testUser1');
+      expect(model.role, 'mentor');
+      expect(model.isVerified, false);
+      expect(model.isFollowing, false);
+      expect(model.profilePictureUrl, isNull);
+      expect(model.followersCount, 0);
+      expect(model.followingCount, 0);
+      expect(model.bio, 'This is a test user.');
+      expect(model.privacySetting, 'public');
+      expect(model.postsCount, 100);
+      expect(model.projectCount, 0);
+      expect(model.details.aboutMe, 'I am a test user created for seeding the database.');
+      expect(model.details.country, 'Testland');
+      expect(model.details.city, 'Testville');
+      expect(model.details.joinedAt, DateTime(2026, 9, 20));
+      expect(model.details.academicExperiences, isEmpty);
+      expect(model.details.contactInfo, isEmpty);
+      expect(model.details.skills, isEmpty);
+    });
+
+    test('ProfileModel correctly parses store profile response format', () {
+      final storeJson = {
+        "status": "success",
+        "message": "User profile retrieved successfully",
+        "data": {
+          "name": "Test User",
+          "username": "testUser4",
+          "role": "store",
+          "is_verified": false,
+          "is_following": false,
+          "details": {
+            "profile_picture_url": "https://example.com/logo.png",
+            "store_banner_url": "https://example.com/banner.png",
+            "public_email": "testUser4@example.com",
+            "public_phone_number": "123-456-7890",
+            "products_count": 100,
+            "followers_count": 0,
+            "bio": null,
+            "country": null,
+            "city": null,
+            "website_url": "https://example.com"
+          }
+        }
+      };
+
+      final model = ProfileModel.fromJson(storeJson);
+      expect(model.name, 'Test User');
+      expect(model.username, 'testUser4');
+      expect(model.role, 'store');
+      expect(model.isVerified, false);
+      expect(model.isFollowing, false);
+      expect(model.profilePictureUrl, 'https://example.com/logo.png');
+      expect(model.bannerImageUrl, 'https://example.com/banner.png');
+      expect(model.publicEmail, 'testUser4@example.com');
+      expect(model.publicPhoneNumber, '123-456-7890');
+      expect(model.websiteUrl, 'https://example.com');
+      expect(model.productsCount, 100);
+      expect(model.postsCount, 100);
+      expect(model.followersCount, 0);
+      expect(model.followingCount, 0);
+      expect(model.bio, isNull);
+      expect(model.privacySetting, 'public');
+      expect(model.details.joinedAt, isNull);
+      expect(model.details.academicExperiences, isEmpty);
+      expect(model.details.contactInfo, isEmpty);
+      expect(model.details.skills, isEmpty);
     });
   });
 

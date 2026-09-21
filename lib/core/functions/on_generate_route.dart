@@ -88,7 +88,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       if (settings.arguments is ProductStoreEntity) {
         final store = settings.arguments as ProductStoreEntity;
         storeId = store.id;
-        username = store.handle.isNotEmpty ? store.handle : store.name;
+        username = store.username.isNotEmpty ? store.username : store.name;
       } else if (settings.arguments is Map<String, dynamic>) {
         final map = settings.arguments as Map<String, dynamic>;
         storeId = map['id'] as int? ?? map['storeId'] as int?;

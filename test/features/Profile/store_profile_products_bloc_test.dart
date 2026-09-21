@@ -65,9 +65,7 @@ void main() {
   const dummyStore = ProductStoreEntity(
     id: 1,
     name: 'Test Store',
-    handle: 'test_store',
-    isActive: true,
-    followersCount: 0,
+    username: 'test_store',
   );
 
   const product1 = ProductEntity(

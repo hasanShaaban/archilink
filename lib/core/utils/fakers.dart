@@ -68,22 +68,26 @@ List<CommentNode> fakeCommentEntities({int count = 5}) {
 
 ProfileEntity fakeProfileEntity({int id = 0}) {
   return ProfileEntity(
+    id: id,
     name: 'Loading User $id',
     username: 'loading_user_$id',
-    bio: 'loading bio',
-    profilePictureUrl: 'url',
-    followersCount: 0,
-    isFollowing: false,
-    followingCount: 0,
-    postsCount: 0,
-    projectCount: 0,
     role: 'Loading Role',
+    isFollowing: false,
+    isVerified: false,
     details: fakeProfileDetailsEntity(),
   );
 }
 
 ProfileDetailsEntity fakeProfileDetailsEntity() {
   return ProfileDetailsEntity(
+    profilePictureUrl: 'url',
+    bannerImageUrl: null,
+    followersCount: 0,
+    followingCount: 0,
+    bio: 'loading bio',
+    privacySetting: 'public',
+    postsCount: 0,
+    projectCount: 0,
     aboutMe: 'Loading bio...',
     academicExperiences: const [
       AcademicExperienceEntity(

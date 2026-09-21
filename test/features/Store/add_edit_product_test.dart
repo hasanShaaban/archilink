@@ -23,8 +23,7 @@ import 'package:dartz/dartz.dart';
 const dummyStore = ProductStoreEntity(
   id: 1,
   name: 'Architect Tools',
-  handle: 'architect_tools',
-  isActive: true,
+  username: 'architect_tools',
   city: 'Damascus',
   country: 'Syria',
 );

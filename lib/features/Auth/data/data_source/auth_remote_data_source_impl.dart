@@ -20,7 +20,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'account-center/login',
         body: {'email': email, 'password': password},
       );
-      final data = response.data?['data'];
+      final data = response.data;
       if (data == null) {
         throw ServerException(message: 'Invalid login response');
       }

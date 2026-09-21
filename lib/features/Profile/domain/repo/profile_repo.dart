@@ -9,11 +9,6 @@ import 'package:dartz/dartz.dart';
 
 abstract class ProfileRepo {
   Future<Either<Failure, ProfileEntity>> getPersonalProfile();
-  Future<Either<Failure, ProfileEntity>> getPersonalStoreProfile();
-  Future<Either<Failure, ProfileEntity>> getStoreProfile({
-    required int id,
-    String? handle,
-  });
   Future<Either<Failure, ProfileEntity>> getUserProfile({
     required String username,
   });
@@ -33,4 +28,3 @@ abstract class ProfileRepo {
   Future<Either<Failure, bool>> updateStoreBanner(File imageFile);
   Future<Either<Failure, bool>> deleteProduct(int productId);
 }
-

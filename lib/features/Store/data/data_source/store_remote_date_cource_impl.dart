@@ -96,9 +96,7 @@ class StoreRemoteDataSourceImpl implements StoreRemoteDateSource {
         store: const ProductStoreEntity(
           id: 0,
           name: '',
-          handle: '',
-          isActive: true,
-          followersCount: 0,
+          username: '',
         ),
         name: params.name ?? '',
         description: params.description ?? '',

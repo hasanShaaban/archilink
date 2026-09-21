@@ -37,7 +37,7 @@ class ProductEntity extends Equatable {
   });
 
   /// UI convenience getters
-  String get storeName => store.handle.isNotEmpty ? store.handle : store.name;
+  String get storeName => store.username.isNotEmpty ? store.username : store.name;
 
   String get formattedStatus {
     switch (status.toLowerCase()) {
@@ -117,11 +117,9 @@ class ProductEntity extends Equatable {
       store: ProductStoreEntity(
         id: 1,
         name: 'Test User',
-        handle: 'testUser4',
-        storeLogoUrl: 'https://example.com/logo.png',
-        storeBannerUrl: 'https://example.com/banner.png',
-        isActive: true,
-        followersCount: 0,
+        username: 'testUser4',
+        avatar: 'https://example.com/logo.png',
+        role: 'store',
       ),
       name: 'Item Name',
       description: 'Durable wood with single metal...',
@@ -134,13 +132,12 @@ class ProductEntity extends Equatable {
     ProductEntity(
       id: 66,
       store: ProductStoreEntity(
-        id: 1,
+        id: 2,
         name: 'Test User',
-        handle: 'minimal_craft',
+        username: 'minimal_craft',
         city: 'Homs',
         country: 'Syria',
-        isActive: true,
-        followersCount: 12,
+        role: 'store',
       ),
       name: 'cum et animi',
       description: 'Aut voluptate minus est et. Non quia hic ut repellat quam.',
@@ -153,13 +150,12 @@ class ProductEntity extends Equatable {
     ProductEntity(
       id: 67,
       store: ProductStoreEntity(
-        id: 1,
+        id: 3,
         name: 'Test User',
-        handle: 'studio_clay',
+        username: 'studio_clay',
         city: 'Damascus',
         country: 'Syria',
-        isActive: true,
-        followersCount: 45,
+        role: 'store',
       ),
       name: 'sit minima laboriosam',
       description: 'Dolore voluptatibus sed nulla rerum assumenda tempora.',
@@ -172,13 +168,12 @@ class ProductEntity extends Equatable {
     ProductEntity(
       id: 84,
       store: ProductStoreEntity(
-        id: 1,
+        id: 4,
         name: 'Test User',
-        handle: 'lumina_arch',
+        username: 'lumina_arch',
         city: 'Latakia',
         country: 'Syria',
-        isActive: true,
-        followersCount: 30,
+        role: 'store',
       ),
       name: 'qui id et',
       description: 'Ipsam dicta quo voluptate est libero. Sunt et eveniet.',
@@ -191,13 +186,12 @@ class ProductEntity extends Equatable {
     ProductEntity(
       id: 93,
       store: ProductStoreEntity(
-        id: 1,
+        id: 5,
         name: 'Test User',
-        handle: 'urban_craft',
+        username: 'urban_craft',
         city: 'Homs',
         country: 'Syria',
-        isActive: true,
-        followersCount: 8,
+        role: 'store',
       ),
       name: 'qui impedit officiis',
       description: 'Deleniti et nostrum sapiente quia eveniet doloremque ut.',
@@ -210,13 +204,12 @@ class ProductEntity extends Equatable {
     ProductEntity(
       id: 83,
       store: ProductStoreEntity(
-        id: 1,
+        id: 6,
         name: 'Test User',
-        handle: 'archi_tools',
+        username: 'archi_tools',
         city: 'Aleppo',
         country: 'Syria',
-        isActive: true,
-        followersCount: 95,
+        role: 'store',
       ),
       name: 'iusto dolores beatae',
       description: 'Officiis vel eligendi vel nobis quibusdam. Dolor enim.',

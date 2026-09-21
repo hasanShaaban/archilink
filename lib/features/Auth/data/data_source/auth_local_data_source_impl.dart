@@ -6,6 +6,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   static const _tokenKey = 'ACCESS_TOKEN';
   static const _usernameKey = 'USERNAME';
   static const _roleKey = 'ROLE';
+  static const _userIdKey = 'USER_ID';
   static const _rememberMeKey = 'REMEMBERME';
   static const _tokenRegisteredKey = 'IS_FCM_TOKEN_REGISTERED';
 
@@ -54,6 +55,21 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<void> saveRole(String role) async {
     await storage.write(_roleKey, role);
+  }
+
+  @override
+  Future<void> clearUserId() async {
+    await storage.delete(_userIdKey);
+  }
+
+  @override
+  int? getUserId() {
+    return storage.read<int>(_userIdKey);
+  }
+
+  @override
+  Future<void> saveUserId(int id) async {
+    await storage.write(_userIdKey, id);
   }
 
   @override

@@ -7,8 +7,6 @@ import 'package:archilink/features/Store/data/models/product_feed_model.dart';
 
 abstract class ProfileRemoteDataSource {
   Future<ProfileModel> getProfile({required String username});
-  Future<ProfileModel> getPersonalStoreProfile();
-  Future<ProfileModel> getStoreProfile({required int id, String? handle});
   Future<ProductFeedModel> getStoreProducts({
     required int storeId,
     int page = 1,
@@ -25,4 +23,3 @@ abstract class ProfileRemoteDataSource {
   Future<bool> updateStoreBanner(File imageFile);
   Future<bool> deleteProduct(int productId);
 }
-

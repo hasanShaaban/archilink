@@ -21,7 +21,7 @@ class StoreHeaderTile extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final grayColor = AppColorsFromTheme.grayForText(context);
-    final logoUrl = store.storeLogoUrl;
+    final logoUrl = store.avatar;
     final hasLogo = logoUrl != null &&
         logoUrl.isNotEmpty &&
         logoUrl.startsWith('http');
@@ -84,7 +84,7 @@ class StoreHeaderTile extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                '@${store.handle.isNotEmpty ? store.handle : store.name}',
+                '@${store.username.isNotEmpty ? store.username : store.name}',
                 style: AppTextStyle.interRegular12.copyWith(
                   color: grayColor,
                   fontWeight: FontWeight.w400,

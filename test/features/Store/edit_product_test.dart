@@ -41,9 +41,7 @@ class FakeStoreRemoteDataSourceForEdit implements StoreRemoteDateSource {
     store: ProductStoreEntity(
       id: 1,
       name: 'Store',
-      handle: 'store',
-      isActive: true,
-      followersCount: 0,
+      username: 'store',
     ),
     name: 'Edited Name',
     description: 'Edited Desc',

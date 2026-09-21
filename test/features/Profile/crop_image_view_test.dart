@@ -80,16 +80,10 @@ class FakeProfileCubit extends ProfileCubit {
   FakeProfileCubit(super.profileRepo);
 
   bool calledPersonalProfile = false;
-  bool calledPersonalStoreProfile = false;
 
   @override
   Future<void> getPersonlProfile() async {
     calledPersonalProfile = true;
-  }
-
-  @override
-  Future<void> getPersonalStoreProfile() async {
-    calledPersonalStoreProfile = true;
   }
 }
 
@@ -329,7 +323,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(fakeRepo.lastStoreLogoFile?.path, dummyFile.path);
-      expect(fakeCubit.calledPersonalStoreProfile, isTrue);
+      expect(fakeCubit.calledPersonalProfile, isTrue);
       expect(find.text('Open Cropper'), findsOneWidget);
       expect(find.text('Store logo updated successfully'), findsOneWidget);
     });
@@ -384,7 +378,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(fakeRepo.lastStoreBannerFile?.path, dummyFile.path);
-      expect(fakeCubit.calledPersonalStoreProfile, isTrue);
+      expect(fakeCubit.calledPersonalProfile, isTrue);
       expect(find.text('Store banner image updated successfully'), findsOneWidget);
     });
 

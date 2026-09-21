@@ -1,16 +1,19 @@
 
 class AuthToken {
+  final int id;
+  final String username;
+  final String role;
   final String accessToken;
   final String tokenType;
-  final String username;
-  final String? role;
 
   const AuthToken({
+    required this.id,
+    required this.username,
+    required this.role,
     required this.accessToken,
     required this.tokenType,
-    required this.username,
-    this.role,
   });
 
   String get authorizationHeader => '$tokenType $accessToken';
 }
+

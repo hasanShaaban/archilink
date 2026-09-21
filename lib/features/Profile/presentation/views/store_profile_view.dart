@@ -44,21 +44,14 @@ class _StoreProfileViewState extends State<StoreProfileView> {
         ? ProfileType.personalStoreProfile
         : ProfileType.storeProfile;
 
-    if (isMyStore) {
-      context.read<ProfileCubit>().getPersonalStoreProfile();
-    } else {
-      final id = widget.storeId ?? int.tryParse(widget.username) ?? 0;
-      context.read<ProfileCubit>().getStoreProfile(
-            id: id,
-            handle: widget.username,
-          );
-    }
+    // Both own and other store profiles use the unified getUserProfile endpoint.
+    context.read<ProfileCubit>().getUserProfile(widget.username);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ProfilePageBody(type: _profileType),
+      body: ProfilePageBody(type: _profileType, storeId: widget.storeId),
     );
   }
 }

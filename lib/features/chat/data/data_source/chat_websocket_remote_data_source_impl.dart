@@ -20,9 +20,7 @@ class ChatWebsocketRemoteDataSourceImpl
     final controller = StreamController<ChatSocketEvent>();
     _controllers[conversationId] = controller;
 
-    final channel = _reverbClient.privateChannel(
-      'private-chat.$conversationId',
-    );
+    final channel = _reverbClient.privateChannel('user.$conversationId');
 
     _reverbClient.client.onConnectionEstablished.listen((_) {
       channel.subscribe();

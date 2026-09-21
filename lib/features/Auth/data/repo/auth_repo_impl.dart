@@ -25,10 +25,11 @@ class AuthRepoImpl implements AuthRepo {
         email: email,
         password: password,
       );
+      await localDataSource.saveUserId(model.id);
       await localDataSource.saveToken(model.accessToken);
       await localDataSource.saveUsername(model.username);
-      if (model.role != null && model.role!.isNotEmpty) {
-        await localDataSource.saveRole(model.role!.toLowerCase().trim());
+      if (model.role.isNotEmpty) {
+        await localDataSource.saveRole(model.role.toLowerCase().trim());
       }
       return right(model.toEntity());
     } on AppException catch (e) {
@@ -58,9 +59,10 @@ class AuthRepoImpl implements AuthRepo {
         role: role,
         phone: phone,
       );
+      await localDataSource.saveUserId(model.user.id);
       await localDataSource.saveToken(model.token);
       await localDataSource.saveUsername(model.user.username);
-      await localDataSource.saveRole(role);
+      await localDataSource.saveRole(role.toLowerCase().trim());
       return right(model.toEntity());
     } on AppException catch (e) {
       if (e is ValidationException) {

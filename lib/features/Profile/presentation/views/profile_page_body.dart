@@ -18,9 +18,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class ProfilePageBody extends StatefulWidget {
-  const ProfilePageBody({super.key, required this.type});
+  const ProfilePageBody({super.key, required this.type, this.storeId});
 
   final ProfileType type;
+  /// The user/store ID used to fetch products. Required for store profiles.
+  /// For personalStoreProfile this is auto-resolved from CurrentUserCubit if null.
+  final int? storeId;
 
   @override
   State<ProfilePageBody> createState() => _ProfilePageBodyState();
@@ -49,7 +52,12 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
           widget.type == ProfileType.personalStoreProfile ||
           widget.type == ProfileType.storeProfile;
       if (isStore) {
-        final storeId = profile.id ?? 0;
+        // Use explicitly passed storeId, then profile.id, then the logged-in
+        // user's ID (for personalStoreProfile when the unified endpoint omits id).
+        final storeId = widget.storeId ??
+            profile.id ??
+            context.read<CurrentUserCubit>().state.id ??
+            0;
         context.read<ProfileBloc>().add(
               LoadInitialProfileProducts(storeId: storeId),
             );
@@ -123,16 +131,11 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                   backgroundColor: AppColorsFromTheme.grayForTheme(context),
                   displacement: 30,
                   onRefresh: () async {
-                    if (widget.type == ProfileType.personalProfile) {
+                    if (widget.type == ProfileType.personalProfile ||
+                        widget.type == ProfileType.personalStoreProfile) {
                       context.read<ProfileCubit>().getPersonlProfile();
-                    } else if (widget.type == ProfileType.personalStoreProfile) {
-                      context.read<ProfileCubit>().getPersonalStoreProfile();
-                    } else if (widget.type == ProfileType.storeProfile) {
-                      context.read<ProfileCubit>().getStoreProfile(
-                        id: profileData.id ?? 0,
-                        handle: profileData.username,
-                      );
-                    } else if (widget.type == ProfileType.userProfile) {
+                    } else {
+                      // storeProfile, userProfile, mentorProfile
                       context.read<ProfileCubit>().getUserProfile(
                         profileData.username,
                       );

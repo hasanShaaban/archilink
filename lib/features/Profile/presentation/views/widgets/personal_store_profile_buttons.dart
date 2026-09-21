@@ -40,7 +40,7 @@ class PersonalStoreProfileButtons extends StatelessWidget {
                   ).pushNamed(AddEditProductView.name);
                   if (result == true && context.mounted) {
                     try {
-                      context.read<ProfileCubit>().getPersonalStoreProfile();
+                      context.read<ProfileCubit>().getPersonlProfile();
                     } catch (_) {}
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -73,7 +73,7 @@ class PersonalStoreProfileButtons extends StatelessWidget {
                 );
                 if (result == true && context.mounted) {
                   try {
-                    context.read<ProfileCubit>().getPersonalStoreProfile();
+                    context.read<ProfileCubit>().getPersonlProfile();
                   } catch (_) {}
                 }
               },

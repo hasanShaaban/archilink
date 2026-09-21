@@ -78,8 +78,7 @@ class FakeProfileCubit extends Cubit<ProfileCubitState> implements ProfileCubit 
   FakeProfileCubit() : super(ProfileInitial());
 
   String? requestedUsername;
-  int? requestedStoreId;
-  bool calledGetPersonalStoreProfile = false;
+  bool calledGetPersonlProfile = false;
 
   @override
   Future<void> getUserProfile(String username) async {
@@ -87,17 +86,8 @@ class FakeProfileCubit extends Cubit<ProfileCubitState> implements ProfileCubit 
   }
 
   @override
-  Future<void> getPersonlProfile() async {}
-
-  @override
-  Future<void> getPersonalStoreProfile() async {
-    calledGetPersonalStoreProfile = true;
-  }
-
-  @override
-  Future<void> getStoreProfile({required int id, String? handle}) async {
-    requestedStoreId = id;
-    requestedUsername = handle;
+  Future<void> getPersonlProfile() async {
+    calledGetPersonlProfile = true;
   }
 
   @override
@@ -321,7 +311,7 @@ void main() {
       expect(profilePageFinder, findsOneWidget);
       final profilePage = tester.widget<ProfilePageBody>(profilePageFinder);
       expect(profilePage.type, ProfileType.personalStoreProfile);
-      expect(fakeProfileCubit.calledGetPersonalStoreProfile, isTrue);
+      expect(fakeProfileCubit.requestedUsername, 'my_store');
     });
   });
 
@@ -340,9 +330,7 @@ void main() {
         store: ProductStoreEntity(
           id: 10,
           name: 'Urban Arch Store',
-          handle: 'urban_arch',
-          isActive: true,
-          followersCount: 50,
+          username: 'urban_arch',
         ),
         name: 'Drafting Compass',
         description: 'High precision drafting tool',
@@ -369,7 +357,7 @@ void main() {
 
       expect(pushedRoute, StoreProfileView.name);
       expect(pushedArgs, isA<ProductStoreEntity>());
-      expect((pushedArgs as ProductStoreEntity).handle, 'urban_arch');
+      expect((pushedArgs as ProductStoreEntity).username, 'urban_arch');
       expect((pushedArgs as ProductStoreEntity).id, 10);
     });
   });
@@ -380,7 +368,6 @@ void main() {
       username: 'store_user',
       bio: 'Hidden store bio text',
       profilePictureUrl: null,
-      followersCount: 10,
       followingCount: 0,
       postsCount: 5,
       projectCount: 0,
@@ -399,7 +386,6 @@ void main() {
       username: 'student_user',
       bio: 'Visible student bio text',
       profilePictureUrl: null,
-      followersCount: 10,
       followingCount: 5,
       postsCount: 3,
       projectCount: 2,
@@ -445,9 +431,7 @@ void main() {
     store: ProductStoreEntity(
       id: 1,
       name: 'My Store',
-      handle: 'my_store',
-      isActive: true,
-      followersCount: 10,
+      username: 'my_store',
     ),
     name: 'Sample Item',
     description: 'Item description',

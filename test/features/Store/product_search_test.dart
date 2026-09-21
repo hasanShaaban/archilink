@@ -62,9 +62,7 @@ class FakeStoreRemoteDataSourceForSearch implements StoreRemoteDateSource {
     store: ProductStoreEntity(
       id: 1,
       name: 'Test User',
-      handle: 'testUser4',
-      isActive: true,
-      followersCount: 0,
+      username: 'testUser4',
     ),
     name: 'Wireless Keyboard',
     description: 'Ergonomic wireless Keyboard with USB receiver',

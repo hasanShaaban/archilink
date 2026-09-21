@@ -15,6 +15,7 @@ import 'package:mime/mime.dart';
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   final ApiService apiService;
   ProfileRemoteDataSourceImpl(this.apiService);
+
   @override
   Future<ProfileModel> getProfile({required String username}) async {
     try {
@@ -26,65 +27,6 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         throw ServerException(message: 'Invalid profile response');
       }
       return ProfileModel.fromJson(data);
-    } on DioException catch (e) {
-      throw AppException.handelDioException(e);
-    }
-  }
-
-  @override
-  Future<ProfileModel> getPersonalStoreProfile() async {
-    try {
-      final response = await apiService.get<Map<String, dynamic>>(
-        'store/profile',
-      );
-      final data = response.data?['data'];
-      if (data == null) {
-        throw ServerException(message: 'Invalid store profile response');
-      }
-      return ProfileModel.fromStoreJson(data);
-    } on DioException catch (e) {
-      throw AppException.handelDioException(e);
-    }
-  }
-
-  @override
-  Future<ProfileModel> getStoreProfile({
-    required int id,
-    String? handle,
-  }) async {
-    try {
-      final response = await apiService.get<Map<String, dynamic>>(
-        'store/profile/$id',
-      );
-      final data = response.data?['data'];
-      if (data == null) {
-        throw ServerException(message: 'Invalid store profile response');
-      }
-
-      final resolvedHandle = handle ?? (data['handle'] as String?) ?? '';
-      bool isFollowing = false;
-      int? followCount;
-
-      if (resolvedHandle.isNotEmpty) {
-        try {
-          final followResponse = await apiService.get<Map<String, dynamic>>(
-            'user/$resolvedHandle/follow-info',
-          );
-          final followData = followResponse.data?['data'];
-          if (followData != null) {
-            isFollowing = (followData['is_following'] as bool?) ?? false;
-            followCount = (followData['followers_count'] as num?)?.toInt();
-          }
-        } catch (_) {
-          // Graceful fallback if follow-info fails
-        }
-      }
-
-      return ProfileModel.fromStoreJson(
-        data,
-        isFollowing: isFollowing,
-        followCount: followCount,
-      );
     } on DioException catch (e) {
       throw AppException.handelDioException(e);
     }

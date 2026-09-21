@@ -118,7 +118,7 @@ void main() {
     });
   });
 
-  group('ProfileRemoteDataSourceImpl store profile fetching', () {
+  group('ProfileRemoteDataSourceImpl store profile fetching via unified endpoint', () {
     late FakeApiService fakeApi;
     late ProfileRemoteDataSourceImpl dataSource;
 
@@ -127,97 +127,68 @@ void main() {
       dataSource = ProfileRemoteDataSourceImpl(fakeApi);
     });
 
-    test('getPersonalStoreProfile calls store/profile and parses correctly', () async {
-      fakeApi.responses['store/profile'] = {
-        'status': 'success',
-        'message': 'Store profile retrieved successfully',
-        'data': {
-          'id': 1,
-          'name': 'Test User',
-          'handle': 'testUser4',
-          'description': 'Store description here',
-          'city': null,
-          'country': null,
-          'store_logo_url': 'https://res.cloudinary.com/logo.jpg',
+    test('getProfile parses store profile response correctly', () async {
+      fakeApi.responses['user/testUser4'] = {
+        'name': 'Test User',
+        'username': 'testUser4',
+        'role': 'store',
+        'is_verified': false,
+        'is_following': false,
+        'details': {
+          'profile_picture_url': 'https://example.com/logo.png',
           'store_banner_url': 'https://example.com/banner.png',
-          'is_active': true,
-          'followers_count': 0,
+          'public_email': 'testUser4@example.com',
+          'public_phone_number': '123-456-7890',
           'products_count': 101,
-        },
-      };
-
-      final profile = await dataSource.getPersonalStoreProfile();
-
-      expect(profile.id, 1);
-      expect(profile.username, 'testUser4');
-      expect(profile.postsCount, 101);
-      expect(profile.bannerImageUrl, 'https://example.com/banner.png');
-    });
-
-    test('getStoreProfile calls store/profile/{id} and user/{handle}/follow-info', () async {
-      fakeApi.responses['store/profile/2'] = {
-        'status': 'success',
-        'message': 'Store profile retrieved successfully',
-        'data': {
-          'id': 2,
-          'name': 'Visited Store',
-          'handle': 'visitedHandle',
-          'description': 'Best designs',
-          'city': null,
-          'country': null,
-          'store_logo_url': null,
-          'store_banner_url': null,
-          'is_active': true,
           'followers_count': 0,
-          'products_count': 5,
+          'bio': null,
+          'country': null,
+          'city': null,
+          'website_url': 'https://example.com',
         },
       };
 
-      fakeApi.responses['user/visitedHandle/follow-info'] = {
-        'status': 'success',
-        'data': {
-          'is_following': true,
-          'followers_count': 7,
-          'following_count': 0,
-        },
-      };
+      final profile = await dataSource.getProfile(username: 'testUser4');
 
-      final profile = await dataSource.getStoreProfile(id: 2, handle: 'visitedHandle');
-
-      expect(profile.id, 2);
-      expect(profile.name, 'Visited Store');
-      expect(profile.username, 'visitedHandle');
-      expect(profile.isFollowing, isTrue);
-      expect(profile.followersCount, 7);
-      expect(profile.postsCount, 5);
+      expect(profile.username, 'testUser4');
+      expect(profile.role, 'store');
+      expect(profile.productsCount, 101);
+      expect(profile.bannerImageUrl, 'https://example.com/banner.png');
+      expect(profile.publicEmail, 'testUser4@example.com');
     });
 
-    test('getStoreProfile gracefully handles missing or failed follow-info', () async {
-      fakeApi.responses['store/profile/3'] = {
-        'status': 'success',
-        'message': 'Store profile retrieved successfully',
-        'data': {
-          'id': 3,
-          'name': 'Store 3',
-          'handle': 'store3',
-          'description': null,
-          'city': null,
-          'country': null,
-          'store_logo_url': null,
-          'store_banner_url': null,
-          'is_active': true,
-          'followers_count': 12,
-          'products_count': 2,
+    test('getProfile parses non-store (mentor) profile response correctly', () async {
+      fakeApi.responses['user/testUser1'] = {
+        'name': 'akikon',
+        'username': 'testUser1',
+        'role': 'mentor',
+        'is_verified': false,
+        'is_following': false,
+        'details': {
+          'profile_picture_url': null,
+          'followers_count': 0,
+          'following_count': 0,
+          'bio': 'This is a test user.',
+          'privacy_setting': 'public',
+          'posts_count': 100,
+          'project_count': 0,
+          'about_me': 'I am a test user.',
+          'academic_experiences': [],
+          'contact_info': [],
+          'skills': [],
+          'country': 'Testland',
+          'city': 'Testville',
+          'joined_at': '2026-09-20',
         },
       };
-      // user/store3/follow-info not configured in fakeApi -> will throw 404
 
-      final profile = await dataSource.getStoreProfile(id: 3, handle: 'store3');
+      final profile = await dataSource.getProfile(username: 'testUser1');
 
-      expect(profile.id, 3);
-      expect(profile.username, 'store3');
-      expect(profile.isFollowing, isFalse);
-      expect(profile.followersCount, 12);
+      expect(profile.username, 'testUser1');
+      expect(profile.role, 'mentor');
+      expect(profile.followersCount, 0);
+      expect(profile.postsCount, 100);
+      expect(profile.bio, 'This is a test user.');
     });
 
     test('getStoreProducts calls store/{storeId}/products?page={page}', () async {
@@ -340,24 +311,26 @@ void main() {
       );
     });
 
-    test('getPersonalProfile delegates to getPersonalStoreProfile when role is store', () async {
-      await authLocalDataSource.saveRole('store');
+    test('getPersonalProfile uses stored username to call getUserProfile', () async {
+      await authLocalDataSource.saveUsername('myStoreUser');
 
-      fakeApi.responses['store/profile'] = {
-        'status': 'success',
-        'message': 'Store profile retrieved successfully',
-        'data': {
-          'id': 1,
-          'name': 'My Store',
-          'handle': 'myStoreHandle',
-          'description': 'My store desc',
-          'city': null,
-          'country': null,
-          'store_logo_url': null,
+      fakeApi.responses['user/myStoreUser'] = {
+        'name': 'My Store',
+        'username': 'myStoreUser',
+        'role': 'store',
+        'is_verified': false,
+        'is_following': false,
+        'details': {
+          'profile_picture_url': null,
           'store_banner_url': null,
-          'is_active': true,
-          'followers_count': 0,
+          'public_email': null,
+          'public_phone_number': null,
           'products_count': 20,
+          'followers_count': 0,
+          'bio': null,
+          'country': null,
+          'city': null,
+          'website_url': null,
         },
       };
 
@@ -367,52 +340,44 @@ void main() {
       result.fold(
         (_) => fail('should succeed'),
         (profile) {
-          expect(profile.id, 1);
-          expect(profile.username, 'myStoreHandle');
+          expect(profile.username, 'myStoreUser');
           expect(profile.role, 'store');
-          expect(profile.postsCount, 20);
+          expect(profile.productsCount, 20);
         },
       );
     });
 
-    test('getStoreProfile retrieves store profile and caches it', () async {
-      fakeApi.responses['store/profile/99'] = {
-        'status': 'success',
-        'message': 'Store profile retrieved successfully',
-        'data': {
-          'id': 99,
-          'name': 'Vendor Hub',
-          'handle': 'vendor_hub',
-          'description': 'Vendor Hub description',
-          'city': null,
-          'country': null,
-          'store_logo_url': null,
+    test('getUserProfile retrieves store profile via user/{username} endpoint', () async {
+      fakeApi.responses['user/vendor_hub'] = {
+        'name': 'Vendor Hub',
+        'username': 'vendor_hub',
+        'role': 'store',
+        'is_verified': false,
+        'is_following': false,
+        'details': {
+          'profile_picture_url': null,
           'store_banner_url': null,
-          'is_active': true,
-          'followers_count': 3,
+          'public_email': null,
+          'public_phone_number': null,
           'products_count': 15,
-        },
-      };
-
-      fakeApi.responses['user/vendor_hub/follow-info'] = {
-        'status': 'success',
-        'data': {
-          'is_following': false,
           'followers_count': 3,
-          'following_count': 0,
+          'bio': null,
+          'country': null,
+          'city': null,
+          'website_url': null,
         },
       };
 
-      final result = await repo.getStoreProfile(id: 99, handle: 'vendor_hub');
+      final result = await repo.getUserProfile(username: 'vendor_hub');
 
       expect(result.isRight(), isTrue);
       result.fold(
         (_) => fail('should succeed'),
         (profile) {
-          expect(profile.id, 99);
-          expect(profile.name, 'Vendor Hub');
           expect(profile.username, 'vendor_hub');
           expect(profile.role, 'store');
+          expect(profile.productsCount, 15);
+          expect(profile.followersCount, 3);
         },
       );
     });

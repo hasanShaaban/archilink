@@ -30,66 +30,12 @@ class ProfileRepoImpl implements ProfileRepo {
 
   @override
   Future<Either<Failure, ProfileEntity>> getPersonalProfile() async {
-    AuthLocalDataSource dataSource =
-        authLocalDataSource ?? sl<AuthLocalDataSource>();
-    final role = dataSource.getRole()?.toLowerCase().trim();
-    if (role == 'store' || role == 'store account') {
-      return getPersonalStoreProfile();
-    }
-
-    String username = dataSource.getUsername()!;
-    try {
-      final remoteModel = await remoteDataSource.getProfile(username: username);
-      final localModel = localDataSource.getCachedProfile();
-
-      if (localModel == null || localModel != remoteModel) {
-        log('Profile data updated, saving to local storage');
-        await localDataSource.saveProfileData(remoteModel.toJson());
-      }
-
-      return right(remoteModel);
-    } on AppException catch (e) {
-      return left(mapExceptionToFailure(e));
-    } catch (_) {
+    final dataSource = authLocalDataSource ?? sl<AuthLocalDataSource>();
+    final username = dataSource.getUsername();
+    if (username == null || username.isEmpty) {
       return left(UnknownFailure());
     }
-  }
-
-  @override
-  Future<Either<Failure, ProfileEntity>> getPersonalStoreProfile() async {
-    try {
-      final remoteModel = await remoteDataSource.getPersonalStoreProfile();
-      final localModel = localDataSource.getCachedProfile();
-
-      if (localModel == null || localModel != remoteModel) {
-        log('Store profile data updated, saving to local storage');
-        await localDataSource.saveProfileData(remoteModel.toJson());
-      }
-
-      return right(remoteModel);
-    } on AppException catch (e) {
-      return left(mapExceptionToFailure(e));
-    } catch (_) {
-      return left(UnknownFailure());
-    }
-  }
-
-  @override
-  Future<Either<Failure, ProfileEntity>> getStoreProfile({
-    required int id,
-    String? handle,
-  }) async {
-    try {
-      final model = await remoteDataSource.getStoreProfile(
-        id: id,
-        handle: handle,
-      );
-      return right(model);
-    } on AppException catch (e) {
-      return left(mapExceptionToFailure(e));
-    } catch (_) {
-      return left(UnknownFailure());
-    }
+    return getUserProfile(username: username);
   }
 
   @override
@@ -97,8 +43,20 @@ class ProfileRepoImpl implements ProfileRepo {
     required String username,
   }) async {
     try {
-      final model = await remoteDataSource.getProfile(username: username);
-      return right(model);
+      final remoteModel = await remoteDataSource.getProfile(username: username);
+
+      // Cache the profile locally when fetching the personal profile.
+      try {
+        final localModel = localDataSource.getCachedProfile();
+        if (localModel == null || localModel != remoteModel) {
+          log('Profile data updated, saving to local storage');
+          await localDataSource.saveProfileData(remoteModel.toJson());
+        }
+      } catch (_) {
+        // Caching is best-effort; don't block on failure.
+      }
+
+      return right(remoteModel);
     } on AppException catch (e) {
       return left(mapExceptionToFailure(e));
     } catch (_) {
@@ -166,7 +124,6 @@ class ProfileRepoImpl implements ProfileRepo {
     }
   }
 
-  
   @override
   Future<Either<Failure, bool>> unfollow(String username) async {
     try {

@@ -10,7 +10,7 @@ class ProfileCubit extends Cubit<ProfileCubitState> {
   final ProfileRepo profileRepo;
   ProfileCubit(this.profileRepo) : super(ProfileInitial());
 
-  Future<void> getPersonlProfile() async{
+  Future<void> getPersonlProfile() async {
     emit(ProfileLoading());
     final result = await profileRepo.getPersonalProfile();
 
@@ -19,32 +19,12 @@ class ProfileCubit extends Cubit<ProfileCubitState> {
       (data) => emit(ProfileSuccess(data)));
   }
 
-  Future<void> getUserProfile(String username)async{
+  Future<void> getUserProfile(String username) async {
     emit(ProfileLoading());
     final result = await profileRepo.getUserProfile(username: username);
 
     result.fold(
-      (failure) =>  emit(ProfileFailuer(failure.message)),
+      (failure) => emit(ProfileFailuer(failure.message)),
       (data) => emit(ProfileSuccess(data)));
-  }
-
-  Future<void> getPersonalStoreProfile() async {
-    emit(ProfileLoading());
-    final result = await profileRepo.getPersonalStoreProfile();
-
-    result.fold(
-      (failure) => emit(ProfileFailuer(failure.message)),
-      (data) => emit(ProfileSuccess(data)),
-    );
-  }
-
-  Future<void> getStoreProfile({required int id, String? handle}) async {
-    emit(ProfileLoading());
-    final result = await profileRepo.getStoreProfile(id: id, handle: handle);
-
-    result.fold(
-      (failure) => emit(ProfileFailuer(failure.message)),
-      (data) => emit(ProfileSuccess(data)),
-    );
   }
 }

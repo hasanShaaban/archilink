@@ -12,6 +12,7 @@ class CurrentUserCubit extends Cubit<CurrentUserState> {
   void loadFromCache() {
     emit(
       CurrentUserState(
+        id: _authLocalDataSource.getUserId(),
         username: _authLocalDataSource.getUsername(),
         token: _authLocalDataSource.getToken(),
         role: _authLocalDataSource.getRole(),
@@ -19,11 +20,18 @@ class CurrentUserCubit extends Cubit<CurrentUserState> {
     );
   }
 
+  void setUserId(int id) {
+    _authLocalDataSource.saveUserId(id);
+    emit(state.copyWith(id: id));
+  }
+
   void setUsername(String username) {
+    _authLocalDataSource.saveUsername(username);
     emit(state.copyWith(username: username));
   }
 
   void setToken(String token) {
+    _authLocalDataSource.saveToken(token);
     emit(state.copyWith(token: token));
   }
 
@@ -34,15 +42,26 @@ class CurrentUserCubit extends Cubit<CurrentUserState> {
   }
 
   void setUser({
+    int? id,
     required String username,
     required String token,
     String? role,
   }) {
+    if (id != null) {
+      _authLocalDataSource.saveUserId(id);
+    }
+    _authLocalDataSource.saveUsername(username);
+    _authLocalDataSource.saveToken(token);
     final normalized = role?.toLowerCase().trim();
     if (normalized != null && normalized.isNotEmpty) {
       _authLocalDataSource.saveRole(normalized);
     }
-    emit(state.copyWith(username: username, token: token, role: normalized));
+    emit(state.copyWith(
+      id: id,
+      username: username,
+      token: token,
+      role: normalized,
+    ));
   }
 
   void clear() {

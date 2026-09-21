@@ -115,11 +115,7 @@ class _CropImageViewState extends State<CropImageView> {
         (success) {
           if (success) {
             try {
-              if (widget.isStore) {
-                context.read<ProfileCubit>().getPersonalStoreProfile();
-              } else {
-                context.read<ProfileCubit>().getPersonlProfile();
-              }
+              context.read<ProfileCubit>().getPersonlProfile();
             } catch (_) {}
 
             Navigator.of(context).pop(true);
