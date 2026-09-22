@@ -9,8 +9,11 @@ class ChatEntity {
   final String chatName;
   final String? chatCoverUrl;
   final ContactEntity contact;
-  final LastMessageEntity lastMessage;
-  final int unreadMessagesCount;
+  final DateTime? latestMessageAt;
+  final LastMessageEntity? lastMessage;
+  final int unreadCount;
+  final int? readInboxMaxId;
+  final int? readOutboxMaxId;
 
   const ChatEntity({
     required this.id,
@@ -18,7 +21,17 @@ class ChatEntity {
     required this.chatName,
     this.chatCoverUrl,
     required this.contact,
-    required this.lastMessage,
-    required this.unreadMessagesCount,
+    this.latestMessageAt,
+    this.lastMessage,
+    this.unreadCount = 0,
+    this.readInboxMaxId,
+    this.readOutboxMaxId,
   });
+
+  /// Backward-compatible alias for unreadCount
+  int get unreadMessagesCount => unreadCount;
+
+  /// Alias matching API field latest_message
+  LastMessageEntity? get latestMessage => lastMessage;
 }
+

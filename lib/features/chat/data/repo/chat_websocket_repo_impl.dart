@@ -6,12 +6,12 @@ class ChatWebsocketRepoImpl extends ChatWebsocketRepo {
 
   ChatWebsocketRepoImpl(this.remoteDataSource);
   @override
-  Stream<ChatSocketEvent> subscribeToChannle(int conversationId) {
-    return remoteDataSource.subscribeToChannel(conversationId);
+  Stream<ChatSocketEvent> subscribeToChannle(int userId) {
+    return remoteDataSource.subscribeToChannel(userId);
   }
 
   @override
-  Future<void> unsubscribeFromChannle(int conversationId) {
-    return remoteDataSource.unsubscribeFromChannel(conversationId);
+  Future<void> unsubscribeFromChannle(int userId) {
+    return remoteDataSource.unsubscribeFromChannel(userId);
   }
 }

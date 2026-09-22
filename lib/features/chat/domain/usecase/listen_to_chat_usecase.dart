@@ -5,7 +5,7 @@ class ListenToChatUsecase {
 
   ListenToChatUsecase(this._repo);
 
-  Stream<ChatSocketEvent> call(int conversationId) {
-    return _repo.subscribeToChannle(conversationId);
+  Stream<ChatSocketEvent> call(int userId) {
+    return _repo.subscribeToChannle(userId);
   }
 }

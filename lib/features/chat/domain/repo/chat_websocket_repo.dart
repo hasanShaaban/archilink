@@ -1,8 +1,8 @@
 import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/message_entity.dart';
 
 abstract class ChatWebsocketRepo {
-  Stream<ChatSocketEvent> subscribeToChannle(int conversationId);
-  Future<void> unsubscribeFromChannle(int conversationId);
+  Stream<ChatSocketEvent> subscribeToChannle(int userId);
+  Future<void> unsubscribeFromChannle(int userId);
 }
 
 sealed class ChatSocketEvent {}

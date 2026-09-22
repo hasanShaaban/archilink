@@ -14,52 +14,85 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
   final ChatRepo _chatRepo;
   final ListenToChatUsecase _listenToChat;
   StreamSubscription<ChatSocketEvent>? _subscription;
+  int? _subscribedUserId;
 
   ChatBloc(this._listenToChat, this._chatRepo) : super(ChatState()) {
     on<SubscribeToChat>(_onSubscribe);
     on<UnsubscribeFromChat>(_onUnsubscribe);
     on<FetchInitialMessages>(_onFetchInitial);
     on<FetchMoreMessages>(_onFetchMore);
+    on<_OnInternalSocketEvent>(_onSocketEvent);
+    on<_OnInternalSocketError>(_onSocketError);
   }
 
   Future<void> _onSubscribe(
     SubscribeToChat event,
     Emitter<ChatState> emit,
   ) async {
+    if (_subscribedUserId == event.userId && _subscription != null) {
+      return;
+    }
+    _subscribedUserId = event.userId;
     emit(state.copyWith(status: ChatStatus.connecting));
 
-    _subscription = _listenToChat(event.conversationId).listen(
+    await _subscription?.cancel();
+    _subscription = _listenToChat(event.userId).listen(
       (socketEvent) {
-        switch (socketEvent) {
-          case MessageSentEvent():
-            final updated = [socketEvent.message, ...state.messages];
-            emit(state.copyWith(messages: updated, status: ChatStatus.ready));
-
-          case MessageDeletedEvent():
-            final updated = state.messages
-                .where((m) => m.id != socketEvent.messageId)
-                .toList();
-            emit(state.copyWith(messages: updated));
-
-          case MessagesDeliveredEvent():
-          case MessagesSeenEvent():
-            // handle status updates later
-            break;
-        }
+        add(_OnInternalSocketEvent(socketEvent));
       },
-      onError: (e) => emit(
-        state.copyWith(status: ChatStatus.error, errorMessage: e.toString()),
-      ),
+      onError: (e) => add(_OnInternalSocketError(e.toString())),
     );
+  }
+
+  void _onSocketEvent(
+    _OnInternalSocketEvent event,
+    Emitter<ChatState> emit,
+  ) {
+    final socketEvent = event.event;
+    switch (socketEvent) {
+      case MessageSentEvent():
+        final updated = [socketEvent.message, ...state.messages];
+        emit(state.copyWith(
+          messages: updated,
+          status: ChatStatus.ready,
+          lastSocketEvent: socketEvent,
+        ));
+
+      case MessageDeletedEvent():
+        final updated = state.messages
+            .where((m) => m.id != socketEvent.messageId)
+            .toList();
+        emit(state.copyWith(
+          messages: updated,
+          lastSocketEvent: socketEvent,
+        ));
+
+      case MessagesDeliveredEvent():
+      case MessagesSeenEvent():
+        emit(state.copyWith(lastSocketEvent: socketEvent));
+    }
+  }
+
+  void _onSocketError(
+    _OnInternalSocketError event,
+    Emitter<ChatState> emit,
+  ) {
+    emit(state.copyWith(
+      status: ChatStatus.error,
+      errorMessage: event.error,
+    ));
   }
 
   Future<void> _onUnsubscribe(
     UnsubscribeFromChat event,
     Emitter<ChatState> emit,
   ) async {
+    _subscribedUserId = null;
     await _subscription?.cancel();
+    _subscription = null;
     emit(ChatState());
   }
+
 
   @override
   Future<void> close() {

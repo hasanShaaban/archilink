@@ -10,6 +10,7 @@ class ChatState {
   final ChatStatus status;
   final String? errorMessage;
   final List<SenderEntity> participants;
+  final ChatSocketEvent? lastSocketEvent;
 
   ChatState({
     this.messages = const [],
@@ -19,6 +20,7 @@ class ChatState {
     this.status = ChatStatus.initial,
     this.errorMessage,
     this.participants = const [],
+    this.lastSocketEvent,
   });
 
   ChatState copyWith({
@@ -29,6 +31,7 @@ class ChatState {
     ChatStatus? status,
     String? errorMessage,
     List<SenderEntity>? participants,
+    ChatSocketEvent? lastSocketEvent,
   }) {
     return ChatState(
       messages: messages ?? this.messages,
@@ -38,6 +41,8 @@ class ChatState {
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
       participants: participants ?? this.participants,
+      lastSocketEvent: lastSocketEvent ?? this.lastSocketEvent,
     );
   }
 }
+

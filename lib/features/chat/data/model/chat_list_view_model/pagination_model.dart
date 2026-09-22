@@ -8,18 +8,18 @@ class PaginationModel extends PaginationEntity {
     required super.perPage,
     required super.total,
     required super.lastPage,
-    required super.from,
-    required super.to,
+    super.from,
+    super.to,
   });
 
   factory PaginationModel.fromJson(Map<String, dynamic> json) {
     return PaginationModel(
-      currentPage: json['current_page'] as int,
-      perPage: json['per_page'] as int,
-      total: json['total'] as int,
-      lastPage: json['last_page'] as int,
-      from: json['from'] as int,
-      to: json['to'] as int,
+      currentPage: (json['current_page'] as num?)?.toInt() ?? 1,
+      perPage: (json['per_page'] as num?)?.toInt() ?? 20,
+      total: (json['total'] as num?)?.toInt() ?? 0,
+      lastPage: (json['last_page'] as num?)?.toInt() ?? 1,
+      from: (json['from'] as num?)?.toInt(),
+      to: (json['to'] as num?)?.toInt(),
     );
   }
 
@@ -34,3 +34,4 @@ class PaginationModel extends PaginationEntity {
     };
   }
 }
+

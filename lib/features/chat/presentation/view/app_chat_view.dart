@@ -22,9 +22,8 @@ class AppChatView extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: BlocProvider(
-          create: (context) => sl<ChatBloc>()
-            ..add(FetchInitialMessages(args.conversationId))
-            ..add(SubscribeToChat(args.conversationId)),
+          create: (context) =>
+              sl<ChatBloc>()..add(FetchInitialMessages(args.conversationId)),
           child: _ChatViewBody(args: args),
         ),
       ),
@@ -94,10 +93,11 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
     final currentUserId = _chatController!.currentUser.id;
     final chatViewMessages = messages
         .map((e) => e.toChatViewMessage(currentUserId))
-        .toList().reversed.toList();
+        .toList()
+        .reversed
+        .toList();
 
     _chatController!.loadMoreData(chatViewMessages);
-    
   }
 
   // ─── Menu action handler ──────────────────────────────────────────────────
@@ -127,10 +127,10 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
       listenWhen: (prev, curr) => prev.messages != curr.messages,
       listener: (BuildContext context, ChatState state) {
         if (state.participants.isNotEmpty) {
-          _initController(state); 
+          _initController(state);
           _syncToController(state.messages);
         }
-        
+
         // Trigger rebuild so ChatView gets the controller
         setState(() {});
       },

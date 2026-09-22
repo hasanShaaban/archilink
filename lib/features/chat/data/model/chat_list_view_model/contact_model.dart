@@ -7,21 +7,23 @@ class ContactModel extends ContactEntity {
     required super.id,
     required super.name,
     required super.username,
-    super.userAvatar,
-    required super.isVerified,
-    required super.country,
-    required super.city,
+    super.avatar,
+    super.isVerified,
+    super.role,
+    super.country,
+    super.city,
   });
 
   factory ContactModel.fromJson(Map<String, dynamic> json) {
     return ContactModel(
       id: json['id'] as int,
-      name: json['name'] as String,
-      username: json['username'] as String,
-      userAvatar: json['user_avatar'] as String?,
-      isVerified: json['is_verified'] as bool,
-      country: json['country'] as String,
-      city: json['city'] as String,
+      name: (json['name'] as String?) ?? '',
+      username: (json['username'] as String?) ?? '',
+      avatar: (json['avatar'] ?? json['user_avatar']) as String?,
+      isVerified: json['is_verified'] as bool?,
+      role: json['role'] as String?,
+      country: json['country'] as String?,
+      city: json['city'] as String?,
     );
   }
 
@@ -30,10 +32,12 @@ class ContactModel extends ContactEntity {
       'id': id,
       'name': name,
       'username': username,
-      'user_avatar': userAvatar,
+      'avatar': avatar,
       'is_verified': isVerified,
+      'role': role,
       'country': country,
       'city': city,
     };
   }
 }
+

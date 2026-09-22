@@ -4,6 +4,7 @@ import 'package:archilink/core/network/websocket/reverb_client.dart';
 import 'package:archilink/features/Chat/data/model/chat_model/message_model.dart';
 import 'package:archilink/features/Chat/domain/data_source/chat_websocket_remote_data_source.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
+import 'package:flutter/foundation.dart';
 
 class ChatWebsocketRemoteDataSourceImpl
     implements ChatWebsocketRemoteDataSource {
@@ -13,14 +14,14 @@ class ChatWebsocketRemoteDataSourceImpl
 
   ChatWebsocketRemoteDataSourceImpl(this._reverbClient);
   @override
-  Stream<ChatSocketEvent> subscribeToChannel(int conversationId) {
-    if (_controllers.containsKey(conversationId)) {
-      return _controllers[conversationId]!.stream;
+  Stream<ChatSocketEvent> subscribeToChannel(int userId) {
+    if (_controllers.containsKey(userId)) {
+      return _controllers[userId]!.stream;
     }
     final controller = StreamController<ChatSocketEvent>();
-    _controllers[conversationId] = controller;
+    _controllers[userId] = controller;
 
-    final channel = _reverbClient.privateChannel('user.$conversationId');
+    final channel = _reverbClient.privateChannel('user.$userId');
 
     _reverbClient.client.onConnectionEstablished.listen((_) {
       channel.subscribe();
@@ -31,44 +32,62 @@ class ChatWebsocketRemoteDataSourceImpl
     }
 
     final subs = <StreamSubscription>[
+      channel.bind('pusher:subscription_succeeded').listen((event) {
+        debugPrint(
+          '✅ [Reverb] Successfully subscribed to private channel: user.$userId',
+        );
+      }),
+      channel.bind('pusher:subscription_error').listen((event) {
+        debugPrint(
+          '❌ [Reverb] Failed to subscribe to channel user.$userId. Error: ${event.data}',
+        );
+      }),
       channel.bind('message.sent').listen((event) {
         if (controller.isClosed) return;
+        debugPrint('📩 [Reverb] Received message.sent event on user.$userId');
         final data = _decode(event.data);
         controller.add(MessageSentEvent(MessageModel.fromJson(data)));
       }),
       channel.bind('message.deleted').listen((event) {
         if (controller.isClosed) return;
+        debugPrint(
+          '🗑️ [Reverb] Received message.deleted event on user.$userId',
+        );
         final data = _decode(event.data);
         controller.add(MessageDeletedEvent(data['message_id'] as int));
       }),
 
       channel.bind('messages.delivered').listen((event) {
         if (controller.isClosed) return;
+        debugPrint(
+          '📦 [Reverb] Received messages.delivered event on user.$userId',
+        );
         final data = _decode(event.data);
         controller.add(MessagesDeliveredEvent(data['conversation_id'] as int));
       }),
 
       channel.bind('messages.seen').listen((event) {
         if (controller.isClosed) return;
+        debugPrint('👁️ [Reverb] Received messages.seen event on user.$userId');
         final data = _decode(event.data);
         controller.add(MessagesSeenEvent(data['conversation_id'] as int));
       }),
     ];
 
-    _subscriptions[conversationId] = subs;
+    _subscriptions[userId] = subs;
     return controller.stream;
   }
 
   @override
-  Future<void> unsubscribeFromChannel(int conversationId) async {
-    final subs = _subscriptions.remove(conversationId);
+  Future<void> unsubscribeFromChannel(int userId) async {
+    final subs = _subscriptions.remove(userId);
     if (subs != null) {
       for (final sub in subs) {
         await sub.cancel();
       }
     }
-    await _controllers[conversationId]?.close();
-    _controllers.remove(conversationId);
+    await _controllers[userId]?.close();
+    _controllers.remove(userId);
   }
 
   Map<String, dynamic> _decode(dynamic data) {

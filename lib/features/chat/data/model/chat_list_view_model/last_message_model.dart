@@ -15,10 +15,11 @@ class LastMessageModel extends LastMessageEntity {
     return LastMessageModel(
       id: json['id'] as int,
       chatId: json['chat_id'] as int,
-      content: json['content'] as String,
-      sentAt: DateTime.parse(json['sent_at'] as String),
+      content: (json['content'] as String?) ?? '',
+      sentAt: DateTime.tryParse(json['sent_at']?.toString() ?? '') ??
+          DateTime.now(),
       editedAt: json['edited_at'] != null
-          ? DateTime.parse(json['edited_at'] as String)
+          ? DateTime.tryParse(json['edited_at'].toString())
           : null,
     );
   }
@@ -33,3 +34,4 @@ class LastMessageModel extends LastMessageEntity {
     };
   }
 }
+
