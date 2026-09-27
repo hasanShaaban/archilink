@@ -18,7 +18,13 @@ class ChatAppBar extends StatelessWidget {
       centerTitle: false,
       actions: [
         IconButton(
-          icon: SvgPicture.asset(Assets.assetsIconsMenu, color: Theme.of(context).colorScheme.onSurface,),
+          icon: SvgPicture.asset(
+            Assets.assetsIconsMenu,
+            colorFilter: ColorFilter.mode(
+              Theme.of(context).colorScheme.onSurface,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () {
             //TODO:handle menu actions
           },

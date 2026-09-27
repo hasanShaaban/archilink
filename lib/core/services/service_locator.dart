@@ -198,6 +198,9 @@ Future<void> initServiceLocator({
   final baseURL = isEmulator
       ? NetworkConfig.emulatorBaseUrl
       : NetworkConfig.physicalBaseUrl;
+  final reverbHost = isEmulator
+      ? NetworkConfig.reverbEmulatorHost
+      : NetworkConfig.reverbPhysicalHost;
 
   ///----------
   ///Dio client
@@ -304,6 +307,7 @@ Future<void> initServiceLocator({
       sl<CurrentUserCubit>(),
       sl<NotificationRepo>(),
       sl<ReverbClient>(),
+      reverbHost: reverbHost,
     ),
   );
   sl.registerLazySingleton(() => UniversitiesCubit(sl<EditProfileRepo>()));

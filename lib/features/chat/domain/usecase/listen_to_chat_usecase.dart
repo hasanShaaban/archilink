@@ -5,7 +5,9 @@ class ListenToChatUsecase {
 
   ListenToChatUsecase(this._repo);
 
-  Stream<ChatSocketEvent> call(int userId) {
-    return _repo.subscribeToChannle(userId);
+  Stream<ChatSocketEvent> call(int currentUserId) {
+    return _repo.connect(currentUserId);
   }
+
+  Future<void> disconnect() => _repo.disconnect();
 }

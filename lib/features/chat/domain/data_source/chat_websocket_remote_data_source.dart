@@ -1,7 +1,10 @@
-import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/messages_reponse_entity.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
 
 abstract class ChatWebsocketRemoteDataSource {
-  Stream<ChatSocketEvent> subscribeToChannel(int userId);
-  Future<void> unsubscribeFromChannel(int userId);
+  /// Connects to [currentUserId]'s private channel and returns a single
+  /// broadcast stream of all chat-related socket events for that user.
+  /// Consumers filter by chatId themselves.
+  Stream<ChatSocketEvent> connect(int currentUserId);
+
+  Future<void> disconnect();
 }

@@ -5,6 +5,8 @@ class SenderEntity {
   final String? userAvatar;
   final String? country;
   final String? city;
+  final String? role;
+  final bool? isVerified;
 
   const SenderEntity({
     required this.id,
@@ -13,6 +15,8 @@ class SenderEntity {
     this.userAvatar,
     this.country,
     this.city,
+    this.role,
+    this.isVerified,
   });
   @override
   bool operator ==(Object other) => other is SenderEntity && other.id == id;

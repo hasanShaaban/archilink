@@ -5,12 +5,12 @@ import 'package:archilink/core/utils/assets.dart';
 import 'package:archilink/core/utils/message_mapper.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
 import 'package:archilink/features/Chat/domain/entity/chat_args.dart';
-import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/message_entity.dart';
+import 'package:archilink/features/Chat/domain/entity/chat_entity.dart/sender_entity.dart';
+import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
 import 'package:archilink/features/Chat/presentation/manager/bloc/chat_bloc.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
 class AppChatView extends StatelessWidget {
   const AppChatView({super.key, required this.args});
@@ -21,9 +21,8 @@ class AppChatView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: BlocProvider(
-          create: (context) =>
-              sl<ChatBloc>()..add(FetchInitialMessages(args.conversationId)),
+        child: BlocProvider.value(
+          value: sl<ChatBloc>()..add(FetchInitialMessages(args.conversationId)),
           child: _ChatViewBody(args: args),
         ),
       ),
@@ -46,58 +45,125 @@ class _ChatViewBody extends StatefulWidget {
 class _ChatViewBodyState extends State<_ChatViewBody> {
   ChatController? _chatController;
   bool _controllerInitialized = false;
+  String? _lastHandledSentTempId;
+  String? _lastHandledFailedTempId;
+
+  @override
+  void initState() {
+    super.initState();
+    final chatBloc = context.read<ChatBloc>();
+    if (chatBloc.state.status == ChatStatus.ready) {
+      _initController(chatBloc.state);
+    }
+  }
 
   @override
   void dispose() {
     _chatController?.dispose();
-    context.read<ChatBloc>().add(
-      UnsubscribeFromChat(widget.args.conversationId),
-    );
     super.dispose();
   }
 
-  // Called once when first messages arrive
+  // Called when initial messages arrive or state is ready
   void _initController(ChatState state) {
     if (_controllerInitialized) return;
 
-    final currentUsername = context.read<CurrentUserCubit>().state.username;
+    final currentUserState = context.read<CurrentUserCubit>().state;
+    final currentUserIdStr = currentUserState.id?.toString() ?? '0';
 
-    // Match current user by username
-    final currentSender = state.participants.firstWhere(
-      (p) => p.username == currentUsername,
+    SenderEntity? currentSender;
+    try {
+      currentSender = state.participants.firstWhere(
+        (p) =>
+            (currentUserState.id != null && p.id == currentUserState.id) ||
+            (currentUserState.username != null &&
+                p.username.toLowerCase() ==
+                    currentUserState.username?.toLowerCase()),
+      );
+    } catch (_) {
+      currentSender = null;
+    }
+
+    final currentUser = ChatUser(
+      id: currentSender?.id.toString() ?? currentUserIdStr,
+      name: currentSender?.name ?? currentUserState.username ?? 'Me',
+      profilePhoto: currentSender?.userAvatar,
     );
 
-    // Everyone else is an other user
     final otherSenders = state.participants
-        .where((p) => p.id != currentSender.id)
+        .where((p) => p.id.toString() != currentUser.id)
+        .toList();
+
+    final otherUsers = otherSenders
+        .map(
+          (s) => ChatUser(
+            id: s.id.toString(),
+            name: s.name,
+            profilePhoto: s.userAvatar,
+          ),
+        )
+        .toList();
+
+    if (otherUsers.isEmpty) {
+      otherUsers.add(
+        ChatUser(
+          id: 'chat_${widget.args.conversationId}',
+          name: widget.args.chatTitle.isNotEmpty
+              ? widget.args.chatTitle
+              : 'Chat',
+          profilePhoto: widget.args.profileImage,
+        ),
+      );
+    }
+
+    final chatViewMessages = state.messages
+        .map((e) => e.toChatViewMessage(currentUser.id))
+        .toList()
+        .reversed
         .toList();
 
     _chatController = ChatController(
-      initialMessageList: [],
+      initialMessageList: chatViewMessages,
       scrollController: ScrollController(),
-      currentUser: ChatUser(
-        id: currentSender.id.toString(),
-        name: currentSender.name,
-      ),
-      otherUsers: otherSenders
-          .map((s) => ChatUser(id: s.id.toString(), name: s.name))
-          .toList(),
+      currentUser: currentUser,
+      otherUsers: otherUsers,
     );
 
     _controllerInitialized = true;
   }
 
-  void _syncToController(List<MessageEntity> messages) {
-    if (_chatController == null) return;
+  void _onSendTap(
+    String message,
+    ReplyMessage replyMessage,
+    MessageType messageType,
+  ) {
+    final text = message.trim();
+    if (text.isEmpty) return;
 
-    final currentUserId = _chatController!.currentUser.id;
-    final chatViewMessages = messages
-        .map((e) => e.toChatViewMessage(currentUserId))
-        .toList()
-        .reversed
-        .toList();
+    final currentUserId =
+        _chatController?.currentUser.id ??
+        context.read<CurrentUserCubit>().state.id?.toString() ??
+        '0';
+    final tempId = DateTime.now().millisecondsSinceEpoch.toString();
 
-    _chatController!.loadMoreData(chatViewMessages);
+    final messageObj = Message(
+      id: tempId,
+      message: text,
+      createdAt: DateTime.now(),
+      sentBy: currentUserId,
+      replyMessage: replyMessage,
+      messageType: messageType,
+      status: MessageStatus.pending,
+    );
+
+    _chatController?.addMessage(messageObj);
+
+    context.read<ChatBloc>().add(
+      SendChatMessage(
+        conversationId: widget.args.conversationId,
+        content: text,
+        tempId: tempId,
+      ),
+    );
   }
 
   // ─── Menu action handler ──────────────────────────────────────────────────
@@ -124,21 +190,122 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
     final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
 
     return BlocConsumer<ChatBloc, ChatState>(
-      listenWhen: (prev, curr) => prev.messages != curr.messages,
+      listenWhen: (prev, curr) =>
+          prev.messages != curr.messages ||
+          prev.status != curr.status ||
+          prev.lastSocketEvent != curr.lastSocketEvent ||
+          prev.lastSentTempId != curr.lastSentTempId ||
+          prev.failedTempId != curr.failedTempId,
       listener: (BuildContext context, ChatState state) {
-        if (state.participants.isNotEmpty) {
+        if (!_controllerInitialized &&
+            (state.status == ChatStatus.ready || state.messages.isNotEmpty)) {
           _initController(state);
-          _syncToController(state.messages);
+        } else if (_controllerInitialized) {
+          // Handle send message success -> update to delivered (two gray ticks)
+          if (state.lastSentTempId != null &&
+              state.lastSentTempId != _lastHandledSentTempId) {
+            _lastHandledSentTempId = state.lastSentTempId;
+            final index = _chatController!.initialMessageList.indexWhere(
+              (m) => m.id == state.lastSentTempId,
+            );
+            if (index != -1) {
+              final msg = _chatController!.initialMessageList[index];
+              msg.setStatus = MessageStatus.delivered;
+            }
+          }
+
+          // Handle send message failure
+          if (state.failedTempId != null &&
+              state.failedTempId != _lastHandledFailedTempId) {
+            _lastHandledFailedTempId = state.failedTempId;
+            final index = _chatController!.initialMessageList.indexWhere(
+              (m) => m.id == state.failedTempId,
+            );
+            if (index != -1) {
+              final msg = _chatController!.initialMessageList[index];
+              msg.setStatus = MessageStatus.undelivered;
+            }
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+            }
+          }
+
+          // Handle real-time incoming messages
+          if (state.lastSocketEvent is MessageSentEvent) {
+            final event = state.lastSocketEvent as MessageSentEvent;
+            final currentUserId = _chatController!.currentUser.id;
+            final isFromMe =
+                event.message.sender.id.toString() == currentUserId;
+            final alreadyPresent = _chatController!.initialMessageList.any(
+              (m) => m.id == event.message.id.toString(),
+            );
+            if (!alreadyPresent) {
+              if (isFromMe) {
+                final pendingIndex = _chatController!.initialMessageList
+                    .indexWhere(
+                      (m) =>
+                          m.sentBy == currentUserId &&
+                          m.message == event.message.content &&
+                          m.status == MessageStatus.pending,
+                    );
+                if (pendingIndex != -1) {
+                  _chatController!.initialMessageList[pendingIndex].setStatus =
+                      MessageStatus.delivered;
+                  return;
+                }
+              }
+              _chatController!.addMessage(
+                event.message.toChatViewMessage(currentUserId),
+              );
+            }
+          }
         }
 
         // Trigger rebuild so ChatView gets the controller
         setState(() {});
       },
       builder: (context, state) {
+        if (state.status == ChatStatus.error && _chatController == null) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    state.errorMessage ?? 'Something went wrong',
+                    style: AppTextStyle.interMedium14.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<ChatBloc>().add(
+                        FetchInitialMessages(widget.args.conversationId),
+                      );
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
         if (_chatController == null) {
           return const Center(child: CircularProgressIndicator());
         }
+
+        final hasProfilePic =
+            widget.args.profileImage != null &&
+            widget.args.profileImage!.isNotEmpty;
+
         return ChatView(
+          onSendTap: _onSendTap,
           chatViewStateConfig: ChatViewStateConfiguration(
             onReloadButtonTap: () {
               context.read<ChatBloc>().add(
@@ -158,28 +325,34 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
             ),
           ),
 
-          // onSendTap: _onSendTap,
           chatController: _chatController!,
-          chatViewState: ChatViewState.hasMessages,
+          chatViewState: state.messages.isEmpty
+              ? ChatViewState.noData
+              : ChatViewState.hasMessages,
 
           // ─── Features ──────────────────────────────────────────────────────────
           featureActiveConfig: const FeatureActiveConfig(
             enableOtherUserName: false,
             enablePagination: true,
-            enableSwipeToReply: true,
+            enableSwipeToReply: false,
             enableReactionPopup: true,
             enableScrollToBottomButton: true,
             enableDoubleTapToLike: true,
+            enableReplySnackBar: false,
+            enableChatSeparator: true,
+            receiptsBuilderVisibility: true,
           ),
 
           // ─── AppBar ────────────────────────────────────────────────────────────
           appBar: ChatViewAppBar(
-            imageType:
-                ImageType.asset, //TODO: change to network for real images
-
+            imageType: hasProfilePic ? ImageType.network : ImageType.asset,
             backGroundColor: scaffoldBg,
-            profilePicture: Assets.assetsImagesBackgroundDark,
-            chatTitle: 'Simform',
+            profilePicture: hasProfilePic
+                ? widget.args.profileImage!
+                : Assets.assetsImagesBackgroundDark,
+            chatTitle: widget.args.chatTitle.isNotEmpty
+                ? widget.args.chatTitle
+                : 'Chat',
             chatTitleTextStyle: AppTextStyle.interSemiBold16.copyWith(
               color: colorScheme.onSurface,
             ),
@@ -235,11 +408,46 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
               textStyle: AppTextStyle.interRegular16.copyWith(
                 color: colorScheme.onSurface,
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               color: AppColorsFromTheme.grayForTheme(context),
               borderRadius: BorderRadius.circular(16),
             ),
             outgoingChatBubbleConfig: ChatBubble(
+              receiptsWidgetConfig: ReceiptsWidgetConfig(
+                showReceiptsIn: ShowReceiptsIn.all,
+                receiptsBuilder: (status) {
+                  return switch (status) {
+                    MessageStatus.pending => const Padding(
+                      padding: EdgeInsets.only(left: 4),
+                      child: Icon(
+                        Icons.access_time_rounded,
+                        size: 14,
+                        color: AppColors.gray,
+                      ),
+                    ),
+                    MessageStatus.delivered => const Padding(
+                      padding: EdgeInsets.only(left: 4),
+                      child: Icon(
+                        Icons.done_all,
+                        size: 16,
+                        color: AppColors.gray,
+                      ),
+                    ),
+                    MessageStatus.read => const Padding(
+                      padding: EdgeInsets.only(left: 4),
+                      child: Icon(Icons.done_all, size: 16, color: Colors.blue),
+                    ),
+                    MessageStatus.undelivered => const Padding(
+                      padding: EdgeInsets.only(left: 4),
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 16,
+                        color: Colors.red,
+                      ),
+                    ),
+                  };
+                },
+              ),
               border: Border.all(
                 color: AppColorsFromTheme.grayForTheme(context),
                 width: 1.5,
@@ -258,7 +466,7 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
             showGlassMorphismEffect: true,
             backgroundColor: colorScheme.surface,
             shadow: BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -269,31 +477,16 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
 
           // ─── Reaction chip below bubbles ───────────────────────────────────────
 
-          // ─── Image messages ────────────────────────────────────────────────────
-          messageConfig: MessageConfiguration(
-            imageMessageConfig: ImageMessageConfiguration(
-              padding: const EdgeInsets.all(4),
-            ),
-          ),
-
           // ─── Input bar ─────────────────────────────────────────────────────────
           sendMessageConfig: SendMessageConfiguration(
-            voiceRecordingConfiguration: VoiceRecordingConfiguration(
-              waveStyle: WaveStyle(
-                waveColor: colorScheme.primary,
-                middleLineColor: colorScheme.primary,
-              ),
-              micIcon: SvgPicture.asset(
-                Assets.assetsIconsMic,
-                color: colorScheme.primary,
-              ),
-            ),
+            allowRecordingVoice: false,
+            shouldSendImageWithText: false,
             textFieldBackgroundColor: AppColorsFromTheme.grayForTheme(context),
             textFieldConfig: TextFieldConfiguration(
-              margin: EdgeInsetsDirectional.all(15),
+              margin: const EdgeInsetsDirectional.all(15),
               hintText: 'Message',
               hintStyle: AppTextStyle.interRegular16.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.4),
+                color: colorScheme.onSurface.withValues(alpha: 0.4),
               ),
               textStyle: AppTextStyle.interRegular16.copyWith(
                 color: colorScheme.onSurface,
@@ -303,21 +496,12 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                 horizontal: 16,
                 vertical: 10,
               ),
+              leadingActions: (context, controller) => const [],
+              trailingActions: (context, controller) => const [],
             ),
             sendButtonIcon: Icon(
               Icons.send_outlined,
               color: colorScheme.primary,
-            ),
-
-            imagePickerIconsConfig: ImagePickerIconsConfiguration(
-              galleryImagePickerIcon: SvgPicture.asset(
-                Assets.assetsIconsAttachment,
-                color: colorScheme.primary,
-              ),
-              cameraImagePickerIcon: Icon(
-                Icons.camera_alt_outlined,
-                color: colorScheme.primary,
-              ),
             ),
             replyMessageColor: colorScheme.onSurface,
             replyDialogColor: AppColorsFromTheme.grayForTheme(context),

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:archilink/core/error/failure.dart';
 import 'package:archilink/core/network/websocket/reverb_client.dart';
+import 'package:archilink/core/utils/device_helper.dart';
 import 'package:archilink/features/Auth/domain/repo/auth_repo.dart';
 import 'package:archilink/features/Auth/domain/repo/notification_repo.dart';
 import 'package:archilink/features/Auth/presentation/manager/cubits/cubit/current_user_cubit.dart';
@@ -10,20 +11,20 @@ import 'package:equatable/equatable.dart';
 
 part 'auth_state.dart';
 
-//TODO: Fix WebSocket Error: Client not connected.
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
   final NotificationRepo notificationRepo;
   final CurrentUserCubit currentUserCubit;
   final ReverbClient reverbClient;
-  // final PusherClient pusherClient;
+  final String reverbHost;
 
   AuthCubit(
     this.authRepo,
     this.currentUserCubit,
     this.notificationRepo,
-    this.reverbClient,
-  ) : super(AuthInitial());
+    this.reverbClient, {
+    required this.reverbHost,
+  }) : super(AuthInitial());
 
   Future<void> login({
     required String email,
@@ -45,8 +46,11 @@ class AuthCubit extends Cubit<AuthState> {
           token: success.accessToken,
           role: success.role,
         );
-
-        await reverbClient.init(token: success.accessToken);
+        await reverbClient.init(
+          token: success.accessToken,
+          host: reverbHost,
+          authHost: reverbHost,
+        );
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());
@@ -84,7 +88,11 @@ class AuthCubit extends Cubit<AuthState> {
           role: role,
         );
 
-        await reverbClient.init(token: success.token);
+        await reverbClient.init(
+          token: success.token,
+          host: reverbHost,
+          authHost: reverbHost,
+        );
 
         await notificationRepo.registerFCM();
         emit(AuthAuthenticated());

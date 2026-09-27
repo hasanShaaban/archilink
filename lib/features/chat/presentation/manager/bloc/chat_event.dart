@@ -7,10 +7,7 @@ class SubscribeToChat extends ChatBlocEvent {
   SubscribeToChat(this.userId);
 }
 
-class UnsubscribeFromChat extends ChatBlocEvent {
-  final int userId;
-  UnsubscribeFromChat(this.userId);
-}
+class UnsubscribeFromChat extends ChatBlocEvent {}
 
 class FetchInitialMessages extends ChatBlocEvent {
   final int conversationId;
@@ -30,5 +27,17 @@ class _OnInternalSocketEvent extends ChatBlocEvent {
 class _OnInternalSocketError extends ChatBlocEvent {
   final String error;
   _OnInternalSocketError(this.error);
+}
+
+class SendChatMessage extends ChatBlocEvent {
+  final int conversationId;
+  final String content;
+  final String tempId;
+
+  SendChatMessage({
+    required this.conversationId,
+    required this.content,
+    required this.tempId,
+  });
 }
 

@@ -171,17 +171,19 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
       case MessageDeletedEvent():
         context.read<ChatListCubit>().getChats();
 
-      case MessagesDeliveredEvent():
-        break;
-
-      case MessagesSeenEvent(:final conversationId):
-        final chatIdStr = conversationId.toString();
+      case MessagesSeenEvent(:final chatId):
+        final chatIdStr = chatId.toString();
         if (chatListController.chatListMap.containsKey(chatIdStr)) {
           chatListController.updateChat(
             chatIdStr,
             (previousChat) => previousChat.copyWith(unreadCount: 0),
           );
         }
+
+      case MessageReactionAddedEvent():
+      case MessageReactionRemovedEvent():
+        // Reaction events are handled inside the individual chat view, not here.
+        break;
     }
   }
 

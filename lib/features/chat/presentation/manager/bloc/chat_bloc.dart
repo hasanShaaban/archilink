@@ -23,6 +23,7 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
     on<FetchMoreMessages>(_onFetchMore);
     on<_OnInternalSocketEvent>(_onSocketEvent);
     on<_OnInternalSocketError>(_onSocketError);
+    on<SendChatMessage>(_onSendMessage);
   }
 
   Future<void> _onSubscribe(
@@ -67,8 +68,9 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
           lastSocketEvent: socketEvent,
         ));
 
-      case MessagesDeliveredEvent():
       case MessagesSeenEvent():
+      case MessageReactionAddedEvent():
+      case MessageReactionRemovedEvent():
         emit(state.copyWith(lastSocketEvent: socketEvent));
     }
   }
@@ -90,6 +92,7 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
     _subscribedUserId = null;
     await _subscription?.cancel();
     _subscription = null;
+    await _listenToChat.disconnect();
     emit(ChatState());
   }
 
@@ -104,7 +107,13 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
     FetchInitialMessages event,
     Emitter<ChatState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true, status: ChatStatus.loading));
+    emit(state.copyWith(
+      isLoading: true,
+      status: ChatStatus.loading,
+      messages: [],
+      participants: [],
+      page: 1,
+    ));
 
     final result = await _chatRepo.fetchMessages(
       conversationId: event.conversationId,
@@ -168,6 +177,37 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
           page: state.page + 1,
         ),
       ),
+    );
+  }
+
+  Future<void> _onSendMessage(
+    SendChatMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    final result = await _chatRepo.sendMessage(
+      conversationId: event.conversationId,
+      content: event.content,
+    );
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          errorMessage: failure.message,
+          failedTempId: event.tempId,
+        ),
+      ),
+      (sentMessage) {
+        final updated = state.messages.any((m) => m.id == sentMessage.id)
+            ? state.messages
+            : [sentMessage, ...state.messages];
+        emit(
+          state.copyWith(
+            messages: updated,
+            lastSentMessage: sentMessage,
+            lastSentTempId: event.tempId,
+          ),
+        );
+      },
     );
   }
 }

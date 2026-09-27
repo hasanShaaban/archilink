@@ -11,15 +11,26 @@ class MessagesResponseModel extends MessagesResponseEntity {
   // Parses the full API response:
   // { "status": "success", "message": { "messages": [...], "pagination": {...} } }
   factory MessagesResponseModel.fromJson(Map<String, dynamic> json) {
-    final body = json['data'] as Map<String, dynamic>;
+    final body = (json['data'] is Map<String, dynamic>)
+        ? json['data'] as Map<String, dynamic>
+        : json;
+
+    final messagesList = body['messages'] as List? ?? [];
+    final paginationMap = body['pagination'] as Map<String, dynamic>?;
 
     return MessagesResponseModel(
-      messages: (body['messages'] as List)
+      messages: messagesList
           .map((m) => MessageModel.fromJson(m as Map<String, dynamic>))
           .toList(),
-      pagination: MessagesPaginationModel.fromJson(
-        body['pagination'] as Map<String, dynamic>,
-      ),
+      pagination: paginationMap != null
+          ? MessagesPaginationModel.fromJson(paginationMap)
+          : const MessagesPaginationModel(
+              currentPage: 1,
+              perPage: 50,
+              lastPage: 1,
+              total: 0,
+              hasMore: false,
+            ),
     );
   }
 }

@@ -8,6 +8,7 @@ extension MessageMapper on MessageEntity {
       message: content,
       createdAt: sentAt ?? DateTime.now(),
       sentBy: sender.id.toString(),
+      status: MessageStatus.delivered,
       // Map first reaction if any — chatview takes a single emoji string
       reaction: reactions.isNotEmpty
           ? Reaction(

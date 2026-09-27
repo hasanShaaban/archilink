@@ -17,21 +17,26 @@ class MessageModel extends MessageEntity {
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
       id: json['id'] as int,
-      chatId: json['chat_id'] as int,
+      chatId: (json['chat_id'] ?? json['chatId']) as int,
       content: json['content'] as String,
       sentAt: json['sent_at'] != null
-          ? DateTime.parse(json['sent_at'] as String)
+          ? DateTime.tryParse(json['sent_at'] as String)
           : null,
       editedAt: json['edited_at'] != null
-          ? DateTime.parse(json['edited_at'] as String)
+          ? DateTime.tryParse(json['edited_at'] as String)
           : null,
       sender: SenderModel.fromJson(json['sender'] as Map<String, dynamic>),
-      receiptUserIds: (json['receipts'] as List)
-          .map((r) => r['user_id'] as int)
-          .toList(),
-      reactions: (json['reactions'] as List)
-          .map((r) => ReactionModel.fromJson(r as Map<String, dynamic>))
-          .toList(),
+      receiptUserIds: (json['receipts'] as List?)
+              ?.map((r) => (r is Map ? r['user_id'] : r) as int)
+              .toList() ??
+          (json['receipt_user_ids'] as List?)
+              ?.map((r) => r as int)
+              .toList() ??
+          [],
+      reactions: (json['reactions'] as List?)
+              ?.map((r) => ReactionModel.fromJson(r as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 }
