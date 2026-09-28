@@ -9,9 +9,11 @@ class ReactionModel extends ReactionEntity {
 
   factory ReactionModel.fromJson(Map<String, dynamic> json) {
     return ReactionModel(
-      userId: json['user_id'] as int,
-      reaction: json['reaction'] as String,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      userId: ((json['user_id'] ?? json['userId']) as num?)?.toInt() ?? 0,
+      reaction: (json['reaction'] ?? '') as String,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
     );
   }
 }

@@ -8,12 +8,15 @@ abstract class ChatWebsocketRepo {
 
 sealed class ChatSocketEvent {}
 
-/// Fired when a new message is sent.
-/// Backend event: `message.sent`
-class MessageSentEvent extends ChatSocketEvent {
+/// Fired when a new message is added.
+/// Backend event: `message.added`
+class MessageAddedEvent extends ChatSocketEvent {
   final MessageEntity message;
-  MessageSentEvent(this.message);
+  MessageAddedEvent(this.message);
 }
+
+/// Backwards compatibility alias for MessageAddedEvent
+typedef MessageSentEvent = MessageAddedEvent;
 
 /// Fired when a message is deleted.
 /// Backend event: `message.deleted`

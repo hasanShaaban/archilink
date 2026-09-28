@@ -15,6 +15,13 @@ class ChatState {
   final String? lastSentTempId;
   final String? failedTempId;
 
+  /// The conversation ID currently loaded in this chat view.
+  final int? currentConversationId;
+
+  /// Pre-built ChatController owned by the Bloc so the view never rebuilds it.
+  /// Null until the first page of messages has arrived.
+  final ChatController? chatController;
+
   ChatState({
     this.messages = const [],
     this.isLoading = false,
@@ -27,6 +34,8 @@ class ChatState {
     this.lastSentMessage,
     this.lastSentTempId,
     this.failedTempId,
+    this.currentConversationId,
+    this.chatController,
   });
 
   ChatState copyWith({
@@ -41,6 +50,9 @@ class ChatState {
     MessageEntity? lastSentMessage,
     String? lastSentTempId,
     String? failedTempId,
+    int? currentConversationId,
+    ChatController? chatController,
+    bool clearChatController = false,
   }) {
     return ChatState(
       messages: messages ?? this.messages,
@@ -54,7 +66,10 @@ class ChatState {
       lastSentMessage: lastSentMessage ?? this.lastSentMessage,
       lastSentTempId: lastSentTempId ?? this.lastSentTempId,
       failedTempId: failedTempId ?? this.failedTempId,
+      currentConversationId:
+          currentConversationId ?? this.currentConversationId,
+      chatController:
+          clearChatController ? null : (chatController ?? this.chatController),
     );
   }
 }
-

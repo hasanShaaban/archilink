@@ -7,7 +7,6 @@ import 'package:archilink/features/Chat/data/model/chat_model/message_model.dart
 import 'package:archilink/features/Chat/data/model/chat_model/reaction_model.dart';
 import 'package:archilink/features/Chat/domain/data_source/chat_websocket_remote_data_source.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
-import 'package:dart_pusher_channels/dart_pusher_channels.dart';
 
 class ChatWebsocketRemoteDataSourceImpl
     implements ChatWebsocketRemoteDataSource {
@@ -23,7 +22,9 @@ class ChatWebsocketRemoteDataSourceImpl
   Stream<ChatSocketEvent> connect(int currentUserId) {
     // Guard: reuse the existing stream if already connected for this user.
     if (_connectedUserId == currentUserId && _controller != null) {
-      log('[Reverb] Already connected to private-user.$currentUserId — reusing stream');
+      log(
+        '[Reverb] Already connected to private-user.$currentUserId — reusing stream',
+      );
       return _controller!.stream;
     }
 
@@ -36,9 +37,6 @@ class ChatWebsocketRemoteDataSourceImpl
     final controller = StreamController<ChatSocketEvent>.broadcast();
     _controller = controller;
 
-    // IMPORTANT: pass the full wire name. This package does NOT auto-prepend
-    // 'private-'. The name is used verbatim on the wire AND as the key for
-    // routing incoming events.
     final channel = _reverbClient.privateChannel('private-user.$currentUserId');
 
     _subscriptions.addAll([
@@ -46,14 +44,25 @@ class ChatWebsocketRemoteDataSourceImpl
         log('[Reverb] Subscribed to private-user.$currentUserId');
       }),
       channel.bind('pusher:subscription_error').listen((event) {
-        log('[Reverb] Subscription error on private-user.$currentUserId | data: ${event.data}');
+        log(
+          '[Reverb] Subscription error on private-user.$currentUserId | data: ${event.data}',
+        );
+      }),
+
+      channel.bind('message.added').listen((event) {
+        log('[Reverb] message.added RAW: ${event.data}');
+        if (controller.isClosed) return;
+        final data = _decode(event.data);
+        final messageData = (data['message'] as Map<String, dynamic>?) ?? data;
+        controller.add(MessageAddedEvent(MessageModel.fromJson(messageData)));
       }),
 
       channel.bind('message.sent').listen((event) {
         log('[Reverb] message.sent RAW: ${event.data}');
         if (controller.isClosed) return;
         final data = _decode(event.data);
-        controller.add(MessageSentEvent(MessageModel.fromJson(data)));
+        final messageData = (data['message'] as Map<String, dynamic>?) ?? data;
+        controller.add(MessageAddedEvent(MessageModel.fromJson(messageData)));
       }),
 
       channel.bind('message.deleted').listen((event) {
@@ -68,7 +77,7 @@ class ChatWebsocketRemoteDataSourceImpl
         );
       }),
 
-      channel.bind('messages.seen').listen((event) {
+      channel.bind('message.seen').listen((event) {
         log('[Reverb] messages.seen RAW: ${event.data}');
         if (controller.isClosed) return;
         final data = _decode(event.data);
@@ -109,7 +118,9 @@ class ChatWebsocketRemoteDataSourceImpl
 
       // Re-subscribe on reconnect (e.g. after a network drop).
       _reverbClient.client.onConnectionEstablished.listen((_) {
-        log('[Reverb] Reconnected — resubscribing to private-user.$currentUserId');
+        log(
+          '[Reverb] Reconnected — resubscribing to private-user.$currentUserId',
+        );
         channel.subscribeIfNotUnsubscribed();
       }),
     ]);
@@ -138,4 +149,3 @@ class ChatWebsocketRemoteDataSourceImpl
     return {};
   }
 }
-

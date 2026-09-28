@@ -164,12 +164,39 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
             },
           );
         } else {
-          // If a new conversation was created that isn't in our list, refresh chats
-          context.read<ChatListCubit>().getChats();
+          // If a new conversation was created that isn't in our list yet, add it locally
+          final isFromOther = message.sender.id != currentUserId;
+          chatListController.loadMoreChats([
+            ChatListItem(
+              id: chatIdStr,
+              name: message.sender.name,
+              chatRoomType: ChatRoomType.oneToOne,
+              imageUrl: message.sender.userAvatar,
+              unreadCount: isFromOther ? 1 : 0,
+              lastMessage: Message(
+                id: message.id.toString(),
+                message: message.content,
+                createdAt: message.sentAt ?? DateTime.now(),
+                sentBy: message.sender.id.toString(),
+                status: MessageStatus.delivered,
+              ),
+            ),
+          ]);
         }
 
-      case MessageDeletedEvent():
-        context.read<ChatListCubit>().getChats();
+      case MessageDeletedEvent(:final chatId, :final messageId):
+        final chatIdStr = chatId.toString();
+        if (chatListController.chatListMap.containsKey(chatIdStr)) {
+          final item = chatListController.chatListMap[chatIdStr];
+          if (item?.lastMessage?.id == messageId.toString()) {
+            chatListController.updateChat(
+              chatIdStr,
+              (previousChat) => previousChat.copyWith(
+                lastMessage: null,
+              ),
+            );
+          }
+        }
 
       case MessagesSeenEvent(:final chatId):
         final chatIdStr = chatId.toString();

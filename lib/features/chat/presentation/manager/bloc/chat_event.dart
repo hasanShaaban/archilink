@@ -11,12 +11,22 @@ class UnsubscribeFromChat extends ChatBlocEvent {}
 
 class FetchInitialMessages extends ChatBlocEvent {
   final int conversationId;
-  FetchInitialMessages(this.conversationId);
+  final int currentUserId;
+  final String chatTitle;
+  final String? profileImage;
+
+  FetchInitialMessages({
+    required this.conversationId,
+    required this.currentUserId,
+    required this.chatTitle,
+    this.profileImage,
+  });
 }
 
 class FetchMoreMessages extends ChatBlocEvent {
   final int conversationId;
-  FetchMoreMessages(this.conversationId);
+  final Completer<List<MessageEntity>?>? completer;
+  FetchMoreMessages(this.conversationId, [this.completer]);
 }
 
 class _OnInternalSocketEvent extends ChatBlocEvent {

@@ -16,25 +16,28 @@ class MessageModel extends MessageEntity {
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
-      id: json['id'] as int,
-      chatId: (json['chat_id'] ?? json['chatId']) as int,
-      content: json['content'] as String,
+      id: (json['id'] as num).toInt(),
+      chatId: ((json['chat_id'] ?? json['chatId']) as num).toInt(),
+      content: (json['content'] ?? '') as String,
       sentAt: json['sent_at'] != null
-          ? DateTime.tryParse(json['sent_at'] as String)
+          ? DateTime.tryParse(json['sent_at'].toString())
           : null,
       editedAt: json['edited_at'] != null
-          ? DateTime.tryParse(json['edited_at'] as String)
+          ? DateTime.tryParse(json['edited_at'].toString())
           : null,
-      sender: SenderModel.fromJson(json['sender'] as Map<String, dynamic>),
+      sender: json['sender'] is Map<String, dynamic>
+          ? SenderModel.fromJson(json['sender'] as Map<String, dynamic>)
+          : const SenderModel(id: 0, name: '', username: ''),
       receiptUserIds: (json['receipts'] as List?)
-              ?.map((r) => (r is Map ? r['user_id'] : r) as int)
+              ?.map((r) => (r is Map ? (r['user_id'] as num).toInt() : (r as num).toInt()))
               .toList() ??
           (json['receipt_user_ids'] as List?)
-              ?.map((r) => r as int)
+              ?.map((r) => (r as num).toInt())
               .toList() ??
           [],
       reactions: (json['reactions'] as List?)
-              ?.map((r) => ReactionModel.fromJson(r as Map<String, dynamic>))
+              ?.whereType<Map<String, dynamic>>()
+              .map(ReactionModel.fromJson)
               .toList() ??
           [],
     );

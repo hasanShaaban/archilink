@@ -14,10 +14,10 @@ class SenderModel extends SenderEntity {
 
   factory SenderModel.fromJson(Map<String, dynamic> json) {
     return SenderModel(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      username: json['username'] as String,
-      userAvatar: (json['avatar'] ?? json['user_avatar']) as String?,
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      name: (json['name'] ?? '') as String,
+      username: (json['username'] ?? '') as String,
+      userAvatar: (json['avatar'] ?? json['user_avatar'] ?? json['profile_photo_url'] ?? json['image']) as String?,
       country: json['country'] as String?,
       city: json['city'] as String?,
       role: json['role'] as String?,
