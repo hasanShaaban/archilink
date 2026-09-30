@@ -14,6 +14,8 @@ class ChatState {
   final MessageEntity? lastSentMessage;
   final String? lastSentTempId;
   final String? failedTempId;
+  final bool isDeleting;
+  final String? deleteErrorMessage;
 
   /// The conversation ID currently loaded in this chat view.
   final int? currentConversationId;
@@ -21,6 +23,13 @@ class ChatState {
   /// Pre-built ChatController owned by the Bloc so the view never rebuilds it.
   /// Null until the first page of messages has arrived.
   final ChatController? chatController;
+
+  /// The last message id the OTHER user has read (their inbox max id).
+  /// Initialized from ChatEntity.readOutboxMaxId when entering a chat.
+  /// Updated when a [MessagesSeenEvent] or [MarkMessagesSeen] carries a
+  /// larger value.  Any outgoing message with id <= readOutboxMaxId is "read"
+  /// (green ticks); messages above it are "delivered" (gray ticks).
+  final int? readOutboxMaxId;
 
   ChatState({
     this.messages = const [],
@@ -34,8 +43,11 @@ class ChatState {
     this.lastSentMessage,
     this.lastSentTempId,
     this.failedTempId,
+    this.isDeleting = false,
+    this.deleteErrorMessage,
     this.currentConversationId,
     this.chatController,
+    this.readOutboxMaxId,
   });
 
   ChatState copyWith({
@@ -50,9 +62,13 @@ class ChatState {
     MessageEntity? lastSentMessage,
     String? lastSentTempId,
     String? failedTempId,
+    bool? isDeleting,
+    String? deleteErrorMessage,
+    bool clearDeleteError = false,
     int? currentConversationId,
     ChatController? chatController,
     bool clearChatController = false,
+    int? readOutboxMaxId,
   }) {
     return ChatState(
       messages: messages ?? this.messages,
@@ -66,10 +82,14 @@ class ChatState {
       lastSentMessage: lastSentMessage ?? this.lastSentMessage,
       lastSentTempId: lastSentTempId ?? this.lastSentTempId,
       failedTempId: failedTempId ?? this.failedTempId,
+      isDeleting: isDeleting ?? this.isDeleting,
+      deleteErrorMessage:
+          clearDeleteError ? null : (deleteErrorMessage ?? this.deleteErrorMessage),
       currentConversationId:
           currentConversationId ?? this.currentConversationId,
       chatController:
           clearChatController ? null : (chatController ?? this.chatController),
+      readOutboxMaxId: readOutboxMaxId ?? this.readOutboxMaxId,
     );
   }
 }

@@ -93,27 +93,90 @@ class ChatWebsocketRemoteDataSourceImpl
       channel.bind('message.reaction.added').listen((event) {
         log('[Reverb] message.reaction.added RAW: ${event.data}');
         if (controller.isClosed) return;
-        final data = _decode(event.data);
-        final reactionData = data['reaction'] as Map<String, dynamic>;
-        controller.add(
-          MessageReactionAddedEvent(
-            chatId: data['chat_id'] as int,
-            reaction: ReactionModel.fromJson(reactionData),
-          ),
-        );
+        try {
+          final data = _decode(event.data);
+          final Map<String, dynamic> reactionData;
+          if (data['reaction'] is Map<String, dynamic>) {
+            reactionData = data['reaction'] as Map<String, dynamic>;
+          } else if (data['data'] is Map<String, dynamic>) {
+            reactionData = data['data'] as Map<String, dynamic>;
+          } else {
+            reactionData = data;
+          }
+
+          final chatIdRaw = data['chat_id'] ??
+              data['chatId'] ??
+              reactionData['chat_id'] ??
+              reactionData['chatId'];
+          final chatId = int.tryParse(chatIdRaw?.toString() ?? '') ?? 0;
+
+          final msgIdRaw = reactionData['message_id'] ??
+              reactionData['messageId'] ??
+              data['message_id'] ??
+              data['messageId'];
+          final messageId = int.tryParse(msgIdRaw?.toString() ?? '') ?? 0;
+
+          final reactionModel = ReactionModel.fromJson(reactionData);
+
+          log(
+            '[Reverb] Parsed reaction.added: chatId=$chatId, messageId=$messageId, emoji=${reactionModel.reaction}, user=${reactionModel.userId}',
+          );
+
+          controller.add(
+            MessageReactionAddedEvent(
+              chatId: chatId,
+              messageId: messageId,
+              reaction: reactionModel,
+            ),
+          );
+        } catch (e, st) {
+          log('[Reverb] Error parsing message.reaction.added: $e\n$st');
+        }
       }),
 
       channel.bind('message.reaction.removed').listen((event) {
         log('[Reverb] message.reaction.removed RAW: ${event.data}');
         if (controller.isClosed) return;
-        final data = _decode(event.data);
-        controller.add(
-          MessageReactionRemovedEvent(
-            chatId: data['chat_id'] as int,
-            messageId: data['message_id'] as int,
-            userId: data['user_id'] as int,
-          ),
-        );
+        try {
+          final data = _decode(event.data);
+          final inner = (data['data'] is Map<String, dynamic>)
+              ? data['data'] as Map<String, dynamic>
+              : (data['reaction'] is Map<String, dynamic>
+                  ? data['reaction'] as Map<String, dynamic>
+                  : data);
+
+          final chatIdRaw = data['chat_id'] ??
+              data['chatId'] ??
+              inner['chat_id'] ??
+              inner['chatId'];
+          final chatId = int.tryParse(chatIdRaw?.toString() ?? '') ?? 0;
+
+          final msgIdRaw = inner['message_id'] ??
+              inner['messageId'] ??
+              data['message_id'] ??
+              data['messageId'];
+          final messageId = int.tryParse(msgIdRaw?.toString() ?? '') ?? 0;
+
+          final userIdRaw = inner['user_id'] ??
+              inner['userId'] ??
+              data['user_id'] ??
+              data['userId'];
+          final userId = int.tryParse(userIdRaw?.toString() ?? '') ?? 0;
+
+          log(
+            '[Reverb] Parsed reaction.removed: chatId=$chatId, messageId=$messageId, user=$userId',
+          );
+
+          controller.add(
+            MessageReactionRemovedEvent(
+              chatId: chatId,
+              messageId: messageId,
+              userId: userId,
+            ),
+          );
+        } catch (e, st) {
+          log('[Reverb] Error parsing message.reaction.removed: $e\n$st');
+        }
       }),
 
       // Re-subscribe on reconnect (e.g. after a network drop).

@@ -7,7 +7,7 @@ class NetworkConfig {
   // Android emulator cannot reach 127.0.0.1 (that's the emulator's own loopback).
   // It reaches the host machine via the special alias 10.0.2.2.
   static const String reverbEmulatorHost = '10.0.2.2';
-  static const String reverbPhysicalHost = '10.210.48.104';
+  static const String reverbPhysicalHost = '10.199.103.103';
 
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 15);

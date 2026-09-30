@@ -15,11 +15,16 @@ class FetchInitialMessages extends ChatBlocEvent {
   final String chatTitle;
   final String? profileImage;
 
+  /// The readOutboxMaxId from the ChatEntity — used to initialise which
+  /// outgoing messages already show green ticks before any WebSocket event.
+  final int? readOutboxMaxId;
+
   FetchInitialMessages({
     required this.conversationId,
     required this.currentUserId,
     required this.chatTitle,
     this.profileImage,
+    this.readOutboxMaxId,
   });
 }
 
@@ -51,3 +56,58 @@ class SendChatMessage extends ChatBlocEvent {
   });
 }
 
+class DeleteChatMessage extends ChatBlocEvent {
+  final int conversationId;
+  final int messageId;
+
+  /// The ID string of this message as it currently lives in ChatController.
+  /// This may be a temp ID (e.g. "1719000000000") for messages that were
+  /// added optimistically and whose real-ID bubble also exists after socket
+  /// delivery, or the real ID string (e.g. "82").
+  /// The handler removes BOTH this ID and the real ID string from the
+  /// controller so no stale bubble remains.
+  final String chatViewMessageId;
+
+  DeleteChatMessage({
+    required this.conversationId,
+    required this.messageId,
+    required this.chatViewMessageId,
+  });
+}
+
+class ReactToMessage extends ChatBlocEvent {
+  final int conversationId;
+  final int messageId;
+  final String emoji;
+
+  ReactToMessage({
+    required this.conversationId,
+    required this.messageId,
+    required this.emoji,
+  });
+}
+
+class RemoveReaction extends ChatBlocEvent {
+  final int conversationId;
+  final int messageId;
+
+  RemoveReaction({
+    required this.conversationId,
+    required this.messageId,
+  });
+}
+
+/// Fired from the UI when an incoming message becomes visible on screen.
+/// The bloc will POST to chats/{conversationId}/seen and update outbox status
+/// locally if [messageId] > current [readOutboxMaxId].
+class MarkMessagesSeen extends ChatBlocEvent {
+  final int conversationId;
+
+  /// The integer ID of the last visible incoming message.
+  final int messageId;
+
+  MarkMessagesSeen({
+    required this.conversationId,
+    required this.messageId,
+  });
+}

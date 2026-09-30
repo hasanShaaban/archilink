@@ -16,4 +16,26 @@ abstract class ChatRepo {
     required int conversationId,
     required String content,
   });
+
+  Future<Either<Failure, void>> deleteMessage({
+    required int conversationId,
+    required int messageId,
+  });
+
+  Future<Either<Failure, void>> reactMessage({
+    required int conversationId,
+    required int messageId,
+    required String reaction,
+  });
+
+  Future<Either<Failure, void>> removeReaction({
+    required int conversationId,
+    required int messageId,
+  });
+
+  /// POST chats/{conversationId}/seen
+  Future<Either<Failure, void>> markMessagesSeen({
+    required int conversationId,
+    required int lastSeenMessageId,
+  });
 }

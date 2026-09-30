@@ -69,4 +69,83 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       throw AppException.handelDioException(e);
     }
   }
+
+  @override
+  Future<void> deleteMessage({
+    required int conversationId,
+    required int messageId,
+  }) async {
+    try {
+      await apiService.delete(
+        'chats/$conversationId/messages/$messageId',
+      );
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<void> reactMessage({
+    required int conversationId,
+    required int messageId,
+    required String reaction,
+  }) async {
+    try {
+      await apiService.post(
+        'chats/$conversationId/react',
+        body: {
+          'message_id': messageId.toString(),
+          'reaction': reaction,
+        },
+      );
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<void> removeReaction({
+    required int conversationId,
+    required int messageId,
+  }) async {
+    try {
+      await apiService.delete(
+        'chats/$conversationId/react',
+        body: {
+          'message_id': messageId.toString(),
+        },
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 405) {
+        // Fallback to POST if server endpoint does not allow DELETE
+        try {
+          await apiService.post(
+            'chats/$conversationId/react',
+            body: {
+              'message_id': messageId.toString(),
+            },
+          );
+          return;
+        } on DioException catch (postError) {
+          throw AppException.handelDioException(postError);
+        }
+      }
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<void> markMessagesSeen({
+    required int conversationId,
+    required int lastSeenMessageId,
+  }) async {
+    try {
+      await apiService.post(
+        'chats/$conversationId/seen',
+        body: {'last_seen_message_id': lastSeenMessageId},
+      );
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }

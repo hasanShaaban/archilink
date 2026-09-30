@@ -59,4 +59,78 @@ class ChatRepoImpl extends ChatRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, void>> deleteMessage({
+    required int conversationId,
+    required int messageId,
+  }) async {
+    try {
+      await remoteDataSource.deleteMessage(
+        conversationId: conversationId,
+        messageId: messageId,
+      );
+      return right(null);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> reactMessage({
+    required int conversationId,
+    required int messageId,
+    required String reaction,
+  }) async {
+    try {
+      await remoteDataSource.reactMessage(
+        conversationId: conversationId,
+        messageId: messageId,
+        reaction: reaction,
+      );
+      return right(null);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> removeReaction({
+    required int conversationId,
+    required int messageId,
+  }) async {
+    try {
+      await remoteDataSource.removeReaction(
+        conversationId: conversationId,
+        messageId: messageId,
+      );
+      return right(null);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> markMessagesSeen({
+    required int conversationId,
+    required int lastSeenMessageId,
+  }) async {
+    try {
+      await remoteDataSource.markMessagesSeen(
+        conversationId: conversationId,
+        lastSeenMessageId: lastSeenMessageId,
+      );
+      return right(null);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

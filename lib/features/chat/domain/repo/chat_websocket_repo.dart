@@ -44,11 +44,16 @@ class MessagesSeenEvent extends ChatSocketEvent {
 
 /// Fired when a reaction is added to a message.
 /// Backend event: `message.reaction.added`
-/// Payload: { chat_id, reaction: MessageReactionResource }
+/// Payload: { chat_id, message_id, reaction: MessageReactionResource }
 class MessageReactionAddedEvent extends ChatSocketEvent {
   final int chatId;
+  final int messageId;
   final ReactionEntity reaction;
-  MessageReactionAddedEvent({required this.chatId, required this.reaction});
+  MessageReactionAddedEvent({
+    required this.chatId,
+    required this.messageId,
+    required this.reaction,
+  });
 }
 
 /// Fired when a reaction is removed from a message.

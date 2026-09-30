@@ -28,7 +28,7 @@ class ApiService {
     return dio.put<T>(path, data: body);
   }
 
-  Future<Response<T>> delete<T>(String path) {
-    return dio.delete<T>(path);
+  Future<Response<T>> delete<T>(String path, {dynamic body}) {
+    return dio.delete<T>(path, data: body);
   }
 }

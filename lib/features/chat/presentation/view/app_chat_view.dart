@@ -34,6 +34,7 @@ class AppChatView extends StatelessWidget {
                 currentUserId: currentUserId,
                 chatTitle: args.chatTitle,
                 profileImage: args.profileImage,
+                readOutboxMaxId: args.readOutboxMaxId,
               ),
             ),
           child: _ChatViewBody(args: args),
@@ -63,6 +64,77 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
   String? _lastHandledSentTempId;
   String? _lastHandledFailedTempId;
   final Map<String, String> _tempIdToRealId = {};
+
+  // ─── Delete (unsend) tap ─────────────────────────────────────────────────
+  void _onUnsendTap(Message message) {
+    final chatBloc = context.read<ChatBloc>();
+    final conversationId = chatBloc.state.currentConversationId;
+    if (conversationId == null) return;
+
+    // message.id is the ID as it lives in the ChatController.
+    // It may be a temp timestamp string (e.g. "1719000000000") or the real
+    // backend ID string (e.g. "82").
+    final chatViewMessageId = message.id;
+
+    // Look up the real backend ID. If it was confirmed by the socket/API,
+    // it will be in _tempIdToRealId.  Otherwise message.id IS the real ID.
+    final resolvedIdStr = _tempIdToRealId[chatViewMessageId] ?? chatViewMessageId;
+    final messageId = int.tryParse(resolvedIdStr);
+
+    // Guard: if we can't resolve a numeric ID it's still pending — the
+    // server hasn't acknowledged it yet, so there's nothing to delete.
+    if (messageId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please wait for the message to be delivered before deleting.'),
+        ),
+      );
+      return;
+    }
+
+    // Extra safety: a temp timestamp number (13 digits) is never a real ID.
+    // If _tempIdToRealId has no mapping yet but message.id looks like a
+    // millisecond timestamp, the real ID hasn't been received yet.
+    if (_tempIdToRealId.containsKey(chatViewMessageId) == false &&
+        resolvedIdStr.length >= 10 &&
+        !chatBloc.state.messages.any((m) => m.id == messageId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please wait for the message to be delivered before deleting.'),
+        ),
+      );
+      return;
+    }
+
+    showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete message'),
+        content: const Text('Are you sure you want to delete this message?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed == true && mounted) {
+        context.read<ChatBloc>().add(
+              DeleteChatMessage(
+                conversationId: conversationId,
+                messageId: messageId,
+                chatViewMessageId: chatViewMessageId,
+              ),
+            );
+      }
+    });
+  }
 
   // ─── Send tap ────────────────────────────────────────────────────────────
   void _onSendTap(
@@ -117,16 +189,55 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
     if (olderEntities != null && olderEntities.isNotEmpty && ctrl != null) {
       final currentUserId = ctrl.currentUser.id;
       final existingIds = ctrl.initialMessageList.map((m) => m.id).toSet();
+      // Snapshot readOutboxMaxId at the time the page resolved so that older
+      // outgoing messages already read by the other user show blue ticks.
+      final readOutboxMaxId = chatBloc.state.readOutboxMaxId ?? 0;
 
+      // Older messages come in newest-first from the API; reverse so they
+      // are in oldest-first order, matching the ascending timeline at the top.
       final uniqueOlder = olderEntities
-          .map((e) => e.toChatViewMessage(currentUserId))
+          .map((e) {
+            final msg = e.toChatViewMessage(currentUserId);
+            // Apply read status: if this outgoing message's id ≤ readOutboxMaxId
+            // the other user has already read it — show blue ticks.
+            final msgId = int.tryParse(msg.id);
+            if (msgId != null &&
+                readOutboxMaxId > 0 &&
+                msgId <= readOutboxMaxId &&
+                msg.sentBy == currentUserId &&
+                msg.status != MessageStatus.read) {
+              return Message(
+                id: msg.id,
+                message: msg.message,
+                createdAt: msg.createdAt,
+                sentBy: msg.sentBy,
+                status: MessageStatus.read,
+                replyMessage: msg.replyMessage,
+                reaction: msg.reaction,
+                messageType: msg.messageType,
+              );
+            }
+            return msg;
+          })
           .toList()
           .reversed
           .where((m) => !existingIds.contains(m.id))
           .toList();
 
       if (uniqueOlder.isNotEmpty) {
-        ctrl.loadMoreData(uniqueOlder, direction: direction);
+        // ⚠️  We do NOT call ctrl.loadMoreData() here.
+        // chatview's loadMoreData() internally tries to restore scroll
+        // position by computing an item index after insertion. That
+        // calculation produces an out-of-bounds index when the total list
+        // size doesn't match its assumptions, crashing with:
+        //   RangeError (length): Not in inclusive range 0..N: N+k
+        //
+        // Instead, prepend directly and notify via the stream — chatview
+        // will re-render the list correctly without any scroll arithmetic.
+        ctrl.initialMessageList.insertAll(0, uniqueOlder);
+        if (!ctrl.messageStreamController.isClosed) {
+          ctrl.messageStreamController.sink.add(ctrl.initialMessageList);
+        }
       }
     }
   }
@@ -152,6 +263,7 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
       currentUserId: currentUserId,
       chatTitle: widget.args.chatTitle,
       profileImage: widget.args.profileImage,
+      readOutboxMaxId: widget.args.readOutboxMaxId,
     );
   }
 
@@ -160,6 +272,7 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final currentUserId = context.read<CurrentUserCubit>().state.id ?? 0;
 
     return BlocConsumer<ChatBloc, ChatState>(
       // Rebuild when the controller reference changes (new chat) or status changes
@@ -169,7 +282,8 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
           prev.errorMessage != curr.errorMessage,
       listenWhen: (prev, curr) =>
           prev.lastSentTempId != curr.lastSentTempId ||
-          prev.failedTempId != curr.failedTempId,
+          prev.failedTempId != curr.failedTempId ||
+          prev.deleteErrorMessage != curr.deleteErrorMessage,
       listener: (context, state) {
         final ctrl = state.chatController;
         if (ctrl == null) return;
@@ -184,10 +298,24 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                 state.lastSentMessage!.id.toString();
           }
 
+          final realIdStr = state.lastSentMessage?.id.toString();
           final idx = ctrl.initialMessageList
               .indexWhere((m) => m.id == state.lastSentTempId);
           if (idx != -1) {
-            ctrl.initialMessageList[idx].setStatus = MessageStatus.delivered;
+            final existing = ctrl.initialMessageList[idx];
+            ctrl.initialMessageList[idx] = Message(
+              id: realIdStr ?? existing.id,
+              message: existing.message,
+              createdAt: existing.createdAt,
+              sentBy: existing.sentBy,
+              status: MessageStatus.delivered,
+              replyMessage: existing.replyMessage,
+              reaction: existing.reaction,
+              messageType: existing.messageType,
+            );
+            if (!ctrl.messageStreamController.isClosed) {
+              ctrl.messageStreamController.sink.add(ctrl.initialMessageList);
+            }
           }
         }
 
@@ -204,6 +332,15 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.errorMessage!)));
           }
+        }
+        // ─ Delete failure: show error snackbar
+        if (state.deleteErrorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.deleteErrorMessage!),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       },
       builder: (context, state) {
@@ -283,7 +420,7 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
             enableReactionPopup: true,
             enableScrollToBottomButton: true,
             enableDoubleTapToLike: true,
-            enableReplySnackBar: false,
+            enableReplySnackBar: true,
             enableChatSeparator: true,
             receiptsBuilderVisibility: true,
           ),
@@ -354,6 +491,18 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               color: AppColorsFromTheme.grayForTheme(context),
               borderRadius: BorderRadius.circular(16),
+              onMessageRead: (message) {
+                // Fired by chatview when an incoming bubble scrolls into view.
+                // Parse the backend integer ID and dispatch seen receipt.
+                final msgId = int.tryParse(message.id);
+                if (msgId == null) return;
+                context.read<ChatBloc>().add(
+                      MarkMessagesSeen(
+                        conversationId: widget.args.conversationId,
+                        messageId: msgId,
+                      ),
+                    );
+              },
             ),
             outgoingChatBubbleConfig: ChatBubble(
               receiptsWidgetConfig: ReceiptsWidgetConfig(
@@ -395,6 +544,15 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
             ),
           ),
 
+          // ─── Reply popup (long-press on message) ─────────────────────────
+          replyPopupConfig: ReplyPopupConfiguration(
+            backgroundColor: scaffoldBg,
+            buttonTextStyle: AppTextStyle.interMedium14
+                .copyWith(color: colorScheme.onSurface),
+            topBorderColor: colorScheme.outlineVariant,
+            onUnsendTap: _onUnsendTap,
+          ),
+
           // ─── Reaction popup ──────────────────────────────────────────────
           reactionPopupConfig: ReactionPopupConfiguration(
             showGlassMorphismEffect: true,
@@ -404,7 +562,119 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
-            userReactionCallback: (message, emoji) {},
+            userReactionCallback: (message, emoji) {
+              final chatBloc = context.read<ChatBloc>();
+              final conversationId = chatBloc.state.currentConversationId;
+              if (conversationId == null) return;
+
+              // Resolve real int ID (temp IDs use _tempIdToRealId map)
+              final resolvedIdStr =
+                  _tempIdToRealId[message.id] ?? message.id;
+              final messageId = int.tryParse(resolvedIdStr);
+              if (messageId == null) return;
+
+              // ⚠️ Do NOT use `message.reaction` from the chatview callback.
+              // chatview applies its own optimistic UI update BEFORE calling
+              // this callback, so the emoji is already in reactedUserIds by
+              // the time we get here — making alreadyReactedWithEmoji always
+              // true and firing DELETE instead of POST.
+              //
+              // Instead check the server-confirmed domain state, which only
+              // updates after the socket event / API response confirms it.
+              final domainMsg = chatBloc.state.messages
+                  .cast<MessageEntity?>()
+                  .firstWhere(
+                    (m) => m?.id == messageId,
+                    orElse: () => null,
+                  );
+
+              final alreadyReactedWithEmoji = domainMsg != null &&
+                  domainMsg.reactions.any(
+                    (r) => r.userId == currentUserId && r.reaction == emoji,
+                  );
+
+              if (alreadyReactedWithEmoji) {
+                chatBloc.add(
+                  RemoveReaction(
+                    conversationId: conversationId,
+                    messageId: messageId,
+                  ),
+                );
+              } else {
+                chatBloc.add(
+                  ReactToMessage(
+                    conversationId: conversationId,
+                    messageId: messageId,
+                    emoji: emoji,
+                  ),
+                );
+              }
+            },
+          ),
+
+          // ─── Message reaction & bottom sheet configuration ───────────────
+          messageConfig: MessageConfiguration(
+            messageReactionConfig: MessageReactionConfiguration(
+              backgroundColor: AppColorsFromTheme.grayForTheme(context),
+              borderColor: scaffoldBg,
+              borderWidth: 1.5,
+              borderRadius: BorderRadius.circular(16),
+              reactionSize: 14,
+              reactionCountTextStyle: AppTextStyle.interMedium12
+                  .copyWith(color: colorScheme.onSurface),
+              reactionsBottomSheetConfig: ReactionsBottomSheetConfiguration(
+                backgroundColor: scaffoldBg,
+                reactedUserTextStyle: AppTextStyle.interMedium14
+                    .copyWith(color: colorScheme.onSurface),
+                reactionSize: 22,
+                profileCircleRadius: 18,
+                bottomSheetPadding: const EdgeInsets.only(
+                  right: 16,
+                  left: 16,
+                  top: 20,
+                  bottom: 20,
+                ),
+                reactionWidgetPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                reactionWidgetMargin: const EdgeInsets.only(bottom: 10),
+                reactionWidgetDecoration: BoxDecoration(
+                  color: AppColorsFromTheme.grayForTheme(context),
+                  borderRadius: const BorderRadius.all(Radius.circular(14)),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant,
+                    width: 1,
+                  ),
+                ),
+                reactedUserCallback: (reactedUser, reactionEmoji) {
+                  if (reactedUser.id == currentUserId.toString()) {
+                    Navigator.of(context).pop();
+                    Message? targetMsg;
+                    for (final m in ctrl.initialMessageList) {
+                      final uIdx =
+                          m.reaction.reactedUserIds.indexOf(reactedUser.id);
+                      if (uIdx != -1 &&
+                          m.reaction.reactions[uIdx] == reactionEmoji) {
+                        targetMsg = m;
+                        break;
+                      }
+                    }
+                    if (targetMsg != null) {
+                      final resolvedIdStr =
+                          _tempIdToRealId[targetMsg.id] ?? targetMsg.id;
+                      final messageId = int.tryParse(resolvedIdStr);
+                      if (messageId != null) {
+                        context.read<ChatBloc>().add(
+                              RemoveReaction(
+                                conversationId: widget.args.conversationId,
+                                messageId: messageId,
+                              ),
+                            );
+                      }
+                    }
+                  }
+                },
+              ),
+            ),
           ),
 
           // ─── Input bar ───────────────────────────────────────────────────

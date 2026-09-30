@@ -36,6 +36,7 @@ import 'package:archilink/features/Chat/domain/data_source/chat_websocket_remote
 import 'package:archilink/features/Chat/domain/repo/chat_repo.dart';
 import 'package:archilink/features/Chat/domain/repo/chat_websocket_repo.dart';
 import 'package:archilink/features/Chat/domain/usecase/listen_to_chat_usecase.dart';
+import 'package:archilink/features/Chat/domain/usecase/mark_messages_seen_usecase.dart';
 import 'package:archilink/features/Chat/presentation/manager/bloc/chat_bloc.dart';
 import 'package:archilink/features/Create_Post/data/data_source/create_post_remote_date_source_impl.dart';
 import 'package:archilink/features/Edit_Profile/data/data_source/edit_profile_remote_data_source_impl.dart';
@@ -279,6 +280,7 @@ Future<void> initServiceLocator({
   ///Usecases
   ///---------
   sl.registerLazySingleton(() => ListenToChatUsecase(sl()));
+  sl.registerLazySingleton(() => MarkMessagesSeenUsecase(sl<ChatRepo>()));
 
   ///---------
   ///Bloc
@@ -311,7 +313,7 @@ Future<void> initServiceLocator({
     ),
   );
   sl.registerLazySingleton(() => UniversitiesCubit(sl<EditProfileRepo>()));
-  sl.registerLazySingleton(() => ChatBloc(sl(), sl<ChatRepo>()));
+  sl.registerLazySingleton(() => ChatBloc(sl(), sl<ChatRepo>(), sl<MarkMessagesSeenUsecase>()));
   sl.registerFactory(() => FollowCubit(sl<ProfileRepo>()));
   sl.registerFactory(
     () => SettingsSessionCubit(

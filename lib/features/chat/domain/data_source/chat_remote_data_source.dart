@@ -12,4 +12,27 @@ abstract class ChatRemoteDataSource {
     required int conversationId,
     required String content,
   });
+
+  Future<void> deleteMessage({
+    required int conversationId,
+    required int messageId,
+  });
+
+  Future<void> reactMessage({
+    required int conversationId,
+    required int messageId,
+    required String reaction,
+  });
+
+  Future<void> removeReaction({
+    required int conversationId,
+    required int messageId,
+  });
+
+  /// POST chats/{conversationId}/seen
+  /// Body: { "last_seen_message_id": lastSeenMessageId }
+  Future<void> markMessagesSeen({
+    required int conversationId,
+    required int lastSeenMessageId,
+  });
 }
