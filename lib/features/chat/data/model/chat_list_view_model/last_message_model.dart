@@ -9,6 +9,7 @@ class LastMessageModel extends LastMessageEntity {
     required super.content,
     required super.sentAt,
     super.editedAt,
+    super.senderId,
   });
 
   factory LastMessageModel.fromJson(Map<String, dynamic> json) {
@@ -21,6 +22,8 @@ class LastMessageModel extends LastMessageEntity {
       editedAt: json['edited_at'] != null
           ? DateTime.tryParse(json['edited_at'].toString())
           : null,
+      senderId: (json['user_id'] as num?)?.toInt() ??
+          (json['sender_id'] as num?)?.toInt(),
     );
   }
 

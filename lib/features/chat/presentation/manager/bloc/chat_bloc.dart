@@ -23,6 +23,9 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
   int? _subscribedUserId;
   final Map<String, String> _tempToRealId = {};
 
+  /// Periodic timer owned by the bloc — pings presence every 10 s.
+  Timer? _presenceTimer;
+
   ChatBloc(this._listenToChat, this._chatRepo, this._markMessagesSeen)
       : super(ChatState()) {
     on<SubscribeToChat>(_onSubscribe);
@@ -36,6 +39,8 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
     on<ReactToMessage>(_onReactToMessage);
     on<RemoveReaction>(_onRemoveReaction);
     on<MarkMessagesSeen>(_onMarkMessagesSeen);
+    on<StartPresencePing>(_onStartPresencePing);
+    on<StopPresencePing>(_onStopPresencePing);
   }
 
   Future<void> _onSubscribe(
@@ -383,8 +388,37 @@ class ChatBloc extends Bloc<ChatBlocEvent, ChatState> {
 
   @override
   Future<void> close() {
+    _presenceTimer?.cancel();
     _subscription?.cancel();
     return super.close();
+  }
+
+  // ─── Presence ping / leave ────────────────────────────────────────────────
+
+  Future<void> _onStartPresencePing(
+    StartPresencePing event,
+    Emitter<ChatState> emit,
+  ) async {
+    // Cancel any existing timer (e.g. navigating between chats rapidly).
+    _presenceTimer?.cancel();
+
+    // Immediate first ping.
+    await _chatRepo.pingPresence(conversationId: event.conversationId);
+
+    // Keep pinging every 10 seconds.
+    _presenceTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      _chatRepo.pingPresence(conversationId: event.conversationId);
+    });
+  }
+
+  Future<void> _onStopPresencePing(
+    StopPresencePing event,
+    Emitter<ChatState> emit,
+  ) async {
+    _presenceTimer?.cancel();
+    _presenceTimer = null;
+    // Fire-and-forget the leave signal.
+    await _chatRepo.leavePresence(conversationId: event.conversationId);
   }
 
   // ─── Helpers ─────────────────────────────────────────────────────────────

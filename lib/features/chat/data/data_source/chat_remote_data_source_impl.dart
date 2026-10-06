@@ -148,4 +148,22 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       throw AppException.handelDioException(e);
     }
   }
+
+  @override
+  Future<void> pingPresence({required int conversationId}) async {
+    try {
+      await apiService.post('chats/$conversationId/presence/ping');
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
+
+  @override
+  Future<void> leavePresence({required int conversationId}) async {
+    try {
+      await apiService.post('chats/$conversationId/presence/leave');
+    } on DioException catch (e) {
+      throw AppException.handelDioException(e);
+    }
+  }
 }

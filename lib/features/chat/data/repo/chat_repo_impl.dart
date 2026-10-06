@@ -133,4 +133,30 @@ class ChatRepoImpl extends ChatRepo {
       return left(UnknownFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, void>> pingPresence(
+      {required int conversationId}) async {
+    try {
+      await remoteDataSource.pingPresence(conversationId: conversationId);
+      return right(null);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> leavePresence(
+      {required int conversationId}) async {
+    try {
+      await remoteDataSource.leavePresence(conversationId: conversationId);
+      return right(null);
+    } on AppException catch (e) {
+      return left(mapExceptionToFailure(e));
+    } catch (_) {
+      return left(UnknownFailure());
+    }
+  }
 }

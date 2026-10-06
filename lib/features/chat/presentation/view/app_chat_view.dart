@@ -21,8 +21,7 @@ class AppChatView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentUserId =
-        context.read<CurrentUserCubit>().state.id ?? 0;
+    final currentUserId = context.read<CurrentUserCubit>().state.id ?? 0;
 
     return Scaffold(
       body: SafeArea(
@@ -61,9 +60,37 @@ enum _ChatAction { viewMembers, muteNotifications, exportChat, starMessage }
 ///  • updates temp-message status on delivery / failure
 ///  • renders based on [ChatState.chatController]
 class _ChatViewBodyState extends State<_ChatViewBody> {
+  late ChatBloc _chatBloc;
   String? _lastHandledSentTempId;
   String? _lastHandledFailedTempId;
   final Map<String, String> _tempIdToRealId = {};
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _chatBloc = context.read<ChatBloc>();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Dispatch after first frame so the BLoC is fully mounted.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _chatBloc.add(
+          StartPresencePing(widget.args.conversationId),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _chatBloc.add(
+      StopPresencePing(widget.args.conversationId),
+    );
+    super.dispose();
+  }
 
   // ─── Delete (unsend) tap ─────────────────────────────────────────────────
   void _onUnsendTap(Message message) {
@@ -78,7 +105,8 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
 
     // Look up the real backend ID. If it was confirmed by the socket/API,
     // it will be in _tempIdToRealId.  Otherwise message.id IS the real ID.
-    final resolvedIdStr = _tempIdToRealId[chatViewMessageId] ?? chatViewMessageId;
+    final resolvedIdStr =
+        _tempIdToRealId[chatViewMessageId] ?? chatViewMessageId;
     final messageId = int.tryParse(resolvedIdStr);
 
     // Guard: if we can't resolve a numeric ID it's still pending — the
@@ -86,7 +114,9 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
     if (messageId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please wait for the message to be delivered before deleting.'),
+          content: Text(
+            'Please wait for the message to be delivered before deleting.',
+          ),
         ),
       );
       return;
@@ -100,7 +130,9 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
         !chatBloc.state.messages.any((m) => m.id == messageId)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please wait for the message to be delivered before deleting.'),
+          content: Text(
+            'Please wait for the message to be delivered before deleting.',
+          ),
         ),
       );
       return;
@@ -126,12 +158,12 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
     ).then((confirmed) {
       if (confirmed == true && mounted) {
         context.read<ChatBloc>().add(
-              DeleteChatMessage(
-                conversationId: conversationId,
-                messageId: messageId,
-                chatViewMessageId: chatViewMessageId,
-              ),
-            );
+          DeleteChatMessage(
+            conversationId: conversationId,
+            messageId: messageId,
+            chatViewMessageId: chatViewMessageId,
+          ),
+        );
       }
     });
   }
@@ -294,13 +326,14 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
           _lastHandledSentTempId = state.lastSentTempId;
 
           if (state.lastSentMessage != null) {
-            _tempIdToRealId[state.lastSentTempId!] =
-                state.lastSentMessage!.id.toString();
+            _tempIdToRealId[state.lastSentTempId!] = state.lastSentMessage!.id
+                .toString();
           }
 
           final realIdStr = state.lastSentMessage?.id.toString();
-          final idx = ctrl.initialMessageList
-              .indexWhere((m) => m.id == state.lastSentTempId);
+          final idx = ctrl.initialMessageList.indexWhere(
+            (m) => m.id == state.lastSentTempId,
+          );
           if (idx != -1) {
             final existing = ctrl.initialMessageList[idx];
             ctrl.initialMessageList[idx] = Message(
@@ -323,14 +356,16 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
         if (state.failedTempId != null &&
             state.failedTempId != _lastHandledFailedTempId) {
           _lastHandledFailedTempId = state.failedTempId;
-          final idx = ctrl.initialMessageList
-              .indexWhere((m) => m.id == state.failedTempId);
+          final idx = ctrl.initialMessageList.indexWhere(
+            (m) => m.id == state.failedTempId,
+          );
           if (idx != -1) {
             ctrl.initialMessageList[idx].setStatus = MessageStatus.undelivered;
           }
           if (state.errorMessage != null) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
           }
         }
         // ─ Delete failure: show error snackbar
@@ -351,8 +386,7 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
         }
 
         // ─ Error with retry
-        if (state.chatController == null &&
-            state.status == ChatStatus.error) {
+        if (state.chatController == null && state.status == ChatStatus.error) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -361,15 +395,15 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                 children: [
                   Text(
                     state.errorMessage ?? 'Something went wrong',
-                    style: AppTextStyle.interMedium14
-                        .copyWith(color: colorScheme.onSurface),
+                    style: AppTextStyle.interMedium14.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context
-                        .read<ChatBloc>()
-                        .add(_fetchInitialEvent()),
+                    onPressed: () =>
+                        context.read<ChatBloc>().add(_fetchInitialEvent()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -384,7 +418,8 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
         }
 
         final ctrl = state.chatController!;
-        final hasProfilePic = widget.args.profileImage != null &&
+        final hasProfilePic =
+            widget.args.profileImage != null &&
             widget.args.profileImage!.isNotEmpty;
 
         return ChatView(
@@ -435,11 +470,12 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
             chatTitle: widget.args.chatTitle.isNotEmpty
                 ? widget.args.chatTitle
                 : 'Chat',
-            chatTitleTextStyle: AppTextStyle.interSemiBold16
-                .copyWith(color: colorScheme.onSurface),
-            userStatus: 'Online',
-            userStatusTextStyle: AppTextStyle.interRegular10
-                .copyWith(color: Colors.green),
+            chatTitleTextStyle: AppTextStyle.interSemiBold16.copyWith(
+              color: colorScheme.onSurface,
+            ),
+            userStatusTextStyle: AppTextStyle.interRegular10.copyWith(
+              color: Colors.green,
+            ),
             actions: [
               PopupMenuButton<_ChatAction>(
                 icon: Icon(Icons.menu, color: colorScheme.onSurface),
@@ -476,19 +512,19 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
             backgroundColor: scaffoldBg,
           ),
 
-          // ─── Profile circle ─────────────────────────────────────────────
+          // ─── Profile circle (hidden — no avatar next to bubbles) ─────────
           profileCircleConfig: const ProfileCircleConfiguration(
             profileImageUrl: '',
-            circleRadius: 16,
+            circleRadius: 0,
           ),
 
           // ─── Bubbles ────────────────────────────────────────────────────
           chatBubbleConfig: ChatBubbleConfiguration(
             inComingChatBubbleConfig: ChatBubble(
-              textStyle: AppTextStyle.interRegular16
-                  .copyWith(color: colorScheme.onSurface),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              textStyle: AppTextStyle.interRegular16.copyWith(
+                color: colorScheme.onSurface,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               color: AppColorsFromTheme.grayForTheme(context),
               borderRadius: BorderRadius.circular(16),
               onMessageRead: (message) {
@@ -497,11 +533,11 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                 final msgId = int.tryParse(message.id);
                 if (msgId == null) return;
                 context.read<ChatBloc>().add(
-                      MarkMessagesSeen(
-                        conversationId: widget.args.conversationId,
-                        messageId: msgId,
-                      ),
-                    );
+                  MarkMessagesSeen(
+                    conversationId: widget.args.conversationId,
+                    messageId: msgId,
+                  ),
+                );
               },
             ),
             outgoingChatBubbleConfig: ChatBubble(
@@ -511,22 +547,35 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                   return switch (status) {
                     MessageStatus.pending => const Padding(
                       padding: EdgeInsets.only(left: 4),
-                      child: Icon(Icons.access_time_rounded,
-                          size: 14, color: AppColors.gray),
+                      child: Icon(
+                        Icons.access_time_rounded,
+                        size: 14,
+                        color: AppColors.gray,
+                      ),
                     ),
                     MessageStatus.delivered => const Padding(
                       padding: EdgeInsets.only(left: 4),
-                      child:
-                          Icon(Icons.done_all, size: 16, color: AppColors.gray),
+                      child: Icon(
+                        Icons.done_all,
+                        size: 16,
+                        color: AppColors.gray,
+                      ),
                     ),
-                    MessageStatus.read => const Padding(
-                      padding: EdgeInsets.only(left: 4),
-                      child: Icon(Icons.done_all, size: 16, color: Colors.blue),
+                    MessageStatus.read => Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Icon(
+                        Icons.done_all,
+                        size: 16,
+                        color: colorScheme.primary,
+                      ),
                     ),
                     MessageStatus.undelivered => const Padding(
                       padding: EdgeInsets.only(left: 4),
-                      child: Icon(Icons.error_outline,
-                          size: 16, color: Colors.red),
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 16,
+                        color: Colors.red,
+                      ),
                     ),
                   };
                 },
@@ -535,10 +584,10 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                 color: AppColorsFromTheme.grayForTheme(context),
                 width: 1.5,
               ),
-              textStyle: AppTextStyle.interRegular16
-                  .copyWith(color: colorScheme.onSurface),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              textStyle: AppTextStyle.interRegular16.copyWith(
+                color: colorScheme.onSurface,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               color: scaffoldBg,
               borderRadius: BorderRadius.circular(16),
             ),
@@ -547,8 +596,9 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
           // ─── Reply popup (long-press on message) ─────────────────────────
           replyPopupConfig: ReplyPopupConfiguration(
             backgroundColor: scaffoldBg,
-            buttonTextStyle: AppTextStyle.interMedium14
-                .copyWith(color: colorScheme.onSurface),
+            buttonTextStyle: AppTextStyle.interMedium14.copyWith(
+              color: colorScheme.onSurface,
+            ),
             topBorderColor: colorScheme.outlineVariant,
             onUnsendTap: _onUnsendTap,
           ),
@@ -568,8 +618,7 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
               if (conversationId == null) return;
 
               // Resolve real int ID (temp IDs use _tempIdToRealId map)
-              final resolvedIdStr =
-                  _tempIdToRealId[message.id] ?? message.id;
+              final resolvedIdStr = _tempIdToRealId[message.id] ?? message.id;
               final messageId = int.tryParse(resolvedIdStr);
               if (messageId == null) return;
 
@@ -583,12 +632,10 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
               // updates after the socket event / API response confirms it.
               final domainMsg = chatBloc.state.messages
                   .cast<MessageEntity?>()
-                  .firstWhere(
-                    (m) => m?.id == messageId,
-                    orElse: () => null,
-                  );
+                  .firstWhere((m) => m?.id == messageId, orElse: () => null);
 
-              final alreadyReactedWithEmoji = domainMsg != null &&
+              final alreadyReactedWithEmoji =
+                  domainMsg != null &&
                   domainMsg.reactions.any(
                     (r) => r.userId == currentUserId && r.reaction == emoji,
                   );
@@ -620,12 +667,14 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
               borderWidth: 1.5,
               borderRadius: BorderRadius.circular(16),
               reactionSize: 14,
-              reactionCountTextStyle: AppTextStyle.interMedium12
-                  .copyWith(color: colorScheme.onSurface),
+              reactionCountTextStyle: AppTextStyle.interMedium12.copyWith(
+                color: colorScheme.onSurface,
+              ),
               reactionsBottomSheetConfig: ReactionsBottomSheetConfiguration(
                 backgroundColor: scaffoldBg,
-                reactedUserTextStyle: AppTextStyle.interMedium14
-                    .copyWith(color: colorScheme.onSurface),
+                reactedUserTextStyle: AppTextStyle.interMedium14.copyWith(
+                  color: colorScheme.onSurface,
+                ),
                 reactionSize: 22,
                 profileCircleRadius: 18,
                 bottomSheetPadding: const EdgeInsets.only(
@@ -634,8 +683,10 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                   top: 20,
                   bottom: 20,
                 ),
-                reactionWidgetPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                reactionWidgetPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 reactionWidgetMargin: const EdgeInsets.only(bottom: 10),
                 reactionWidgetDecoration: BoxDecoration(
                   color: AppColorsFromTheme.grayForTheme(context),
@@ -650,8 +701,9 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                     Navigator.of(context).pop();
                     Message? targetMsg;
                     for (final m in ctrl.initialMessageList) {
-                      final uIdx =
-                          m.reaction.reactedUserIds.indexOf(reactedUser.id);
+                      final uIdx = m.reaction.reactedUserIds.indexOf(
+                        reactedUser.id,
+                      );
                       if (uIdx != -1 &&
                           m.reaction.reactions[uIdx] == reactionEmoji) {
                         targetMsg = m;
@@ -664,11 +716,11 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
                       final messageId = int.tryParse(resolvedIdStr);
                       if (messageId != null) {
                         context.read<ChatBloc>().add(
-                              RemoveReaction(
-                                conversationId: widget.args.conversationId,
-                                messageId: messageId,
-                              ),
-                            );
+                          RemoveReaction(
+                            conversationId: widget.args.conversationId,
+                            messageId: messageId,
+                          ),
+                        );
                       }
                     }
                   }
@@ -681,16 +733,16 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
           sendMessageConfig: SendMessageConfiguration(
             allowRecordingVoice: false,
             shouldSendImageWithText: false,
-            textFieldBackgroundColor:
-                AppColorsFromTheme.grayForTheme(context),
+            textFieldBackgroundColor: AppColorsFromTheme.grayForTheme(context),
             textFieldConfig: TextFieldConfiguration(
               margin: const EdgeInsetsDirectional.all(15),
               hintText: 'Message',
               hintStyle: AppTextStyle.interRegular16.copyWith(
                 color: colorScheme.onSurface.withValues(alpha: 0.4),
               ),
-              textStyle: AppTextStyle.interRegular16
-                  .copyWith(color: colorScheme.onSurface),
+              textStyle: AppTextStyle.interRegular16.copyWith(
+                color: colorScheme.onSurface,
+              ),
               borderRadius: BorderRadius.circular(16),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -699,8 +751,10 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
               leadingActions: (context, controller) => const [],
               trailingActions: (context, controller) => const [],
             ),
-            sendButtonIcon:
-                Icon(Icons.send_outlined, color: colorScheme.primary),
+            sendButtonIcon: Icon(
+              Icons.send_outlined,
+              color: colorScheme.primary,
+            ),
             replyMessageColor: colorScheme.onSurface,
             replyDialogColor: AppColorsFromTheme.grayForTheme(context),
             replyTitleColor: colorScheme.primary,
@@ -710,5 +764,4 @@ class _ChatViewBodyState extends State<_ChatViewBody> {
       },
     );
   }
-
 }

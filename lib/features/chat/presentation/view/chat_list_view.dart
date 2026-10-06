@@ -30,9 +30,7 @@ class ChatListView extends StatelessWidget {
       child: Scaffold(
         body: MultiBlocProvider(
           providers: [
-            BlocProvider.value(
-              value: sl<ChatBloc>(),
-            ),
+            BlocProvider.value(value: sl<ChatBloc>()),
             BlocProvider(
               create: (context) => ChatListCubit(sl<ChatRepo>())..getChats(),
             ),
@@ -99,16 +97,27 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
   final ScrollController _scrollController = ScrollController();
   ChatSocketEvent? _lastHandledSocketEvent;
 
+  /// The conversationId of the chat currently open in [AppChatView].
+  /// While non-null, incoming messages for that conversation must NOT
+  /// increment the unread badge — the user is already reading them.
+  int? _openConversationId;
+
+  /// Tracks readOutboxMaxId per chat so we can colour the seen icon in tiles.
+  /// Seeded from [widget.chats] and updated by [MessagesSeenEvent].
+  final Map<String, int> _readOutboxMaxIds = {};
+
   @override
   void initState() {
     super.initState();
+    _seedReadOutboxMaxIds(widget.chats);
     chatListController = ChatListController(
       initialChatList: _mapChatsToItems(widget.chats),
       scrollController: _scrollController,
     );
 
     // Subscribe to the current user's channel as soon as the user enters the chats view
-    final currentUserId = context.read<CurrentUserCubit>().state.id ??
+    final currentUserId =
+        context.read<CurrentUserCubit>().state.id ??
         sl<CurrentUserCubit>().state.id;
     if (currentUserId != null) {
       context.read<ChatBloc>().add(SubscribeToChat(currentUserId));
@@ -122,10 +131,18 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
     });
   }
 
+  void _seedReadOutboxMaxIds(List<ChatEntity> chats) {
+    for (final chat in chats) {
+      final id = chat.readOutboxMaxId;
+      if (id != null) _readOutboxMaxIds[chat.id.toString()] = id;
+    }
+  }
+
   @override
   void didUpdateWidget(covariant ChatListViewBody oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.chats != oldWidget.chats) {
+      _seedReadOutboxMaxIds(widget.chats);
       final items = _mapChatsToItems(widget.chats);
       chatListController.chatListMap.clear();
       chatListController.loadMoreChats(items);
@@ -146,23 +163,27 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
         final chatIdStr = message.chatId.toString();
         if (chatListController.chatListMap.containsKey(chatIdStr)) {
           // Identify the matching chat and update its last message and unread count
-          chatListController.updateChat(
-            chatIdStr,
-            (previousChat) {
-              final isFromOther = message.sender.id != currentUserId;
-              final currentUnread = previousChat.unreadCount ?? 0;
-              return previousChat.copyWith(
-                lastMessage: Message(
-                  id: message.id.toString(),
-                  message: message.content,
-                  createdAt: message.sentAt ?? DateTime.now(),
-                  sentBy: message.sender.id.toString(),
-                  status: MessageStatus.delivered,
-                ),
-                unreadCount: isFromOther ? currentUnread + 1 : currentUnread,
-              );
-            },
-          );
+          chatListController.updateChat(chatIdStr, (previousChat) {
+            final isFromOther = message.sender.id != currentUserId;
+            final currentUnread = previousChat.unreadCount ?? 0;
+
+            // If the user is currently inside this conversation, all incoming
+            // messages are immediately visible — do NOT bump the unread badge.
+            final isCurrentlyOpen = message.chatId == _openConversationId;
+
+            return previousChat.copyWith(
+              lastMessage: Message(
+                id: message.id.toString(),
+                message: message.content,
+                createdAt: message.sentAt ?? DateTime.now(),
+                sentBy: message.sender.id.toString(),
+                status: MessageStatus.delivered,
+              ),
+              unreadCount: (isFromOther && !isCurrentlyOpen)
+                  ? currentUnread + 1
+                  : currentUnread,
+            );
+          });
         } else {
           // If a new conversation was created that isn't in our list yet, add it locally
           final isFromOther = message.sender.id != currentUserId;
@@ -191,20 +212,31 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
           if (item?.lastMessage?.id == messageId.toString()) {
             chatListController.updateChat(
               chatIdStr,
-              (previousChat) => previousChat.copyWith(
-                lastMessage: null,
-              ),
+              (previousChat) => previousChat.copyWith(lastMessage: null),
             );
           }
         }
 
-      case MessagesSeenEvent(:final chatId):
+      case MessagesSeenEvent(
+        :final chatId,
+        :final userId,
+        :final readOutboxMaxId,
+      ):
         final chatIdStr = chatId.toString();
-        if (chatListController.chatListMap.containsKey(chatIdStr)) {
-          chatListController.updateChat(
-            chatIdStr,
-            (previousChat) => previousChat.copyWith(unreadCount: 0),
-          );
+        if (userId == currentUserId) {
+          // WE read the chat — clear the unread badge.
+          if (chatListController.chatListMap.containsKey(chatIdStr)) {
+            chatListController.updateChat(
+              chatIdStr,
+              (previousChat) => previousChat.copyWith(unreadCount: 0),
+            );
+          }
+        } else {
+          // The OTHER user read our messages — update readOutboxMaxId so the
+          // seen icon in the tile switches to the primary (green) colour.
+          setState(() {
+            _readOutboxMaxIds[chatIdStr] = readOutboxMaxId;
+          });
         }
 
       case MessageReactionAddedEvent():
@@ -215,6 +247,9 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
   }
 
   List<ChatListItem> _mapChatsToItems(List<ChatEntity> chats) {
+    // Grab current user ID once — used to identify outgoing last messages.
+    final currentUserIdStr = sl<CurrentUserCubit>().state.id?.toString();
+
     return chats.map((chat) {
       final displayName = chat.chatName.isNotEmpty
           ? chat.chatName
@@ -222,11 +257,35 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
 
       Message? lastMessage;
       if (chat.lastMessage != null) {
+        // ── Resolve who sent the last message ─────────────────────────────
+        // Priority 1: senderId explicitly returned by the API (most reliable).
+        // Priority 2: if unreadCount > 0, the last message is definitely from
+        //             the OTHER user (they sent something new we haven't read).
+        // Priority 3: if lastMessage.id > readInboxMaxId, the message sits
+        //             beyond the last one we RECEIVED, meaning WE sent it.
+        // Fallback: assume it came from the contact (conservative).
+        final String sentBy;
+        if (chat.lastMessage!.senderId != null) {
+          sentBy = chat.lastMessage!.senderId!.toString();
+        } else if (chat.unreadCount > 0) {
+          // There are unread messages → last message is from the other user.
+          sentBy = chat.contact.id.toString();
+        } else if (currentUserIdStr != null &&
+            chat.readInboxMaxId != null &&
+            chat.lastMessage!.id > chat.readInboxMaxId!) {
+          // Last message ID exceeds the highest message we received from others
+          // → it must be an outgoing message we sent.
+          sentBy = currentUserIdStr;
+        } else {
+          // Cannot determine → default to contact (no seen icon shown).
+          sentBy = chat.contact.id.toString();
+        }
+
         lastMessage = Message(
           id: chat.lastMessage!.id.toString(),
           message: chat.lastMessage!.content,
           createdAt: chat.lastMessage!.sentAt,
-          sentBy: chat.contact.id.toString(),
+          sentBy: sentBy,
           status: MessageStatus.delivered,
         );
       }
@@ -294,9 +353,7 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             prefixIcon: null,
-            textFieldBackgroundColor: AppColorsFromTheme.grayForTheme(
-              context,
-            ),
+            textFieldBackgroundColor: AppColorsFromTheme.grayForTheme(context),
             textEditingController: TextEditingController(),
             suffixIcon: IconButton(
               splashRadius: 1,
@@ -351,6 +408,9 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
           ),
           tileConfig: ListTileConfig(
             lastMessageMaxLines: 2,
+            // Disable the built-in status icon — we draw it ourselves below
+            // so we can control visibility (only on outgoing messages).
+            showLastMessageStatus: false,
             timeConfig: LastMessageTimeConfig(
               timeBuilder: (time) {
                 return Text(
@@ -387,20 +447,18 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
                                 height: 14,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 1.5,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                             ),
                             errorWidget: (context, url, error) =>
                                 SvgPicture.asset(
-                              Assets.assetsIconsUser,
-                              colorFilter: ColorFilter.mode(
-                                Theme.of(context).colorScheme.onSurface,
-                                BlendMode.srcIn,
-                              ),
-                            ),
+                                  Assets.assetsIconsUser,
+                                  colorFilter: ColorFilter.mode(
+                                    Theme.of(context).colorScheme.onSurface,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
                           ),
                         )
                       : SvgPicture.asset(
@@ -413,15 +471,91 @@ class _ChatListViewBodyState extends State<ChatListViewBody> {
                 );
               },
             ),
-            onTap: (chat) {
-              Navigator.of(context, rootNavigator: true).pushNamed(
-                AppChatView.name,
-                arguments: ChatArgs(
-                  conversationId: int.tryParse(chat.id) ?? 0,
-                  chatTitle: chat.name,
-                  profileImage: chat.imageUrl,
+            // lastMessageTileBuilder: render the text with a leading seen icon
+            // ONLY when the last message was sent by the current user.
+            lastMessageTileBuilder: (chat) {
+              final lastMsg = chat.lastMessage;
+              if (lastMsg == null) return SizedBox.shrink();
+
+              final currentUserIdStr = context
+                  .read<CurrentUserCubit>()
+                  .state
+                  .id
+                  ?.toString();
+              final isMine = lastMsg.sentBy == currentUserIdStr;
+
+              // Determine seen status from our readOutboxMaxId map.
+              final outboxMax = _readOutboxMaxIds[chat.id] ?? 0;
+              final msgId = int.tryParse(lastMsg.id) ?? 0;
+              final isSeen = isMine && outboxMax > 0 && msgId <= outboxMax;
+
+              final primary = Theme.of(context).colorScheme.primary;
+              final gray = AppColors.gray;
+
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    if (isMine) ...[
+                      Icon(
+                        Icons.done_all,
+                        size: 14,
+                        color: isSeen ? primary : gray,
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                    Expanded(
+                      child: Text(
+                        lastMsg.message,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyle.interMedium14.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               );
+            },
+            onTap: (chat) {
+              final chatId = chat.id;
+              final conversationId = int.tryParse(chatId) ?? 0;
+
+              // Immediately zero out the unread badge when the user enters
+              if (chatListController.chatListMap.containsKey(chatId) &&
+                  (chatListController.chatListMap[chatId]?.unreadCount ?? 0) >
+                      0) {
+                chatListController.updateChat(
+                  chatId,
+                  (prev) => prev.copyWith(unreadCount: 0),
+                );
+              }
+
+              // Mark this conversation as open so incoming WebSocket messages
+              // don't increment the unread badge while the user is viewing it.
+              setState(() => _openConversationId = conversationId);
+
+              // Resolve the readOutboxMaxId from the original ChatEntity
+              final chatEntity = widget.chats.cast<ChatEntity?>().firstWhere(
+                (c) => c?.id.toString() == chatId,
+                orElse: () => null,
+              );
+
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(
+                    AppChatView.name,
+                    arguments: ChatArgs(
+                      conversationId: conversationId,
+                      chatTitle: chat.name,
+                      profileImage: chat.imageUrl,
+                      readOutboxMaxId: chatEntity?.readOutboxMaxId,
+                    ),
+                  )
+                  .then((_) {
+                    // User popped back — clear the open-conversation guard.
+                    if (mounted) setState(() => _openConversationId = null);
+                  });
             },
             padding: const EdgeInsets.all(12),
             middleWidgetPadding: const EdgeInsets.symmetric(horizontal: 12),

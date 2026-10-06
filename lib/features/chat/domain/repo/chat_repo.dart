@@ -38,4 +38,12 @@ abstract class ChatRepo {
     required int conversationId,
     required int lastSeenMessageId,
   });
+
+  /// POST chats/{conversationId}/presence/ping
+  /// Fire-and-forget — call every 10 s while the chat view is open.
+  Future<Either<Failure, void>> pingPresence({required int conversationId});
+
+  /// POST chats/{conversationId}/presence/leave
+  /// Fire-and-forget — call when the user leaves the chat view.
+  Future<Either<Failure, void>> leavePresence({required int conversationId});
 }

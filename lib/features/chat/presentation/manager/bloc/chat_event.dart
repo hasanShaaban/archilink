@@ -111,3 +111,18 @@ class MarkMessagesSeen extends ChatBlocEvent {
     required this.messageId,
   });
 }
+
+/// Fired when the user enters a chat view.
+/// The bloc immediately pings the presence endpoint and starts a 10-second
+/// periodic timer that keeps pinging until [StopPresencePing] is dispatched.
+class StartPresencePing extends ChatBlocEvent {
+  final int conversationId;
+  StartPresencePing(this.conversationId);
+}
+
+/// Fired when the user leaves a chat view.
+/// Cancels the periodic ping timer and posts to the leave endpoint.
+class StopPresencePing extends ChatBlocEvent {
+  final int conversationId;
+  StopPresencePing(this.conversationId);
+}

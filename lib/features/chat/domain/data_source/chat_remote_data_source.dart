@@ -35,4 +35,12 @@ abstract class ChatRemoteDataSource {
     required int conversationId,
     required int lastSeenMessageId,
   });
+
+  /// POST chats/{conversationId}/presence/ping
+  /// Fire-and-forget; should be called every 10 s while the chat is open.
+  Future<void> pingPresence({required int conversationId});
+
+  /// POST chats/{conversationId}/presence/leave
+  /// Fire-and-forget; call when the user leaves the chat view.
+  Future<void> leavePresence({required int conversationId});
 }
